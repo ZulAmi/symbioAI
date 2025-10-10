@@ -107,3 +107,8 @@ This workspace contains a modular AI system designed to surpass existing solutio
   - [ ] #6: One-Shot Meta-Learning with Causal Models (NEXT)
 - [x] **BONUS Advanced Features** - Beyond Priority 1
   - [x] Compositional Concept Learning ✅
+  - [x] Automated Theorem Proving Integration ✅
+  - [x] Active Learning & Curiosity-Driven Exploration ✅ (System 15)
+  - [x] Sparse Mixture of Adapters ✅ (System 16)
+  - [x] Quantization-Aware Evolutionary Training ✅ (System 17)
+  - [x] Speculative Execution with Verification ✅ (System 18)
