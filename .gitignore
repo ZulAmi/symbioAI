@@ -1,0 +1,345 @@
+# Symbio AI - Git Ignore Configuration
+# Comprehensive ignore patterns for Python AI/ML projects
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv-3.11/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ============================================================================
+# AI/ML Specific
+# ============================================================================
+# Model files
+*.pth
+*.pt
+*.h5
+*.pkl
+*.pickle
+*.joblib
+*.onnx
+*.pb
+*.ckpt
+*.safetensors
+*.bin
+
+# Model checkpoints
+checkpoints/
+models/checkpoints/
+saved_models/
+model_cache/
+
+# Training artifacts
+runs/
+logs/
+tensorboard/
+wandb/
+mlruns/
+.mlflow/
+
+# Data files
+data/raw/
+data/processed/
+data/interim/
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.hdf5
+*.h5
+
+# Dataset caches
+.cache/
+*.cache
+cache/
+__pycache__/
+
+# Hugging Face cache
+.huggingface/
+transformers_cache/
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# Operating System
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.temporary/
+
+# Generated files
+requirements-mac.txt
+requirements-filtered.txt
+requirements-core.txt
+
+# Secrets and credentials
+.secrets/
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+.env.local
+.env.production
+.env.*.local
+credentials.json
+service-account.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# Redis
+redis_data/
+dump.rdb
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Kubernetes
+*.secret.yaml
+*-secret.yaml
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+test-results/
+
+# Build artifacts
+build/
+dist/
+*.whl
+
+# Experiments
+experiments/outputs/
+experiments/artifacts/
+experiments/runs/
+
+# Benchmark results
+benchmark_results/
+*.benchmark
+
+# Monitoring dashboards
+monitoring/dashboards/*.generated.json
+
+# API keys and tokens
+.api_keys
+*.token
+
+# Local configuration overrides
+config/local.yaml
+config/*.local.yaml
+config/production.yaml
+
+# ============================================================================
+# Keep Important Files
+# ============================================================================
+# Documentation and configs you want to keep
+!README.md
+!QUICKSTART.md
+!READY.md
+!requirements.txt
+!requirements-core.txt
+!config/default.yaml
+!.gitignore
+!pytest.ini
+
+# Keep example notebooks for demos
+!examples/*.ipynb
+
+# Keep important documentation
+!docs/**/*.md
+!docs/**/*.png
