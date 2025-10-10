@@ -37,37 +37,47 @@ python examples/theorem_proving_demo.py
 Run these in order for the best first experience:
 
 ### 1. Automated Theorem Proving (2 min) ⭐⭐⭐⭐⭐
+
 ```bash
 python examples/theorem_proving_demo.py
 ```
+
 **Shows:** Formal verification, mathematical proof generation, safety guarantees  
 **Why impressive:** Only commercial AI with integrated theorem proving (Z3/Lean/Coq)
 
 ### 2. Recursive Self-Improvement (3 min) ⭐⭐⭐⭐⭐
+
 ```bash
 python examples/recursive_self_improvement_demo.py
 ```
+
 **Shows:** Meta-evolution - algorithms that improve their own improvement strategies  
 **Why impressive:** +23% better strategies through recursive self-optimization (unique in market)
 
 ### 3. Metacognitive Self-Diagnosis (3 min) ⭐⭐⭐⭐⭐
+
 ```bash
 python examples/metacognitive_causal_demo.py
 ```
+
 **Shows:** Real-time self-awareness, automatic debugging, root cause analysis  
 **Why impressive:** 85% accuracy in diagnosing its own failures, 60% faster debugging
 
 ### 4. Neural-Symbolic Hybrid (2 min) ⭐⭐⭐⭐⭐
+
 ```bash
 python examples/neural_symbolic_demo.py
 ```
+
 **Shows:** Program synthesis from natural language, symbolic reasoning  
 **Why impressive:** Combines neural learning with formal logic (85% synthesis accuracy)
 
 ### 5. Cross-Task Transfer Learning (3 min) ⭐⭐⭐⭐⭐
+
 ```bash
 python examples/cross_task_transfer_demo.py
 ```
+
 **Shows:** Automatic discovery of transfer patterns, curriculum generation  
 **Why impressive:** 60% sample efficiency improvement through intelligent transfer
 
@@ -76,6 +86,7 @@ python examples/cross_task_transfer_demo.py
 ## 📋 ALL 23 AVAILABLE DEMOS
 
 ### 🔥 Priority 1 Revolutionary Features (6 systems)
+
 ```bash
 python examples/theorem_proving_demo.py              # Formal verification (89% valid)
 python examples/recursive_self_improvement_demo.py    # Meta-evolution (+23%)
@@ -86,6 +97,7 @@ python examples/neural_symbolic_demo.py              # Hybrid reasoning (85% syn
 ```
 
 ### ⭐ Bonus Advanced Features (5 systems)
+
 ```bash
 python examples/compositional_concept_demo.py        # Compositional concept learning
 python examples/active_learning_curiosity_demo.py    # Curiosity-driven exploration
@@ -95,6 +107,7 @@ python examples/speculative_execution_demo.py        # Speculative reasoning (30
 ```
 
 ### 🏗️ Foundational Systems (7 systems)
+
 ```bash
 python examples/unified_multimodal_demo.py           # 5 modalities unified (91% routing)
 python examples/continual_learning_demo.py           # No catastrophic forgetting (<5% loss)
@@ -106,6 +119,7 @@ python examples/multi_agent_collaboration_demo.py    # Emergent multi-agent team
 ```
 
 ### 🛠️ Additional Tools (5 utilities)
+
 ```bash
 python examples/evolutionary_merge_demo.py           # Evolutionary model merging
 python examples/evolutionary_skill_learning_demo.py  # Population-based skill evolution
@@ -121,34 +135,43 @@ python examples/self_healing_demo.py                 # Self-healing system capab
 ## 🎮 INTERACTIVE COMMANDS
 
 ### Quick Health Check
+
 ```bash
 python quickstart.py health
 ```
+
 **Shows:** Python version, installed packages, theorem prover availability
 
 ### Run All Demos
+
 ```bash
 python quickstart.py all
 ```
+
 **What it does:** Runs all 13 major demos sequentially  
 **Runtime:** 30-45 minutes  
 **Output:** Success count and comprehensive results
 
 ### Start API Gateway
+
 ```bash
 python quickstart.py api
 ```
+
 **What it does:** Starts service mesh on http://127.0.0.1:8080  
 **Visit:** `/admin/metrics` for monitoring dashboard  
 **Use:** REST API for all 18 systems
 
 ### Start Full System
+
 ```bash
 python quickstart.py system
 # OR
 python main.py
 ```
-**What it does:** 
+
+**What it does:**
+
 - Initializes agent orchestrator
 - Coordinates all 18 AI systems
 - Runs continuous improvement loop
@@ -170,13 +193,13 @@ python main.py
 Demo 1: Safety Verification
 ────────────────────────────────────────────────────────────────
 Verifying safety property: x >= 0 ∧ y >= 0 ⇒ x + y >= 0
-  
+
 Z3 Solver Result:
   Status: ✓ VALID (Proven)
   Confidence: 89%
   Time: 0.043 seconds
   Proof steps: 3
-  
+
 Proof:
   1. Assume x >= 0 and y >= 0
   2. By addition axiom: x + y >= x >= 0
@@ -252,14 +275,18 @@ FINAL RESULTS
 ## 🎓 LEARNING PATHS
 
 ### Path 1: "Quick Demo" (5 minutes)
+
 Perfect for first-time users:
+
 ```bash
 python quickstart.py health
 python examples/theorem_proving_demo.py
 ```
 
 ### Path 2: "Show Me The Best" (15 minutes)
+
 See the most impressive features:
+
 ```bash
 python examples/theorem_proving_demo.py
 python examples/recursive_self_improvement_demo.py
@@ -268,13 +295,17 @@ python examples/neural_symbolic_demo.py
 ```
 
 ### Path 3: "I Want Everything" (45 minutes)
+
 Complete comprehensive overview:
+
 ```bash
 python quickstart.py all
 ```
 
 ### Path 4: "Deep Dive" (2-3 hours)
+
 Understand the full system:
+
 ```bash
 python quickstart.py all                    # Run all demos
 python main.py                              # Start full system
@@ -287,25 +318,16 @@ open AUTOMATED_THEOREM_PROVING_COMPLETE.md  # Read completion reports
 ## 📚 DOCUMENTATION HIERARCHY
 
 **Start here (you are here):**
+
 1. ✅ **RUN_ME_FIRST.md** - This file (complete startup guide)
 2. **START_NOW.md** - One-page quick reference
 3. **HOW_TO_RUN.md** - Detailed command reference
 
-**Next level:**
-4. **QUICKSTART.md** - Original setup guide (installation steps)
-5. **README.md** - Full project overview
+**Next level:** 4. **QUICKSTART.md** - Original setup guide (installation steps) 5. **README.md** - Full project overview
 
-**Deep documentation:**
-6. **docs/whitepaper.md** - Comprehensive technical whitepaper (1,550+ lines)
-7. **docs/automated_theorem_proving.md** - Theorem proving details
-8. **docs/recursive_self_improvement.md** - Meta-evolution details
-9. **docs/*.md** - 18+ system-specific guides
+**Deep documentation:** 6. **docs/whitepaper.md** - Comprehensive technical whitepaper (1,550+ lines) 7. **docs/automated_theorem_proving.md** - Theorem proving details 8. **docs/recursive_self_improvement.md** - Meta-evolution details 9. **docs/\*.md** - 18+ system-specific guides
 
-**Completion reports:**
-10. **AUTOMATED_THEOREM_PROVING_COMPLETE.md**
-11. **PRIORITY_1_COMPLETE.md**
-12. **SYSTEM_COVERAGE_ANALYSIS.md**
-13. **40+ other *_COMPLETE.md files**
+**Completion reports:** 10. **AUTOMATED_THEOREM_PROVING_COMPLETE.md** 11. **PRIORITY_1_COMPLETE.md** 12. **SYSTEM_COVERAGE_ANALYSIS.md** 13. **40+ other \*\_COMPLETE.md files**
 
 ---
 
@@ -325,13 +347,17 @@ open AUTOMATED_THEOREM_PROVING_COMPLETE.md  # Read completion reports
 ## 🔧 TROUBLESHOOTING
 
 ### Problem: "ModuleNotFoundError: No module named 'XXX'"
+
 **Solution:**
+
 ```bash
 pip install -r requirements-core.txt
 ```
 
 ### Problem: "Cannot find demo file"
+
 **Solution:**
+
 ```bash
 cd "/Users/zulhilmirahmat/Development/programming/Symbio AI"
 ls examples/  # Verify demos exist
@@ -339,7 +365,9 @@ python examples/theorem_proving_demo.py
 ```
 
 ### Problem: Virtual environment not active
+
 **Solution:**
+
 ```bash
 source .venv/bin/activate
 python --version  # Should show 3.11.x
@@ -347,11 +375,14 @@ which python      # Should show .venv/bin/python
 ```
 
 ### Problem: Demo shows warnings about GPU/Redis/PostgreSQL
+
 **Solution:**
 This is normal! These are optional features. Demos work fine without them.
 
 ### Problem: "Z3/Lean/Coq not found"
+
 **Solution:**
+
 ```bash
 # Z3 is already installed (z3-solver 4.12.2)
 # Lean and Coq are optional system-level tools
@@ -362,18 +393,18 @@ This is normal! These are optional features. Demos work fine without them.
 
 ## 📊 PERFORMANCE METRICS YOU'LL SEE
 
-| System | Metric | Value You'll See |
-|--------|--------|------------------|
-| **Theorem Proving** | Proof Validity | 89% |
-| **Meta-Evolution** | Strategy Improvement | +23% |
-| **Self-Diagnosis** | Root Cause Accuracy | 85% |
-| **Self-Diagnosis** | Debugging Speed | 60% faster |
-| **Transfer Learning** | Sample Efficiency | +60% |
-| **Quantization** | Compression Ratio | 8x |
-| **Quantization** | Accuracy Loss | <2% |
-| **Multi-Modal** | Routing Accuracy | 91% |
-| **Continual Learning** | Forgetting Rate | <5% |
-| **MoE Routing** | Expert Selection | 90%+ accuracy |
+| System                 | Metric               | Value You'll See |
+| ---------------------- | -------------------- | ---------------- |
+| **Theorem Proving**    | Proof Validity       | 89%              |
+| **Meta-Evolution**     | Strategy Improvement | +23%             |
+| **Self-Diagnosis**     | Root Cause Accuracy  | 85%              |
+| **Self-Diagnosis**     | Debugging Speed      | 60% faster       |
+| **Transfer Learning**  | Sample Efficiency    | +60%             |
+| **Quantization**       | Compression Ratio    | 8x               |
+| **Quantization**       | Accuracy Loss        | <2%              |
+| **Multi-Modal**        | Routing Accuracy     | 91%              |
+| **Continual Learning** | Forgetting Rate      | <5%              |
+| **MoE Routing**        | Expert Selection     | 90%+ accuracy    |
 
 These aren't promises - they're **measured results you'll see in real-time when you run the demos!**
 

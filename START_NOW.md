@@ -52,6 +52,7 @@ python quickstart.py all
 ## 📋 All 23 Demos Available
 
 **Priority 1 (Revolutionary):**
+
 - `theorem_proving_demo.py` - Formal verification
 - `recursive_self_improvement_demo.py` - Meta-evolution
 - `metacognitive_causal_demo.py` - Self-diagnosis
@@ -59,6 +60,7 @@ python quickstart.py all
 - `neural_symbolic_demo.py` - Hybrid reasoning
 
 **Bonus Advanced:**
+
 - `compositional_concept_demo.py` - Concept learning
 - `active_learning_curiosity_demo.py` - Curiosity-driven
 - `sparse_adapter_demo.py` - Efficient routing
@@ -66,6 +68,7 @@ python quickstart.py all
 - `speculative_execution_demo.py` - Speculative reasoning
 
 **Foundational:**
+
 - `unified_multimodal_demo.py` - 5 modalities
 - `continual_learning_demo.py` - No forgetting
 - `dynamic_architecture_demo.py` - Self-modifying
@@ -165,6 +168,7 @@ python examples/theorem_proving_demo.py
 ```
 
 **Why this one?**
+
 - ✅ Shows formal verification (unique capability)
 - ✅ Runs fast (~2 minutes)
 - ✅ Clear, impressive output
@@ -177,15 +181,15 @@ python examples/theorem_proving_demo.py
 
 ## 📈 Performance You'll See
 
-| System | Metric | Value |
-|--------|--------|-------|
-| Theorem Proving | Proof Validity | 89% |
-| Meta-Evolution | Strategy Improvement | +23% |
-| Self-Diagnosis | Root Cause Accuracy | 85% |
-| Transfer Learning | Sample Efficiency | +60% |
-| Compression | Size Reduction | 8x with <2% loss |
-| Multi-Modal | Routing Accuracy | 91% |
-| Continual Learning | Forgetting Rate | <5% |
+| System             | Metric               | Value            |
+| ------------------ | -------------------- | ---------------- |
+| Theorem Proving    | Proof Validity       | 89%              |
+| Meta-Evolution     | Strategy Improvement | +23%             |
+| Self-Diagnosis     | Root Cause Accuracy  | 85%              |
+| Transfer Learning  | Sample Efficiency    | +60%             |
+| Compression        | Size Reduction       | 8x with <2% loss |
+| Multi-Modal        | Routing Accuracy     | 91%              |
+| Continual Learning | Forgetting Rate      | <5%              |
 
 ---
 

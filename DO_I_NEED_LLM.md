@@ -113,30 +113,37 @@ python examples/literature_qa_demo.py
 ### All the revolutionary capabilities work:
 
 ✅ **Formal Verification** (89% proof validity)
+
 - Uses Z3 theorem prover (already installed)
 - No LLM needed for mathematical proofs
 
 ✅ **Meta-Evolution** (+23% improvement)
+
 - Pure evolutionary algorithms
 - No LLM needed for strategy evolution
 
 ✅ **Self-Diagnosis** (85% accuracy)
+
 - Causal inference models
 - No LLM needed for root cause analysis
 
 ✅ **Transfer Learning** (60% efficiency gain)
+
 - Graph neural networks
 - No LLM needed for pattern discovery
 
 ✅ **8x Compression** (<2% loss)
+
 - Quantization-aware training
 - No LLM needed for model compression
 
 ✅ **Multi-Modal** (91% routing)
+
 - Specialized encoders for each modality
 - No LLM needed for fusion
 
 ✅ **Continual Learning** (<5% forgetting)
+
 - EWC, replay buffers, progressive networks
 - No LLM needed for anti-forgetting
 
@@ -147,16 +154,19 @@ python examples/literature_qa_demo.py
 ### Optional Enhancement Scenarios:
 
 **1. Main System Orchestrator (`main.py`)**
+
 - **Without LLM:** Uses mock responses, shows architecture
 - **With LLM:** Can generate actual text responses
 - **Verdict:** Run without LLM first to see the system, add LLM later if needed
 
 **2. Literature Q&A System**
+
 - **Without LLM:** Uses local knowledge base and mock data
 - **With LLM:** Can answer custom research questions
 - **Verdict:** Core functionality works without LLM
 
 **3. Production API Gateway**
+
 - **Without LLM:** All core routing, caching, monitoring works
 - **With LLM:** Can handle natural language queries
 - **Verdict:** Try without LLM first
@@ -190,6 +200,7 @@ python quickstart.py all
 **Only if you want to test LLM integration features:**
 
 #### Option A: Use Free Local Models (No API Keys)
+
 ```bash
 # The system will auto-download small HuggingFace models if needed
 # Example: Mistral-7B-Instruct (works on your Mac)
@@ -197,6 +208,7 @@ python quickstart.py all
 ```
 
 #### Option B: Use API Keys (Paid Services)
+
 ```bash
 # Only if you want to test commercial LLM integration
 export OPENAI_API_KEY="your-key-here"
@@ -207,6 +219,7 @@ python main.py
 ```
 
 #### Option C: Skip LLM Entirely
+
 ```bash
 # Just use the 18 core systems (recommended!)
 # They're all more impressive than LLM integration anyway
@@ -290,30 +303,36 @@ python examples/quantization_evolution_demo.py      # See 8x compression
 ### How Demos Work Without LLM:
 
 **Theorem Proving:**
+
 - Uses Z3 SMT solver (symbolic mathematics)
 - Pure formal logic, no language models
 
 **Recursive Self-Improvement:**
+
 - Evolutionary algorithms with fitness functions
 - Meta-optimization of hyperparameters
 - Pure numerical optimization
 
 **Metacognitive Causal:**
+
 - Structural causal models (SCMs)
 - Bayesian inference
 - Counterfactual reasoning
 
 **Transfer Learning:**
+
 - Graph neural networks (GNN)
 - Task embedding similarity
 - Meta-learning algorithms
 
 **All Others:**
+
 - PyTorch neural networks
 - Custom architectures (transformers, CNNs, GNNs)
 - Mathematical optimization
 
 **LLM Integration (main.py):**
+
 - Optional module that CAN use LLMs
 - Falls back to mock mode if no API keys
 - NOT required for core capabilities
@@ -324,7 +343,7 @@ python examples/quantization_evolution_demo.py      # See 8x compression
 
 **Question:** Do I need to upload a local LLM to see the project run and see the improvements?
 
-**Answer:** 
+**Answer:**
 **NO! Run `python examples/theorem_proving_demo.py` right now. You'll see it working in 2 minutes with zero setup. All 18 systems work without any LLM. The improvements (+23%, 85% accuracy, 60% efficiency) are from novel algorithms, not LLM integration.**
 
 ---
