@@ -248,11 +248,11 @@ if plan:
     print(f"Expected Improvement: {plan.expected_improvement:.1%}")
     print(f"Confidence: {plan.confidence:.2%}")
     print(f"Cost: {plan.estimated_cost:.2f} GPU hours")
-    
+
     print("\n⚠️  Risks:")
     for risk in plan.risks:
         print(f"  • {risk}")
-    
+
     print("\n📊 Validation Metrics:")
     for metric in plan.validation_metrics:
         print(f"  • {metric}")

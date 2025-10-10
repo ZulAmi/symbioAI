@@ -12,13 +12,13 @@ The Causal Self-Diagnosis System has been **fully implemented** across **1,102 l
 
 ### ✅ All Requirements Met
 
-| Requirement | Status | Implementation |
-|-------------|--------|----------------|
+| Requirement                                  | Status      | Implementation                                      |
+| -------------------------------------------- | ----------- | --------------------------------------------------- |
 | **Causal inference for failure attribution** | ✅ Complete | `CausalGraph.identify_root_causes()` - 85% accuracy |
-| **Counterfactual reasoning ("What if...?")** | ✅ Complete | `CounterfactualReasoner.generate_counterfactual()` |
-| **Automatic hypothesis generation** | ✅ Complete | Integrated in `diagnose_failure()` pipeline |
-| **Root cause analysis** | ✅ Complete | Full causal path tracing + attribution |
-| **Intervention experiments** | ✅ Complete | `InterventionPlan` with A/B testing framework |
+| **Counterfactual reasoning ("What if...?")** | ✅ Complete | `CounterfactualReasoner.generate_counterfactual()`  |
+| **Automatic hypothesis generation**          | ✅ Complete | Integrated in `diagnose_failure()` pipeline         |
+| **Root cause analysis**                      | ✅ Complete | Full causal path tracing + attribution              |
+| **Intervention experiments**                 | ✅ Complete | `InterventionPlan` with A/B testing framework       |
 
 ---
 
@@ -115,6 +115,7 @@ The Causal Self-Diagnosis System has been **fully implemented** across **1,102 l
 **Implementation**: `CausalGraph` class (Lines 200-430)
 
 **How It Works**:
+
 ```python
 # Build causal graph from system components
 graph = CausalGraph()
@@ -128,10 +129,11 @@ root_causes = graph.identify_root_causes("accuracy")
 ```
 
 **Key Features**:
+
 - ✅ **6 Node Types**: INPUT, HIDDEN, OUTPUT, PARAMETER, HYPERPARAMETER, ENVIRONMENT
 - ✅ **3 Evidence Types**: Observational, Interventional, Counterfactual
 - ✅ **Graph Operations**: Traversal, path finding, strength computation
-- ✅ **Root Cause Algorithm**: 
+- ✅ **Root Cause Algorithm**:
   - Computes causal strength from node to failure
   - Identifies nodes with few parents (true "roots")
   - Ranks by deviation × causal strength
@@ -146,6 +148,7 @@ root_causes = graph.identify_root_causes("accuracy")
 **Implementation**: `CounterfactualReasoner` class (Lines 430-640)
 
 **How It Works**:
+
 ```python
 reasoner = CounterfactualReasoner(causal_graph)
 
@@ -164,9 +167,10 @@ print(f"Action needed: {cf.intervention_required}")  # COLLECT_MORE_DATA
 ```
 
 **Key Features**:
+
 - ✅ **Causal Simulation**: Propagates changes through graph
 - ✅ **Outcome Prediction**: Estimates impact on target metrics
-- ✅ **Plausibility Scoring**: 
+- ✅ **Plausibility Scoring**:
   - Distance from current state
   - Historical precedents
   - Physical/logical constraints
@@ -177,6 +181,7 @@ print(f"Action needed: {cf.intervention_required}")  # COLLECT_MORE_DATA
 - ✅ **Multi-Node Counterfactuals**: Can change multiple nodes simultaneously
 
 **Example Outputs**:
+
 ```
 Counterfactual 1: "What if learning_rate = 0.001 (currently 0.01)?"
   Predicted accuracy: 0.78 (+13%)
@@ -221,18 +226,21 @@ for evidence in diagnosis.supporting_evidence:
 **Hypothesis Types Generated**:
 
 1. **Data Hypotheses**:
+
    - "Insufficient training data in domain X"
    - "Data distribution shift detected"
    - "Class imbalance causing bias"
    - "Noisy labels degrading performance"
 
 2. **Model Hypotheses**:
+
    - "Model capacity insufficient for task complexity"
    - "Overfitting to training distribution"
    - "Catastrophic forgetting of previous knowledge"
    - "Attention mechanism focusing on spurious correlations"
 
 3. **Hyperparameter Hypotheses**:
+
    - "Learning rate too high causing training instability"
    - "Regularization too weak allowing overfitting"
    - "Batch size affecting convergence rate"
@@ -243,6 +251,7 @@ for evidence in diagnosis.supporting_evidence:
    - "Concurrent system load affecting performance"
 
 **Evidence Linking**:
+
 ```python
 @dataclass
 class FailureDiagnosis:
@@ -252,6 +261,7 @@ class FailureDiagnosis:
 ```
 
 **Example Output**:
+
 ```
 Hypothesis 1: "Insufficient regularization causing overfitting"
   Supporting Evidence:
@@ -294,7 +304,7 @@ print(f"Risks: {plan.risks}")
 # 3. Execute intervention (with A/B testing)
 for strategy, params in plan.interventions:
     result = execute_intervention(strategy, params)
-    
+
     # 4. Learn from outcome
     system.learn_from_intervention(
         intervention_id=plan.plan_id,
@@ -303,6 +313,7 @@ for strategy, params in plan.interventions:
 ```
 
 **Intervention Strategies** (8 types):
+
 ```python
 class InterventionStrategy(Enum):
     RETRAIN = "retrain"                      # Full model retraining
@@ -316,29 +327,31 @@ class InterventionStrategy(Enum):
 ```
 
 **Complete Intervention Plan**:
+
 ```python
 @dataclass
 class InterventionPlan:
     plan_id: str
     target_failure: FailureMode
-    
+
     # Interventions (ordered by priority)
     interventions: List[Tuple[InterventionStrategy, Dict[str, Any]]]
-    
+
     # Predictions
     expected_improvement: float  # Predicted accuracy gain
     confidence: float            # Confidence in prediction
     estimated_cost: float        # GPU hours / dollars
-    
+
     # Risk management
     risks: List[str]            # Potential negative outcomes
     side_effects: List[str]     # Other impacts
-    
+
     # Validation
     validation_metrics: List[str]  # Metrics to monitor
 ```
 
 **Example Plan**:
+
 ```
 Intervention Plan ID: plan_2024_001
 Target: OVERFITTING
@@ -378,6 +391,7 @@ Validation Metrics:
 ```
 
 **Learning from Experiments**:
+
 ```python
 # After intervention is executed
 actual_result = {
@@ -404,16 +418,16 @@ system.learn_from_intervention(
 
 ### vs. Traditional Error Detection Systems
 
-| Capability | Traditional Systems | Symbio AI Causal Diagnosis |
-|------------|--------------------|-----------------------------|
-| **Detect Failures** | ✅ Yes | ✅ Yes |
-| **Explain WHY** | ❌ No | ✅ Yes (causal inference) |
-| **Root Cause** | ❌ Manual investigation | ✅ Automatic (85% accuracy) |
-| **Counterfactuals** | ❌ Not supported | ✅ "What-if" scenarios |
-| **Hypothesis Generation** | ❌ Manual | ✅ Automatic |
-| **Intervention Planning** | ❌ Ad-hoc | ✅ Systematic with cost/benefit |
-| **Learn from Fixes** | ❌ Static | ✅ Improves over time |
-| **Evidence-Based** | ❌ No | ✅ Quantified evidence |
+| Capability                | Traditional Systems     | Symbio AI Causal Diagnosis      |
+| ------------------------- | ----------------------- | ------------------------------- |
+| **Detect Failures**       | ✅ Yes                  | ✅ Yes                          |
+| **Explain WHY**           | ❌ No                   | ✅ Yes (causal inference)       |
+| **Root Cause**            | ❌ Manual investigation | ✅ Automatic (85% accuracy)     |
+| **Counterfactuals**       | ❌ Not supported        | ✅ "What-if" scenarios          |
+| **Hypothesis Generation** | ❌ Manual               | ✅ Automatic                    |
+| **Intervention Planning** | ❌ Ad-hoc               | ✅ Systematic with cost/benefit |
+| **Learn from Fixes**      | ❌ Static               | ✅ Improves over time           |
+| **Evidence-Based**        | ❌ No                   | ✅ Quantified evidence          |
 
 ### Key Differentiators
 
@@ -429,9 +443,11 @@ system.learn_from_intervention(
 ## 📁 IMPLEMENTATION FILES
 
 ### Core Implementation (1,102 lines)
+
 **File**: `training/causal_self_diagnosis.py`
 
 **Structure**:
+
 - Lines 1-200: Data structures (Node, Edge, Diagnosis, Counterfactual, Plan)
 - Lines 200-430: `CausalGraph` class
 - Lines 430-640: `CounterfactualReasoner` class
@@ -439,6 +455,7 @@ system.learn_from_intervention(
 - Lines 900-1102: Intervention planning and learning
 
 **Key Classes**:
+
 ```python
 class CausalGraph:
     """Causal graph construction and analysis."""
@@ -464,9 +481,11 @@ class CausalSelfDiagnosis:
 ```
 
 ### Demo & Examples (604 lines)
+
 **File**: `examples/metacognitive_causal_demo.py`
 
 **Demos Included**:
+
 1. Metacognitive monitoring basics
 2. Uncertainty quantification
 3. Reasoning trace analysis
@@ -476,9 +495,11 @@ class CausalSelfDiagnosis:
 7. **Complete integration** ← All features together
 
 ### Tests (400+ lines)
+
 **File**: `tests/test_causal_diagnosis.py`
 
 **Test Coverage**:
+
 - ✅ Causal graph construction
 - ✅ Root cause identification
 - ✅ Counterfactual generation
@@ -487,7 +508,9 @@ class CausalSelfDiagnosis:
 - ✅ End-to-end scenarios (overfitting, data issues, etc.)
 
 ### Documentation (2,500+ lines)
+
 **Files**:
+
 - `docs/metacognitive_causal_systems.md` (817 lines) - Technical architecture
 - `docs/CAUSAL_SELF_DIAGNOSIS_COMPLETE.md` (500+ lines) - Complete reference
 - `docs/causal_diagnosis_quick_start.md` (600+ lines) - Quick start guide
@@ -579,19 +602,19 @@ for cf in counterfactuals:
 
 ## 📊 IMPLEMENTATION STATISTICS
 
-| Metric | Value |
-|--------|-------|
-| **Core Implementation** | 1,102 lines |
-| **Test Suite** | 400+ lines |
-| **Demo Scripts** | 604 lines |
-| **Documentation** | 2,500+ lines |
-| **Total Code** | 4,606+ lines |
-| **Classes** | 12 main classes |
-| **Methods** | 50+ public methods |
-| **Test Coverage** | 100% of core paths |
-| **Node Types** | 6 types |
-| **Failure Modes** | 9 types |
-| **Intervention Strategies** | 8 types |
+| Metric                      | Value              |
+| --------------------------- | ------------------ |
+| **Core Implementation**     | 1,102 lines        |
+| **Test Suite**              | 400+ lines         |
+| **Demo Scripts**            | 604 lines          |
+| **Documentation**           | 2,500+ lines       |
+| **Total Code**              | 4,606+ lines       |
+| **Classes**                 | 12 main classes    |
+| **Methods**                 | 50+ public methods |
+| **Test Coverage**           | 100% of core paths |
+| **Node Types**              | 6 types            |
+| **Failure Modes**           | 9 types            |
+| **Intervention Strategies** | 8 types            |
 
 ---
 
@@ -600,24 +623,28 @@ for cf in counterfactuals:
 ### Requirements Coverage
 
 - [x] **Causal inference for failure attribution** ✅ COMPLETE
+
   - [x] CausalGraph with 6 node types
   - [x] Root cause identification algorithm
   - [x] 85% accuracy on test cases
   - [x] Evidence-based attribution
 
 - [x] **Counterfactual reasoning** ✅ COMPLETE
+
   - [x] CounterfactualReasoner class
   - [x] "What-if" scenario generation
   - [x] Outcome prediction via causal simulation
   - [x] Plausibility and actionability scoring
 
 - [x] **Automatic hypothesis generation** ✅ COMPLETE
+
   - [x] Integrated in diagnosis pipeline
   - [x] 4 hypothesis categories
   - [x] Evidence linking (supporting + contradicting)
   - [x] Confidence scoring
 
 - [x] **Root cause analysis with intervention experiments** ✅ COMPLETE
+
   - [x] InterventionPlan data structure
   - [x] 8 intervention strategies
   - [x] Cost/benefit analysis
@@ -646,25 +673,33 @@ for cf in counterfactuals:
 ## 🎓 TECHNICAL INNOVATIONS
 
 ### 1. Multi-Evidence Causal Inference
+
 Combines three types of evidence for robust causal attribution:
+
 - **Observational**: Correlation patterns in historical data
 - **Interventional**: Results from controlled experiments
 - **Counterfactual**: Hypothetical scenario analysis
 
 ### 2. Plausibility-Weighted Counterfactuals
+
 Novel metric for assessing counterfactual realism:
+
 ```
 plausibility = f(distance, history, constraints, resources)
 ```
 
 ### 3. Adaptive Causal Learning
+
 Causal graph improves over time:
+
 - Updates edge strengths from intervention outcomes
 - Discovers new causal relationships
 - Adjusts confidence based on prediction accuracy
 
 ### 4. Cost-Aware Intervention Planning
+
 Multi-objective optimization considering:
+
 - Expected performance improvement
 - Computational cost (GPU hours)
 - Implementation complexity
@@ -693,6 +728,7 @@ This system represents a **significant competitive advantage** that sets Symbio 
 ## 📞 NEXT STEPS
 
 ### Immediate Actions
+
 1. ✅ Implementation complete
 2. ✅ Tests passing
 3. ✅ Documentation complete
@@ -700,6 +736,7 @@ This system represents a **significant competitive advantage** that sets Symbio 
 5. ⏭️ Ready for investor demonstrations
 
 ### Future Enhancements
+
 - Real-time causal discovery from streaming data
 - Multi-modal causal reasoning (text + images + structured data)
 - Distributed causal graph computation
@@ -717,4 +754,4 @@ This system represents a **significant competitive advantage** that sets Symbio 
 
 ---
 
-*This implementation fulfills all requirements for the Causal Self-Diagnosis System and establishes Symbio AI as the only platform with true causal reasoning capabilities for self-diagnosis.*
+_This implementation fulfills all requirements for the Causal Self-Diagnosis System and establishes Symbio AI as the only platform with true causal reasoning capabilities for self-diagnosis._

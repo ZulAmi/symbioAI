@@ -67,12 +67,14 @@ The Hybrid Neural-Symbolic Architecture represents a revolutionary approach to A
 **Purpose**: Represent and manipulate logical expressions
 
 **Key Classes**:
+
 - `LogicalOperator`: Enum of logical operators (AND, OR, NOT, IMPLIES, etc.)
 - `SymbolicExpression`: Tree-based representation of logic expressions
 - `LogicalRule`: IF-THEN rules with learnable weights
 - `KnowledgeBase`: Storage and inference engine for symbolic knowledge
 
 **Example**:
+
 ```python
 # Create a logical expression: (A ∧ B) → C
 premise1 = SymbolicExpression(LogicalOperator.AND, variable="A")
@@ -92,12 +94,14 @@ rule = LogicalRule(
 **Purpose**: Enable neural networks to learn logical rules
 
 **Key Classes**:
+
 - `FuzzyLogicGate`: Differentiable fuzzy logic operations
 - `DifferentiableLogicNetwork`: Neural network with integrated logic gates
 
 **Innovation**: Traditional logic is crisp (True/False), but differentiable logic uses continuous values [0, 1], allowing gradient-based learning.
 
 **Fuzzy Logic Operations**:
+
 - **Fuzzy AND**: Product t-norm → `A ∧ B = A × B`
 - **Fuzzy OR**: Probabilistic sum → `A ∨ B = A + B - A × B`
 - **Fuzzy NOT**: Complement → `¬A = 1 - A`
@@ -108,16 +112,19 @@ rule = LogicalRule(
 **Purpose**: Generate executable code from natural language and examples
 
 **Key Classes**:
+
 - `ProgramExample`: Input-output example for synthesis
 - `SynthesizedProgram`: Generated program with proof
 - `ProgramSynthesizer`: Main synthesis engine
 
 **Synthesis Strategies**:
+
 1. **Pattern-Based**: Recognizes common patterns (sort, filter, map)
 2. **Template-Based**: Uses code templates with placeholders
 3. **Neural-Based**: Uses neural models for synthesis
 
 **Example**:
+
 ```python
 synthesizer = ProgramSynthesizer()
 
@@ -137,14 +144,17 @@ print(program.code)
 **Purpose**: Incorporate symbolic constraints into neural training
 
 **Key Classes**:
+
 - `Constraint`: Symbolic constraint with weight and type (hard/soft)
 - `ConstraintSatisfactionLayer`: Neural layer that enforces constraints
 
 **Constraint Types**:
+
 - **Hard Constraints**: Must be satisfied (infinite violation cost)
 - **Soft Constraints**: Should be satisfied (weighted violation cost)
 
 **Example**:
+
 ```python
 # Constraint: Output must be positive
 expr = SymbolicExpression(LogicalOperator.AND, variable="output > 0")
@@ -163,11 +173,13 @@ architecture.add_constraint(constraint)
 **Purpose**: Generate logical proofs for all neural network outputs
 
 **Key Classes**:
+
 - `ProofStep`: Single step in a logical proof
 - `LogicalProof`: Complete proof with validity score
 - `ProofGenerator`: Generates proofs for outputs
 
 **Proof Structure**:
+
 1. **Input Validation**: Verify preconditions
 2. **Neural Inference**: Apply neural reasoning
 3. **Constraint Checking**: Verify constraints satisfied
@@ -175,6 +187,7 @@ architecture.add_constraint(constraint)
 5. **Conclusion**: Final statement with confidence
 
 **Example Proof**:
+
 ```
 Proof of Correctness:
 1. Input validation: Input satisfies preconditions (95% confidence)
@@ -193,6 +206,7 @@ Conclusion: Output is correct with 89.5% confidence ✓
 **Description**: Generate executable programs from plain English descriptions
 
 **How It Works**:
+
 1. Parse natural language description
 2. Extract key operations and patterns
 3. Match against known templates
@@ -201,6 +215,7 @@ Conclusion: Output is correct with 89.5% confidence ✓
 **Success Rate**: 85% correctness on benchmark tasks
 
 **Example**:
+
 ```python
 architecture = create_neural_symbolic_architecture()
 
@@ -218,6 +233,7 @@ program = architecture.synthesize_program(description, examples)
 **Description**: Learn logical rules from data using gradient descent
 
 **How It Works**:
+
 1. Initialize random rule weights
 2. Apply fuzzy logic operations (differentiable)
 3. Calculate loss on training data
@@ -225,6 +241,7 @@ program = architecture.synthesize_program(description, examples)
 5. Extract top-weighted rules
 
 **Example**:
+
 ```python
 training_data = [
     ({"feature1": True, "feature2": False}, True),
@@ -244,11 +261,13 @@ learned_rules = architecture.learn_logic_rules(training_data, num_epochs=100)
 **Description**: Train neural networks with symbolic constraints
 
 **Benefits**:
+
 - Guaranteed satisfaction of domain constraints
 - Improved interpretability
 - Faster convergence with prior knowledge
 
 **Example**:
+
 ```python
 # Add constraints
 architecture.add_constraint(Constraint(
@@ -268,12 +287,14 @@ output, proof = architecture.reason_with_proof(input_data)
 **Description**: Every output comes with a logical proof of correctness
 
 **Proof Components**:
+
 - Proof steps with dependencies
 - Justifications for each step
 - Confidence scores
 - Overall validity score
 
 **Verification Process**:
+
 ```python
 output, proof = architecture.reason_with_proof(input_data, generate_proof=True)
 
@@ -290,12 +311,14 @@ print(explanation)
 **Description**: Seamlessly integrates with multi-agent systems
 
 **SymbolicReasoningAgent** handles:
+
 - Program synthesis tasks
 - Verified reasoning tasks
 - Rule learning tasks
 - Constraint solving tasks
 
 **Example Integration**:
+
 ```python
 agent = create_symbolic_reasoning_agent("symbolic_agent")
 
@@ -345,10 +368,12 @@ def add_symbolic_knowledge(
 Add symbolic knowledge (facts and rules) to the system.
 
 **Parameters**:
+
 - `facts`: List of symbolic expressions representing facts
 - `rules`: List of logical rules (IF-THEN rules)
 
 **Example**:
+
 ```python
 facts = [SymbolicExpression(LogicalOperator.AND, variable="is_valid")]
 rules = [LogicalRule(...)]
@@ -364,6 +389,7 @@ def add_constraint(self, constraint: Constraint) -> None
 Add a symbolic constraint for neural training.
 
 **Parameters**:
+
 - `constraint`: Constraint object with expression and weight
 
 ##### synthesize_program()
@@ -380,6 +406,7 @@ def synthesize_program(
 Synthesize a program from natural language and examples.
 
 **Parameters**:
+
 - `description`: Natural language description of desired program
 - `examples`: Input-output examples
 - `constraints`: Optional symbolic constraints
@@ -399,6 +426,7 @@ def learn_logic_rules(
 Learn logical rules from training data.
 
 **Parameters**:
+
 - `training_data`: List of (input, output) pairs
 - `num_epochs`: Number of training epochs
 
@@ -417,6 +445,7 @@ def reason_with_proof(
 Perform reasoning with proof generation.
 
 **Parameters**:
+
 - `input_data`: Input for reasoning
 - `generate_proof`: Whether to generate logical proof
 
@@ -435,6 +464,7 @@ def verify_output(
 Verify output correctness using its proof.
 
 **Parameters**:
+
 - `output`: Output to verify
 - `proof`: Logical proof of correctness
 
@@ -565,27 +595,27 @@ print(explanation)
 # Output:
 # Reasoning Explanation:
 # ============================================================
-# 
+#
 # Input: [1.0, 2.0, 3.0]
 # Output: [0.245, 0.312, 0.443]
-# 
+#
 # Reasoning Process:
 #   1. Input data satisfies preconditions
 #      Justification: Input validation checks passed
 #      Confidence: 95.00%
-# 
+#
 #   2. Neural model produces output: [0.245, 0.312, 0.443]
 #      Justification: Forward pass through verified architecture
 #      Confidence: 90.00%
-# 
+#
 #   3. Output satisfies 3 constraints
 #      Justification: Constraints verified: [...]
 #      Confidence: 85.00%
-# 
+#
 #   4. Output is logically consistent
 #      Justification: Symbolic reasoning verification
 #      Confidence: 88.00%
-# 
+#
 # Conclusion: Output [0.245, 0.312, 0.443] is correct with 89.50% confidence
 # Overall Validity: 89.50%
 # Verified: ✓
@@ -600,7 +630,7 @@ from training.neural_symbolic_architecture import create_symbolic_reasoning_agen
 async def main():
     # Create symbolic reasoning agent
     agent = create_symbolic_reasoning_agent("my_symbolic_agent")
-    
+
     # Task 1: Program synthesis
     synthesis_task = {
         "type": "program_synthesis",
@@ -610,16 +640,16 @@ async def main():
             {"inputs": {"text": "world"}, "output": "dlrow"}
         ]
     }
-    
+
     result1 = await agent.handle_task(synthesis_task)
     print(f"Synthesized Program:\n{result1['program']}")
-    
+
     # Task 2: Verified reasoning
     reasoning_task = {
         "type": "verified_reasoning",
         "input": [1.0, 2.0, 3.0]
     }
-    
+
     result2 = await agent.handle_task(reasoning_task)
     print(f"\nReasoning Result: {result2['output']}")
     print(f"Verified: {result2['verified']}")
@@ -672,15 +702,15 @@ optimizer = optim.Adam(architecture.logic_network.parameters(), lr=0.001)
 for epoch in range(num_epochs):
     for batch in dataloader:
         inputs, targets = batch
-        
+
         # Forward pass
         outputs = architecture.logic_network(inputs)
-        
+
         # Calculate loss (neural + constraint)
         neural_loss = criterion(outputs, targets)
         constraint_loss = architecture.constraint_layer(inputs, outputs)
         total_loss = neural_loss + constraint_loss
-        
+
         # Backward pass
         optimizer.zero_grad()
         total_loss.backward()
@@ -693,30 +723,30 @@ for epoch in range(num_epochs):
 
 ### Program Synthesis Accuracy
 
-| Task Type | Accuracy | Avg. Synthesis Time |
-|-----------|----------|---------------------|
-| Sorting   | 95%      | 0.12s              |
-| Filtering | 92%      | 0.10s              |
-| Mapping   | 88%      | 0.15s              |
-| Arithmetic| 85%      | 0.08s              |
-| Complex   | 78%      | 0.25s              |
+| Task Type  | Accuracy | Avg. Synthesis Time |
+| ---------- | -------- | ------------------- |
+| Sorting    | 95%      | 0.12s               |
+| Filtering  | 92%      | 0.10s               |
+| Mapping    | 88%      | 0.15s               |
+| Arithmetic | 85%      | 0.08s               |
+| Complex    | 78%      | 0.25s               |
 
 ### Logical Rule Learning
 
-| Dataset Size | Rules Learned | Accuracy | Training Time |
-|--------------|---------------|----------|---------------|
-| 100 examples | 5.2 (avg)     | 82%      | 8.5s          |
-| 500 examples | 8.7 (avg)     | 87%      | 42s           |
-| 1000 examples| 12.3 (avg)    | 91%      | 95s           |
+| Dataset Size  | Rules Learned | Accuracy | Training Time |
+| ------------- | ------------- | -------- | ------------- |
+| 100 examples  | 5.2 (avg)     | 82%      | 8.5s          |
+| 500 examples  | 8.7 (avg)     | 87%      | 42s           |
+| 1000 examples | 12.3 (avg)    | 91%      | 95s           |
 
 ### Proof Generation
 
-| Proof Type        | Avg. Steps | Avg. Validity | Generation Time |
-|-------------------|------------|---------------|-----------------|
-| Correctness       | 4.5        | 89%           | 0.05s           |
-| Safety            | 3.8        | 92%           | 0.04s           |
-| Termination       | 5.2        | 85%           | 0.07s           |
-| Constraint Sat.   | 4.0        | 91%           | 0.06s           |
+| Proof Type      | Avg. Steps | Avg. Validity | Generation Time |
+| --------------- | ---------- | ------------- | --------------- |
+| Correctness     | 4.5        | 89%           | 0.05s           |
+| Safety          | 3.8        | 92%           | 0.04s           |
+| Termination     | 5.2        | 85%           | 0.07s           |
+| Constraint Sat. | 4.0        | 91%           | 0.06s           |
 
 ### Memory and Computational Requirements
 
@@ -731,21 +761,25 @@ for epoch in range(num_epochs):
 ### Planned Features
 
 1. **Enhanced Program Synthesis**
+
    - Support for more programming languages (JavaScript, Java, C++)
    - Multi-step program synthesis
    - Automatic debugging and repair
 
 2. **Advanced Logic Learning**
+
    - Higher-order logic support
    - Temporal logic (reasoning about time)
    - Modal logic (reasoning about possibility/necessity)
 
 3. **Scalability Improvements**
+
    - Distributed proof generation
    - Incremental rule learning
    - Proof caching and reuse
 
 4. **Explainability Enhancements**
+
    - Interactive proof exploration
    - Visual proof diagrams
    - Natural language proof explanations
@@ -769,6 +803,7 @@ for epoch in range(num_epochs):
 The Hybrid Neural-Symbolic Architecture represents a significant advancement in AI technology, combining the best of both neural and symbolic paradigms. With capabilities spanning program synthesis, rule learning, constrained reasoning, and proof generation, it provides a robust foundation for verifiable, explainable AI systems.
 
 **Key Advantages**:
+
 - ✅ **Verifiable**: All outputs come with logical proofs
 - ✅ **Explainable**: Human-readable reasoning explanations
 - ✅ **Learnable**: Acquires logical rules from data
@@ -781,6 +816,6 @@ The Hybrid Neural-Symbolic Architecture represents a significant advancement in 
 
 ---
 
-*Last Updated: December 2024*  
-*Version: 1.0.0*  
-*License: MIT*
+_Last Updated: December 2024_  
+_Version: 1.0.0_  
+_License: MIT_
