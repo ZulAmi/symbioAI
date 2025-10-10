@@ -87,8 +87,8 @@ class TaskType(Enum):
 @dataclass
 class AgentModel:
     """Individual agent model in the population."""
-    id: str
     model: nn.Module
+    id: Optional[str] = None
     fitness_score: float = 0.0
     task_performances: Dict[str, float] = field(default_factory=dict)
     specializations: List[str] = field(default_factory=list)
@@ -100,6 +100,7 @@ class AgentModel:
     def __post_init__(self):
         if not self.id:
             self.id = f"agent_{hashlib.md5(str(time.time()).encode()).hexdigest()[:8]}"
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -124,10 +125,39 @@ class EvolutionConfig:
     crossover_strategy: CrossoverStrategy = CrossoverStrategy.PARAMETER_AVERAGING
     
     def __post_init__(self):
-        # Validate ratios sum to approximately 1.0
+        # Validate ratios sum to approximately 1.0 (allow for floating point precision)
         total_ratio = self.elitism_ratio + self.crossover_ratio + self.mutation_ratio
-        if abs(total_ratio - 1.0) > 0.01:
-            raise ValueError(f"Population ratios must sum to 1.0, got {total_ratio}")
+
+        if total_ratio <= 0:
+            raise ValueError("Population ratios must be positive")
+
+        if abs(total_ratio - 1.0) > 0.1:
+            logger.warning(
+                "Population ratios sum to %.3f; auto-normalizing to 1.0 (elitism=%.3f, crossover=%.3f, mutation=%.3f)",
+                total_ratio,
+                self.elitism_ratio,
+                self.crossover_ratio,
+                self.mutation_ratio,
+            )
+
+            scale = 1.0 / total_ratio
+            normalized = {
+                "elitism_ratio": max(0.0, self.elitism_ratio * scale),
+                "crossover_ratio": max(0.0, self.crossover_ratio * scale),
+                "mutation_ratio": max(0.0, self.mutation_ratio * scale),
+            }
+
+            normalized_total = sum(normalized.values())
+            if normalized_total == 0:
+                raise ValueError("Population ratios normalization failed; all ratios are zero")
+
+            final_scale = 1.0 / normalized_total
+            for key, value in normalized.items():
+                object.__setattr__(self, key, value * final_scale)
+        else:
+            # Adjust minor floating point drift by absorbing the remainder into mutation_ratio
+            remainder = 1.0 - total_ratio
+            object.__setattr__(self, "mutation_ratio", max(0.0, self.mutation_ratio + remainder))
 
 
 class TaskEvaluator(ABC):

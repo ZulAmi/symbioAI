@@ -16,7 +16,7 @@ import json
 import numpy as np
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, Callable, Set
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, is_dataclass
 from datetime import datetime
 from collections import defaultdict
 from enum import Enum
@@ -622,6 +622,29 @@ class ZeroShotTaskSynthesizer:
 
 
 class CrossTaskTransferEngine:
+    @staticmethod
+    def _make_json_safe(obj: Any) -> Any:
+        """Convert objects with complex types (Enum, datetime, dataclass) into JSON-safe values."""
+        if is_dataclass(obj):
+            obj = asdict(obj)
+
+        if isinstance(obj, Enum):
+            return obj.value
+
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+
+        if isinstance(obj, Path):
+            return str(obj)
+
+        if isinstance(obj, dict):
+            return {key: CrossTaskTransferEngine._make_json_safe(value) for key, value in obj.items()}
+
+        if isinstance(obj, (list, tuple, set)):
+            return [CrossTaskTransferEngine._make_json_safe(value) for value in obj]
+
+        return obj
+
     """
     Main engine for cross-task transfer learning.
     
@@ -1132,8 +1155,10 @@ class CrossTaskTransferEngine:
             "exported_at": datetime.utcnow().isoformat()
         }
         
+        serializable_data = self._make_json_safe(graph_data)
+
         with open(output_path, 'w') as f:
-            json.dump(graph_data, f, indent=2)
+            json.dump(serializable_data, f, indent=2)
         
         self.logger.info(f"Exported transfer graph to {output_path}")
 
