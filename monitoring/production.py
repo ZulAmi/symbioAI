@@ -548,9 +548,22 @@ class TimingContext:
 class ProductionLogger:
     """Production-grade structured logging system."""
     
-    def __init__(self, config: Dict[str, Any]):
-        self.config = config
+    def __init__(self, config: Union[Dict[str, Any], str] = None):
+        # Handle both dict config and string name
+        if isinstance(config, str):
+            # If string provided (logger name), create default config
+            self.name = config
+            self.config = {'level': 'INFO', 'file': 'logs/symbio_ai.log'}
+        elif isinstance(config, dict):
+            self.name = config.get('name', __name__)
+            self.config = config
+        else:
+            # Default config
+            self.name = __name__
+            self.config = {'level': 'INFO', 'file': 'logs/symbio_ai.log'}
+        
         self.setup_logging()
+        self._logger = logging.getLogger(self.name)
         self.request_id_var = None
         self.correlation_id_var = None
     
@@ -566,26 +579,47 @@ class ProductionLogger:
         root_logger = logging.getLogger()
         root_logger.setLevel(getattr(logging, self.config.get('level', 'INFO')))
         
-        # Console handler
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        root_logger.addHandler(console_handler)
+        # Console handler (avoid duplicate attachment)
+        console_handler_exists = any(
+            isinstance(handler, logging.StreamHandler) and getattr(handler, "_symbio_structured", False)
+            for handler in root_logger.handlers
+        )
+        if not console_handler_exists:
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(formatter)
+            console_handler._symbio_structured = True  # Mark to prevent duplicates
+            root_logger.addHandler(console_handler)
         
         # File handler
         log_file = self.config.get('file', 'logs/symbio_ai.log')
-        Path(log_file).parent.mkdir(parents=True, exist_ok=True)
-        
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        root_logger.addHandler(file_handler)
+        log_path = Path(log_file)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+
+        resolved_log_path = str(log_path.resolve())
+        file_handler_exists = any(
+            isinstance(handler, logging.FileHandler)
+            and getattr(handler, "_symbio_structured", False)
+            and getattr(handler, "baseFilename", None) == resolved_log_path
+            for handler in root_logger.handlers
+        )
+
+        if not file_handler_exists:
+            file_handler = logging.FileHandler(resolved_log_path)
+            file_handler.setFormatter(formatter)
+            file_handler._symbio_structured = True
+            root_logger.addHandler(file_handler)
         
         # Disable some noisy loggers
         logging.getLogger('urllib3').setLevel(logging.WARNING)
         logging.getLogger('asyncio').setLevel(logging.WARNING)
     
-    def get_logger(self, name: str) -> logging.Logger:
+    def get_logger(self, name: str = None) -> logging.Logger:
         """Get a logger with structured formatting."""
-        return logging.getLogger(name)
+        return logging.getLogger(name or self.name)
+
+    def __getattr__(self, item):
+        """Proxy attribute access to the underlying standard logger."""
+        return getattr(self._logger, item)
 
 
 class StructuredFormatter(logging.Formatter):

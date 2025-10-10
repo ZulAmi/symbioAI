@@ -1,0 +1,364 @@
+{
+  "tasks": {
+    "vision_image_classification": {
+      "task_id": "vision_image_classification",
+      "task_name": "Image Classification",
+      "task_type": "classification",
+      "domain": "vision",
+      "input_dimensionality": 150528,
+      "output_dimensionality": 1000,
+      "sample_complexity": 0.6,
+      "computational_complexity": 0.7,
+      "task_description": "Classify images into 1000 categories",
+      "required_skills": [
+        "feature_extraction",
+        "pattern_recognition",
+        "visual_reasoning"
+      ],
+      "domain_knowledge": [
+        "computer_vision",
+        "convolutional_networks"
+      ],
+      "best_performance": 0.0,
+      "current_performance": 0.0,
+      "training_history": [],
+      "source_tasks": [],
+      "target_tasks": [],
+      "transfer_efficiency": {},
+      "task_embedding": null,
+      "created_at": "2025-10-10T14:53:44.001178"
+    },
+    "vision_object_detection": {
+      "task_id": "vision_object_detection",
+      "task_name": "Object Detection",
+      "task_type": "detection",
+      "domain": "vision",
+      "input_dimensionality": 150528,
+      "output_dimensionality": 100,
+      "sample_complexity": 0.8,
+      "computational_complexity": 0.9,
+      "task_description": "Detect and locate objects in images",
+      "required_skills": [
+        "feature_extraction",
+        "spatial_reasoning",
+        "pattern_recognition"
+      ],
+      "domain_knowledge": [
+        "computer_vision",
+        "region_proposals",
+        "anchor_boxes"
+      ],
+      "best_performance": 0.0,
+      "current_performance": 0.0,
+      "training_history": [],
+      "source_tasks": [],
+      "target_tasks": [],
+      "transfer_efficiency": {},
+      "task_embedding": null,
+      "created_at": "2025-10-10T14:53:44.001363"
+    },
+    "nlp_sentiment_analysis": {
+      "task_id": "nlp_sentiment_analysis",
+      "task_name": "Sentiment Analysis",
+      "task_type": "classification",
+      "domain": "nlp",
+      "input_dimensionality": 512,
+      "output_dimensionality": 3,
+      "sample_complexity": 0.4,
+      "computational_complexity": 0.3,
+      "task_description": "Classify text sentiment (positive/negative/neutral)",
+      "required_skills": [
+        "text_understanding",
+        "semantic_analysis",
+        "pattern_recognition"
+      ],
+      "domain_knowledge": [
+        "natural_language_processing",
+        "transformers"
+      ],
+      "best_performance": 0.0,
+      "current_performance": 0.0,
+      "training_history": [],
+      "source_tasks": [],
+      "target_tasks": [],
+      "transfer_efficiency": {},
+      "task_embedding": null,
+      "created_at": "2025-10-10T14:53:44.001366"
+    },
+    "nlp_text_summarization": {
+      "task_id": "nlp_text_summarization",
+      "task_name": "Text Summarization",
+      "task_type": "generation",
+      "domain": "nlp",
+      "input_dimensionality": 512,
+      "output_dimensionality": 128,
+      "sample_complexity": 0.7,
+      "computational_complexity": 0.6,
+      "task_description": "Generate concise summaries of long text",
+      "required_skills": [
+        "text_understanding",
+        "semantic_analysis",
+        "generation"
+      ],
+      "domain_knowledge": [
+        "natural_language_processing",
+        "transformers",
+        "attention"
+      ],
+      "best_performance": 0.0,
+      "current_performance": 0.0,
+      "training_history": [],
+      "source_tasks": [],
+      "target_tasks": [],
+      "transfer_efficiency": {},
+      "task_embedding": null,
+      "created_at": "2025-10-10T14:53:44.001368"
+    },
+    "audio_speech_recognition": {
+      "task_id": "audio_speech_recognition",
+      "task_name": "Speech Recognition",
+      "task_type": "sequence_to_sequence",
+      "domain": "audio",
+      "input_dimensionality": 16000,
+      "output_dimensionality": 5000,
+      "sample_complexity": 0.9,
+      "computational_complexity": 0.8,
+      "task_description": "Convert speech audio to text",
+      "required_skills": [
+        "temporal_modeling",
+        "pattern_recognition",
+        "sequence_processing"
+      ],
+      "domain_knowledge": [
+        "audio_processing",
+        "recurrent_networks",
+        "attention"
+      ],
+      "best_performance": 0.0,
+      "current_performance": 0.0,
+      "training_history": [],
+      "source_tasks": [],
+      "target_tasks": [],
+      "transfer_efficiency": {},
+      "task_embedding": null,
+      "created_at": "2025-10-10T14:53:44.001370"
+    }
+  },
+  "transfer_edges": [
+    {
+      "source_task": "vision_object_detection",
+      "target_task": "vision_image_classification",
+      "relation_type": "weakly_similar",
+      "transfer_direction": "bidirectional",
+      "transfer_coefficient": 0.5,
+      "performance_gain": 0.0,
+      "sample_efficiency_gain": 0.0,
+      "convergence_speed_gain": 0.0,
+      "shared_representations": [
+        "feature_extraction",
+        "pattern_recognition"
+      ],
+      "transferred_layers": [],
+      "adaptation_required": 0.0,
+      "transfer_attempts": 0,
+      "successful_transfers": 0,
+      "last_transfer": "2025-10-10T14:53:44.001674",
+      "optimal_transfer_strategy": "",
+      "failure_modes": []
+    },
+    {
+      "source_task": "nlp_sentiment_analysis",
+      "target_task": "vision_image_classification",
+      "relation_type": "complementary",
+      "transfer_direction": "bidirectional",
+      "transfer_coefficient": 0.38,
+      "performance_gain": 0.0,
+      "sample_efficiency_gain": 0.0,
+      "convergence_speed_gain": 0.0,
+      "shared_representations": [
+        "pattern_recognition"
+      ],
+      "transferred_layers": [],
+      "adaptation_required": 0.0,
+      "transfer_attempts": 0,
+      "successful_transfers": 0,
+      "last_transfer": "2025-10-10T14:53:44.001703",
+      "optimal_transfer_strategy": "",
+      "failure_modes": []
+    },
+    {
+      "source_task": "nlp_sentiment_analysis",
+      "target_task": "nlp_text_summarization",
+      "relation_type": "weakly_similar",
+      "transfer_direction": "bidirectional",
+      "transfer_coefficient": 0.5,
+      "performance_gain": 0.1,
+      "sample_efficiency_gain": 0.0,
+      "convergence_speed_gain": 0.0,
+      "shared_representations": [
+        "semantic_analysis",
+        "text_understanding"
+      ],
+      "transferred_layers": [],
+      "adaptation_required": 0.0,
+      "transfer_attempts": 1,
+      "successful_transfers": 1,
+      "last_transfer": "2025-10-10T14:53:44.503066",
+      "optimal_transfer_strategy": "",
+      "failure_modes": []
+    },
+    {
+      "source_task": "nlp_text_summarization",
+      "target_task": "nlp_sentiment_analysis",
+      "relation_type": "weakly_similar",
+      "transfer_direction": "bidirectional",
+      "transfer_coefficient": 0.5,
+      "performance_gain": 0.0,
+      "sample_efficiency_gain": 0.0,
+      "convergence_speed_gain": 0.0,
+      "shared_representations": [
+        "semantic_analysis",
+        "text_understanding"
+      ],
+      "transferred_layers": [],
+      "adaptation_required": 0.0,
+      "transfer_attempts": 0,
+      "successful_transfers": 0,
+      "last_transfer": "2025-10-10T14:53:44.001733",
+      "optimal_transfer_strategy": "",
+      "failure_modes": []
+    },
+    {
+      "source_task": "vision_image_classification",
+      "target_task": "vision_object_detection",
+      "relation_type": "moderately_similar",
+      "transfer_direction": "unidirectional",
+      "transfer_coefficient": 0.5,
+      "performance_gain": 0.1,
+      "sample_efficiency_gain": 0.0,
+      "convergence_speed_gain": 0.0,
+      "shared_representations": [],
+      "transferred_layers": [],
+      "adaptation_required": 0.0,
+      "transfer_attempts": 1,
+      "successful_transfers": 1,
+      "last_transfer": "2025-10-10T14:53:44.503045",
+      "optimal_transfer_strategy": "",
+      "failure_modes": []
+    }
+  ],
+  "curricula": {
+    "curriculum_vision_object_detection_1760075624.502948": {
+      "curriculum_id": "curriculum_vision_object_detection_1760075624.502948",
+      "target_task": "vision_object_detection",
+      "strategy": "transfer_potential",
+      "task_sequence": [
+        "vision_image_classification",
+        "vision_object_detection"
+      ],
+      "task_difficulties": {
+        "vision_image_classification": 0.6499999999999999,
+        "vision_object_detection": 0.8500000000000001
+      },
+      "task_dependencies": {
+        "vision_image_classification": [],
+        "vision_object_detection": []
+      },
+      "expected_performance": 0.7,
+      "actual_performance": 0.0,
+      "curriculum_efficiency": 0.0,
+      "adaptive_adjustments": 0,
+      "skipped_tasks": [],
+      "repeated_tasks": [],
+      "created_at": "2025-10-10T14:53:44.502963",
+      "completed_at": null
+    },
+    "curriculum_vision_object_detection_1760075624.503002": {
+      "curriculum_id": "curriculum_vision_object_detection_1760075624.503002",
+      "target_task": "vision_object_detection",
+      "strategy": "easy_to_hard",
+      "task_sequence": [
+        "vision_image_classification",
+        "vision_object_detection"
+      ],
+      "task_difficulties": {
+        "vision_image_classification": 0.6499999999999999,
+        "vision_object_detection": 0.8500000000000001
+      },
+      "task_dependencies": {
+        "vision_image_classification": [],
+        "vision_object_detection": []
+      },
+      "expected_performance": 0.7,
+      "actual_performance": 0.0,
+      "curriculum_efficiency": 0.0,
+      "adaptive_adjustments": 0,
+      "skipped_tasks": [],
+      "repeated_tasks": [],
+      "created_at": "2025-10-10T14:53:44.503007",
+      "completed_at": null
+    }
+  },
+  "meta_knowledge": {},
+  "metrics": {
+    "num_tasks": 5,
+    "num_trained_models": 5,
+    "num_transfer_edges": 5,
+    "num_curricula": 2,
+    "num_meta_knowledge": 0,
+    "total_transfers": 2,
+    "avg_transfer_coefficient": 0.476,
+    "discovery_events": 4
+  },
+  "transfer_history": [
+    {
+      "source_task": "vision_image_classification",
+      "target_task": "vision_object_detection",
+      "strategy": "fine_tuning",
+      "performance_gain": 0.1,
+      "sample_efficiency_gain": 0.15,
+      "convergence_speed_gain": 0.125,
+      "timestamp": "2025-10-10T14:53:44.503045"
+    },
+    {
+      "source_task": "nlp_sentiment_analysis",
+      "target_task": "nlp_text_summarization",
+      "strategy": "feature_extraction",
+      "performance_gain": 0.1,
+      "sample_efficiency_gain": 0.15,
+      "convergence_speed_gain": 0.125,
+      "timestamp": "2025-10-10T14:53:44.503066"
+    }
+  ],
+  "discovery_log": [
+    {
+      "timestamp": "2025-10-10T14:53:44.001680",
+      "source": "vision_object_detection",
+      "target": "vision_image_classification",
+      "relation": "weakly_similar",
+      "transfer_coefficient": 0.5
+    },
+    {
+      "timestamp": "2025-10-10T14:53:44.001705",
+      "source": "nlp_sentiment_analysis",
+      "target": "vision_image_classification",
+      "relation": "complementary",
+      "transfer_coefficient": 0.38
+    },
+    {
+      "timestamp": "2025-10-10T14:53:44.001715",
+      "source": "nlp_sentiment_analysis",
+      "target": "nlp_text_summarization",
+      "relation": "weakly_similar",
+      "transfer_coefficient": 0.5
+    },
+    {
+      "timestamp": "2025-10-10T14:53:44.001735",
+      "source": "nlp_text_summarization",
+      "target": "nlp_sentiment_analysis",
+      "relation": "weakly_similar",
+      "transfer_coefficient": 0.5
+    }
+  ],
+  "exported_at": "2025-10-10T14:53:44.504042"
+}

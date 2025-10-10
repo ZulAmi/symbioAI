@@ -26,12 +26,44 @@ import hashlib
 import numpy as np
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple, Callable, Set, Union
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, is_dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 from collections import defaultdict, deque
 import torch
 import torch.nn as nn
+
+
+def _make_json_safe(obj: Any) -> Any:
+    """Convert complex objects (dataclasses, numpy types) into JSON-safe values."""
+    if is_dataclass(obj):
+        obj = asdict(obj)
+
+    if isinstance(obj, Enum):
+        return obj.value
+
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+
+    if isinstance(obj, Path):
+        return str(obj)
+
+    if isinstance(obj, np.generic):
+        return obj.item()
+
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+
+    if isinstance(obj, dict):
+        return {key: _make_json_safe(value) for key, value in obj.items()}
+
+    if isinstance(obj, (list, tuple, set)):
+        return [_make_json_safe(value) for value in obj]
+
+    if hasattr(obj, "to_json"):
+        return obj.to_json()
+
+    return obj
 
 # Import existing evolutionary infrastructure
 from training.evolution import (
@@ -906,7 +938,7 @@ class RecursiveSelfImprovementEngine:
         
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
-            json.dump(export_data, f, indent=2)
+            json.dump(_make_json_safe(export_data), f, indent=2)
         
         self.logger.info(f"Exported learned strategies to {output_path}")
 
