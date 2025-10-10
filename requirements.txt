@@ -145,6 +145,13 @@ mkdocs==1.5.3
 mkdocs-material==9.4.10
 
 # ========================================
+# FORMAL VERIFICATION (Optional)
+# ========================================
+
+# Add this to enable real Z3 proofs (system gracefully degrades without it)
+z3-solver==4.12.2
+
+# ========================================
 # CLOUD & DEPLOYMENT
 # ========================================
 

@@ -348,9 +348,18 @@ class CoordinatorAgent(Agent):
     """Coordinator agent for managing agent collaboration."""
     
     def __init__(self, agent_id: str):
-        super().__init__(agent_id, "coordinator", AgentCapabilities())
+        capabilities = AgentCapabilities(
+            supported_tasks=[TaskType.COORDINATION],
+            max_concurrent_tasks=5,
+            specializations=["coordination", "load_balancing"]
+        )
+        super().__init__(agent_id, capabilities)
         self.managed_agents: List[Agent] = []
         self.coordination_strategies: Dict[str, Callable] = {}
+    
+    async def execute_task(self, task: Task) -> Any:
+        """Execute a coordination task."""
+        return await self.handle(task.payload)
     
     async def handle(self, task: Dict[str, Any]) -> Any:
         """Handle coordination tasks."""
@@ -402,9 +411,13 @@ class ReasoningAgent(Agent):
                 memory_gb=config.get("memory_gb", 4) if config else 4
             )
         )
-        super().__init__(agent_id, "reasoning", capabilities)
+        super().__init__(agent_id, capabilities)
         self.reasoning_depth = config.get("reasoning_depth", 3) if config else 3
         self.logic_framework = config.get("logic_framework", "deductive") if config else "deductive"
+    
+    async def execute_task(self, task: Task) -> Any:
+        """Execute a reasoning task."""
+        return await self.handle(task.payload)
     
     async def handle(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Handle reasoning and analysis tasks."""
@@ -543,9 +556,13 @@ class CodingAgent(Agent):
                 memory_gb=config.get("memory_gb", 8) if config else 8
             )
         )
-        super().__init__(agent_id, "coding", capabilities)
+        super().__init__(agent_id, capabilities)
         self.supported_languages = config.get("languages", ["python", "javascript", "typescript"]) if config else ["python", "javascript", "typescript"]
         self.code_style = config.get("code_style", "clean_code") if config else "clean_code"
+    
+    async def execute_task(self, task: Task) -> Any:
+        """Execute a coding task."""
+        return await self.handle(task.payload)
     
     async def handle(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Handle coding and programming tasks."""
@@ -712,9 +729,13 @@ class VisionAgent(Agent):
                 gpu_memory_gb=config.get("gpu_memory_gb", 8) if config else 8
             )
         )
-        super().__init__(agent_id, "vision", capabilities)
+        super().__init__(agent_id, capabilities)
         self.supported_formats = config.get("formats", ["jpg", "png", "tiff", "bmp"]) if config else ["jpg", "png", "tiff", "bmp"]
         self.model_type = config.get("model_type", "cnn") if config else "cnn"
+    
+    async def execute_task(self, task: Task) -> Any:
+        """Execute a vision task."""
+        return await self.handle(task.payload)
     
     async def handle(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Handle computer vision tasks."""
@@ -1567,4 +1588,67 @@ class AgentOrchestrator:
             "num_agents": len(successful_results),
             "results": successful_results,
             "consensus": "majority_rule"
+        }
+    
+    async def _chaining_integration(self, partial_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Integrate results by chaining outputs (sequential processing)."""
+        if not partial_results:
+            return {"success": False, "error": "No results to chain"}
+        
+        # Chain results in order
+        chained_result = None
+        for agent_id, result_data in partial_results.items():
+            result = result_data.get("result", {})
+            if chained_result is None:
+                chained_result = result
+            else:
+                # Merge or chain results
+                if isinstance(result, dict) and isinstance(chained_result, dict):
+                    chained_result.update(result)
+        
+        return {
+            "success": True,
+            "strategy": "chaining",
+            "final_result": chained_result,
+            "num_agents": len(partial_results)
+        }
+    
+    async def _weighted_integration(self, partial_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Integrate results using weighted averaging."""
+        if not partial_results:
+            return {"success": False, "error": "No results for weighted integration"}
+        
+        # For now, use equal weights
+        weights = {agent_id: 1.0 / len(partial_results) for agent_id in partial_results}
+        
+        return {
+            "success": True,
+            "strategy": "weighted_average",
+            "weights": weights,
+            "results": partial_results,
+            "num_agents": len(partial_results)
+        }
+    
+    async def _ensemble_integration(self, partial_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Integrate results using ensemble methods."""
+        if not partial_results:
+            return {"success": False, "error": "No results for ensemble"}
+        
+        return {
+            "success": True,
+            "strategy": "ensemble",
+            "results": partial_results,
+            "num_agents": len(partial_results)
+        }
+    
+    async def _hierarchical_integration(self, partial_results: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+        """Integrate results using hierarchical combination."""
+        if not partial_results:
+            return {"success": False, "error": "No results for hierarchical integration"}
+        
+        return {
+            "success": True,
+            "strategy": "hierarchical",
+            "results": partial_results,
+            "num_agents": len(partial_results)
         }
