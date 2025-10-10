@@ -1,0 +1,33 @@
+{
+  "title": "Symbio AI Ops Overview",
+  "panels": [
+    {
+      "name": "Gateway Requests/min",
+      "metric": "gateway.requests_per_minute",
+      "chart": "line",
+      "thresholds": {
+        "warning": 400,
+        "critical": 550
+      }
+    },
+    {
+      "name": "Policy Denials",
+      "metric": "gateway.policy_denials",
+      "chart": "bar"
+    },
+    {
+      "name": "Self-Healing Actions",
+      "metric": "orchestrator.self_heal_events",
+      "chart": "line"
+    },
+    {
+      "name": "Adapter Success Rate",
+      "metric": "adapter.success_ratio",
+      "chart": "gauge",
+      "thresholds": {
+        "warning": 0.82,
+        "critical": 0.7
+      }
+    }
+  ]
+}
