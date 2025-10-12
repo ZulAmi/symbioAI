@@ -9,7 +9,6 @@ Demonstrates all 5 core features:
 5. Dynamic modality routing
 
 Author: Symbio AI Team
-Date: October 2025
 """
 
 import torch

@@ -46,25 +46,25 @@ Ultra-small adapters (nano to medium granularity):
 
 ```python
 from training.sparse_mixture_adapters import (
-    create_sparse_adapter_mixture,
-    AdapterSpecialization,
-    AdapterGranularity
+ create_sparse_adapter_mixture,
+ AdapterSpecialization,
+ AdapterGranularity
 )
 
 # Create system
 smoa = create_sparse_adapter_mixture(
-    max_adapters=1_000_000,  # 1 million capacity
-    max_active_adapters=3,   # Sparse!
-    routing_strategy="hybrid"
+ max_adapters=1_000_000, # 1 million capacity
+ max_active_adapters=3, # Sparse!
+ routing_strategy="hybrid"
 )
 
 # Create nano adapter (2K-10K params)
 adapter = await smoa.create_adapter(
-    specialization=AdapterSpecialization.DOMAIN,
-    domain_tags=["medical", "radiology"],
-    skill_tags=["diagnosis", "classification"],
-    granularity=AdapterGranularity.NANO,
-    rank=2  # Ultra-low rank
+ specialization=AdapterSpecialization.DOMAIN,
+ domain_tags=["medical", "radiology"],
+ skill_tags=["diagnosis", "classification"],
+ granularity=AdapterGranularity.NANO,
+ rank=2 # Ultra-low rank
 )
 ```
 
@@ -96,47 +96,47 @@ Intelligently routes queries to relevant adapters using multiple strategies:
 ```python
 # Query for adapters
 route = await smoa.query_adapters(
-    "Diagnose this chest X-ray for pneumonia",
-    metadata={"task": "diagnosis", "domain": "medical"},
-    strategy=RoutingStrategy.HYBRID
+ "Diagnose this chest X-ray for pneumonia",
+ metadata={"task": "diagnosis", "domain": "medical"},
+ strategy=RoutingStrategy.HYBRID
 )
 
 print(f"Selected {len(route.adapter_ids)} adapters")
 print(f"Routing latency: {route.routing_latency_ms:.2f}ms")
 for adapter_id, score in zip(route.adapter_ids, route.routing_scores):
-    print(f"  {adapter_id}: {score:.3f}")
+ print(f" {adapter_id}: {score:.3f}")
 ```
 
 **Routing Strategies**:
 
 1. **Semantic Routing**: Content-based similarity
 
-   - Embeds query and adapters
-   - Computes cosine similarity
-   - Selects top-k most similar
+ - Embeds query and adapters
+ - Computes cosine similarity
+ - Selects top-k most similar
 
 2. **Task-Based Routing**: Explicit task specification
 
-   - Matches task and domain tags
-   - Fast filtering
-   - Deterministic
+ - Matches task and domain tags
+ - Fast filtering
+ - Deterministic
 
 3. **Learned Routing**: Learned router network
 
-   - Neural router (small MLP)
-   - Learns from usage patterns
-   - Optimizes for performance
+ - Neural router (small MLP)
+ - Learns from usage patterns
+ - Optimizes for performance
 
 4. **Hybrid Routing**: Combines multiple strategies
 
-   - 60% semantic + 40% task-based
-   - Best of both worlds
-   - Recommended default
+ - 60% semantic + 40% task-based
+ - Best of both worlds
+ - Recommended default
 
 5. **Hierarchical Routing**: Coarse-to-fine
-   - Level 1: Domain adapters
-   - Level 2: Task adapters within domains
-   - Efficient for large libraries
+ - Level 1: Domain adapters
+ - Level 2: Task adapters within domains
+ - Efficient for large libraries
 
 #### 3. Adapter Composer (`AdapterComposer`)
 
@@ -145,8 +145,8 @@ Composes multiple adapters hierarchically:
 ```python
 # Compose adapters
 composition = await smoa.compose_adapters(
-    adapter_ids=["adapter_1", "adapter_2", "adapter_3"],
-    strategy="parallel"
+ adapter_ids=["adapter_1", "adapter_2", "adapter_3"],
+ strategy="parallel"
 )
 
 print(f"Composition: {composition.composition_id}")
@@ -176,14 +176,14 @@ print(f"Active: {opt_stats['total_active_adapters']}")
 
 1. **Auto-Merging**: Merges similar/redundant adapters
 
-   - Finds adapters with high similarity (>0.9)
-   - Merges into single adapter
-   - Preserves capabilities
+ - Finds adapters with high similarity (>0.9)
+ - Merges into single adapter
+ - Preserves capabilities
 
 2. **Auto-Pruning**: Removes unused/underperforming adapters
-   - Low usage count (< 10)
-   - Poor success rate (< 30%)
-   - Low specialization score
+ - Low usage count (< 10)
+ - Poor success rate (< 30%)
+ - Low specialization score
 
 #### 5. Sparse Adapter Library (`SparseAdapterLibrary`)
 
@@ -214,16 +214,16 @@ print(f"Cache hit rate: {stats['hit_rate']:.1%}")
 
 ```python
 from training.sparse_mixture_adapters import (
-    create_sparse_adapter_mixture,
-    AdapterSpecialization,
-    AdapterGranularity
+ create_sparse_adapter_mixture,
+ AdapterSpecialization,
+ AdapterGranularity
 )
 
 # Create system
 smoa = create_sparse_adapter_mixture(
-    max_adapters=1_000_000,
-    max_active_adapters=3,
-    routing_strategy="hybrid"
+ max_adapters=1_000_000,
+ max_active_adapters=3,
+ routing_strategy="hybrid"
 )
 
 # Create specialized medical adapters
@@ -231,26 +231,26 @@ specialties = ["radiology", "cardiology", "neurology", "oncology"]
 tasks = ["diagnosis", "treatment", "prognosis"]
 
 for specialty in specialties:
-    for task in tasks:
-        adapter = await smoa.create_adapter(
-            specialization=AdapterSpecialization.DOMAIN,
-            domain_tags=["medical", specialty],
-            skill_tags=[task],
-            granularity=AdapterGranularity.NANO,
-            rank=2
-        )
-        print(f"Created {specialty} {task} adapter")
+ for task in tasks:
+ adapter = await smoa.create_adapter(
+ specialization=AdapterSpecialization.DOMAIN,
+ domain_tags=["medical", specialty],
+ skill_tags=[task],
+ granularity=AdapterGranularity.NANO,
+ rank=2
+ )
+ print(f"Created {specialty} {task} adapter")
 
 # Query for diagnosis
 route = await smoa.query_adapters(
-    "Analyze this chest X-ray for pneumonia",
-    metadata={"task": "diagnosis", "domain": "medical"}
+ "Analyze this chest X-ray for pneumonia",
+ metadata={"task": "diagnosis", "domain": "medical"}
 )
 
 print(f"Selected {len(route.adapter_ids)} adapters:")
 for adapter_id in route.adapter_ids:
-    adapter = smoa.library.get_adapter(adapter_id)
-    print(f"  - {adapter.domain_tags} / {adapter.skill_tags}")
+ adapter = smoa.library.get_adapter(adapter_id)
+ print(f" - {adapter.domain_tags} / {adapter.skill_tags}")
 
 # Apply adapters to base model output
 # result = model(input, adapters=route.adapter_ids)
@@ -261,32 +261,32 @@ for adapter_id in route.adapter_ids:
 ```python
 # Create adapters for multiple domains
 domains = {
-    "medical": ["diagnosis", "treatment", "research"],
-    "legal": ["contract_review", "case_analysis", "compliance"],
-    "finance": ["risk_analysis", "trading", "forecasting"],
-    "education": ["tutoring", "assessment", "curriculum"]
+ "medical": ["diagnosis", "treatment", "research"],
+ "legal": ["contract_review", "case_analysis", "compliance"],
+ "finance": ["risk_analysis", "trading", "forecasting"],
+ "education": ["tutoring", "assessment", "curriculum"]
 }
 
 for domain, tasks in domains.items():
-    for task in tasks:
-        adapter = await smoa.create_adapter(
-            specialization=AdapterSpecialization.DOMAIN,
-            domain_tags=[domain],
-            skill_tags=[task],
-            granularity=AdapterGranularity.NANO
-        )
+ for task in tasks:
+ adapter = await smoa.create_adapter(
+ specialization=AdapterSpecialization.DOMAIN,
+ domain_tags=[domain],
+ skill_tags=[task],
+ granularity=AdapterGranularity.NANO
+ )
 
 # Query across domains
 queries = [
-    ("Diagnose this ECG", {"domain": "medical"}),
-    ("Review this contract", {"domain": "legal"}),
-    ("Predict market volatility", {"domain": "finance"}),
-    ("Create a math lesson plan", {"domain": "education"})
+ ("Diagnose this ECG", {"domain": "medical"}),
+ ("Review this contract", {"domain": "legal"}),
+ ("Predict market volatility", {"domain": "finance"}),
+ ("Create a math lesson plan", {"domain": "education"})
 ]
 
 for query, metadata in queries:
-    route = await smoa.query_adapters(query, metadata=metadata)
-    print(f"{query}: {len(route.adapter_ids)} adapters, {route.routing_latency_ms:.2f}ms")
+ route = await smoa.query_adapters(query, metadata=metadata)
+ print(f"{query}: {len(route.adapter_ids)} adapters, {route.routing_latency_ms:.2f}ms")
 ```
 
 ### Example 3: Hierarchical Composition
@@ -294,23 +294,23 @@ for query, metadata in queries:
 ```python
 # Create base skill adapters
 math_adapter = await smoa.create_adapter(
-    specialization=AdapterSpecialization.SKILL,
-    domain_tags=["mathematics"],
-    skill_tags=["algebra", "calculus"],
-    granularity=AdapterGranularity.NANO
+ specialization=AdapterSpecialization.SKILL,
+ domain_tags=["mathematics"],
+ skill_tags=["algebra", "calculus"],
+ granularity=AdapterGranularity.NANO
 )
 
 coding_adapter = await smoa.create_adapter(
-    specialization=AdapterSpecialization.SKILL,
-    domain_tags=["programming"],
-    skill_tags=["python", "algorithms"],
-    granularity=AdapterGranularity.NANO
+ specialization=AdapterSpecialization.SKILL,
+ domain_tags=["programming"],
+ skill_tags=["python", "algorithms"],
+ granularity=AdapterGranularity.NANO
 )
 
 # Compose for complex task
 composition = await smoa.compose_adapters(
-    adapter_ids=[math_adapter.adapter_id, coding_adapter.adapter_id],
-    strategy="parallel"
+ adapter_ids=[math_adapter.adapter_id, coding_adapter.adapter_id],
+ strategy="parallel"
 )
 
 print(f"Created composition: {composition.composition_id}")
@@ -318,8 +318,8 @@ print(f"Combines: math + coding skills")
 
 # Use composition for numerical computing task
 route = await smoa.query_adapters(
-    "Implement numerical optimization algorithm",
-    metadata={"task": "code_generation"}
+ "Implement numerical optimization algorithm",
+ metadata={"task": "code_generation"}
 )
 ```
 
@@ -328,33 +328,33 @@ route = await smoa.query_adapters(
 ```python
 # Create adapters over time
 async def add_new_specialization(domain, skills):
-    adapters = []
-    for skill in skills:
-        adapter = await smoa.create_adapter(
-            specialization=AdapterSpecialization.DOMAIN,
-            domain_tags=[domain],
-            skill_tags=[skill],
-            granularity=AdapterGranularity.NANO
-        )
-        adapters.append(adapter)
-    return adapters
+ adapters = []
+ for skill in skills:
+ adapter = await smoa.create_adapter(
+ specialization=AdapterSpecialization.DOMAIN,
+ domain_tags=[domain],
+ skill_tags=[skill],
+ granularity=AdapterGranularity.NANO
+ )
+ adapters.append(adapter)
+ return adapters
 
 # Month 1: Medical
 medical_adapters = await add_new_specialization(
-    "medical",
-    ["radiology", "cardiology"]
+ "medical",
+ ["radiology", "cardiology"]
 )
 
 # Month 2: Legal
 legal_adapters = await add_new_specialization(
-    "legal",
-    ["contract", "compliance"]
+ "legal",
+ ["contract", "compliance"]
 )
 
 # Month 3: Finance
 finance_adapters = await add_new_specialization(
-    "finance",
-    ["trading", "risk"]
+ "finance",
+ ["trading", "risk"]
 )
 
 # Library grows continuously
@@ -370,28 +370,28 @@ print(f"Inference cost: CONSTANT (only 3 adapters active)")
 import random
 
 for _ in range(1000):
-    # Random queries
-    query = random.choice([
-        "medical diagnosis",
-        "legal review",
-        "financial analysis"
-    ])
+ # Random queries
+ query = random.choice([
+ "medical diagnosis",
+ "legal review",
+ "financial analysis"
+ ])
 
-    route = await smoa.query_adapters(query)
+ route = await smoa.query_adapters(query)
 
-    # Simulate feedback
-    for adapter_id in route.adapter_ids:
-        adapter = smoa.library.get_adapter(adapter_id)
-        adapter.usage_count += 1
-        adapter.success_rate = random.uniform(0.7, 0.95)
+ # Simulate feedback
+ for adapter_id in route.adapter_ids:
+ adapter = smoa.library.get_adapter(adapter_id)
+ adapter.usage_count += 1
+ adapter.success_rate = random.uniform(0.7, 0.95)
 
 # Optimize library
 opt_stats = await smoa.optimize_library()
 
 print("Optimization results:")
-print(f"  Merged: {opt_stats['adapters_merged']} similar adapters")
-print(f"  Pruned: {opt_stats['adapters_pruned']} unused adapters")
-print(f"  Active: {opt_stats['total_active_adapters']} high-quality adapters")
+print(f" Merged: {opt_stats['adapters_merged']} similar adapters")
+print(f" Pruned: {opt_stats['adapters_pruned']} unused adapters")
+print(f" Active: {opt_stats['total_active_adapters']} high-quality adapters")
 ```
 
 ## Configuration
@@ -402,37 +402,37 @@ print(f"  Active: {opt_stats['total_active_adapters']} high-quality adapters")
 from training.sparse_mixture_adapters import SMoAConfig, RoutingStrategy
 
 config = SMoAConfig(
-    # Library settings
-    max_adapters=1_000_000,              # Max adapters in library
-    default_adapter_rank=4,              # Default LoRA rank
-    default_granularity=AdapterGranularity.NANO,
+ # Library settings
+ max_adapters=1_000_000, # Max adapters in library
+ default_adapter_rank=4, # Default LoRA rank
+ default_granularity=AdapterGranularity.NANO,
 
-    # Routing settings
-    routing_strategy=RoutingStrategy.HYBRID,
-    max_active_adapters=3,               # Sparse activation
-    routing_threshold=0.5,               # Min score to activate
+ # Routing settings
+ routing_strategy=RoutingStrategy.HYBRID,
+ max_active_adapters=3, # Sparse activation
+ routing_threshold=0.5, # Min score to activate
 
-    # Memory management
-    max_loaded_adapters=100,             # LRU cache size
-    lazy_loading=True,                   # Load on demand
-    enable_offloading=True,              # Offload unused
+ # Memory management
+ max_loaded_adapters=100, # LRU cache size
+ lazy_loading=True, # Load on demand
+ enable_offloading=True, # Offload unused
 
-    # Composition
-    enable_hierarchical_composition=True,
-    max_composition_depth=3,
-    enable_adapter_mixing=True,
+ # Composition
+ enable_hierarchical_composition=True,
+ max_composition_depth=3,
+ enable_adapter_mixing=True,
 
-    # Optimization
-    enable_auto_merging=True,
-    merge_similarity_threshold=0.9,
-    enable_auto_pruning=True,
-    prune_usage_threshold=10,
-    prune_score_threshold=0.3,
+ # Optimization
+ enable_auto_merging=True,
+ merge_similarity_threshold=0.9,
+ enable_auto_pruning=True,
+ prune_usage_threshold=10,
+ prune_score_threshold=0.3,
 
-    # Performance
-    routing_latency_budget_ms=1.0,       # Max routing time
-    enable_caching=True,                 # Cache routes
-    cache_ttl_seconds=300
+ # Performance
+ routing_latency_budget_ms=1.0, # Max routing time
+ enable_caching=True, # Cache routes
+ cache_ttl_seconds=300
 )
 
 smoa = SparseAdapterMixture(config)
@@ -442,37 +442,37 @@ smoa = SparseAdapterMixture(config)
 
 ### Routing Latency
 
-| Library Size  | Routing Latency | Cache Hit Rate |
+| Library Size | Routing Latency | Cache Hit Rate |
 | ------------- | --------------- | -------------- |
-| 100 adapters  | 0.08ms          | 85%            |
-| 1K adapters   | 0.12ms          | 75%            |
-| 10K adapters  | 0.18ms          | 65%            |
-| 100K adapters | 0.25ms          | 55%            |
-| 1M adapters   | 0.40ms          | 45%            |
+| 100 adapters | 0.08ms | 85% |
+| 1K adapters | 0.12ms | 75% |
+| 10K adapters | 0.18ms | 65% |
+| 100K adapters | 0.25ms | 55% |
+| 1M adapters | 0.40ms | 45% |
 
-**Result**: Sub-millisecond routing even with 1M+ adapters! ✅
+**Result**: Sub-millisecond routing even with 1M+ adapters!
 
 ### Inference Overhead
 
 | # Adapters | Active | Total Params | Inference Overhead |
 | ---------- | ------ | ------------ | ------------------ |
-| 1K         | 3      | 5M           | 0.0002%            |
-| 100K       | 3      | 500M         | 0.0002%            |
-| 10M        | 3      | 50B          | 0.0002%            |
-| 1B         | 3      | 5T           | 0.0002%            |
+| 1K | 3 | 5M | 0.0002% |
+| 100K | 3 | 500M | 0.0002% |
+| 10M | 3 | 50B | 0.0002% |
+| 1B | 3 | 5T | 0.0002% |
 
-**Result**: Constant 0.0002% overhead regardless of library size! ✅
+**Result**: Constant 0.0002% overhead regardless of library size!
 
 ### Memory Usage
 
 | # Adapters | Total Size | Loaded | Memory Usage |
 | ---------- | ---------- | ------ | ------------ |
-| 1K         | 5MB        | 100    | 500KB        |
-| 100K       | 500MB      | 100    | 500KB        |
-| 10M        | 50GB       | 100    | 500KB        |
-| 1B         | 5TB        | 100    | 500KB        |
+| 1K | 5MB | 100 | 500KB |
+| 100K | 500MB | 100 | 500KB |
+| 10M | 50GB | 100 | 500KB |
+| 1B | 5TB | 100 | 500KB |
 
-**Result**: Constant 500KB memory regardless of library size! ✅
+**Result**: Constant 500KB memory regardless of library size!
 
 ## Integration
 
@@ -489,11 +489,11 @@ lora_adapter = task_manager.create_task_adapter("task_1", rank=8)
 
 # Import into SMoA
 smoa_adapter = await smoa.create_adapter(
-    specialization=AdapterSpecialization.TASK,
-    domain_tags=["imported"],
-    skill_tags=["task_1"],
-    granularity=AdapterGranularity.MICRO,
-    rank=8
+ specialization=AdapterSpecialization.TASK,
+ domain_tags=["imported"],
+ skill_tags=["task_1"],
+ granularity=AdapterGranularity.MICRO,
+ rank=8
 )
 
 # Copy weights (in production)
@@ -506,36 +506,36 @@ smoa_adapter = await smoa.create_adapter(
 import torch.nn as nn
 
 class AdapterEnabledModel(nn.Module):
-    def __init__(self, base_model, smoa):
-        super().__init__()
-        self.base_model = base_model
-        self.smoa = smoa
+ def __init__(self, base_model, smoa):
+ super().__init__()
+ self.base_model = base_model
+ self.smoa = smoa
 
-    async def forward(self, input_text, metadata=None):
-        # Route to adapters
-        route = await self.smoa.query_adapters(
-            input_text,
-            metadata=metadata
-        )
+ async def forward(self, input_text, metadata=None):
+ # Route to adapters
+ route = await self.smoa.query_adapters(
+ input_text,
+ metadata=metadata
+ )
 
-        # Load active adapters
-        active_adapters = [
-            self.smoa.library.get_adapter(aid)
-            for aid in route.adapter_ids
-        ]
+ # Load active adapters
+ active_adapters = [
+ self.smoa.library.get_adapter(aid)
+ for aid in route.adapter_ids
+ ]
 
-        # Apply base model + adapters
-        # (implementation depends on model architecture)
-        output = self.base_model(input_text)
+ # Apply base model + adapters
+ # (implementation depends on model architecture)
+ output = self.base_model(input_text)
 
-        # Apply each adapter with mixing weights
-        if route.routing_scores:
-            for adapter, score in zip(active_adapters, route.routing_scores):
-                # Apply adapter transformation
-                # output = adapter.apply(output, weight=score)
-                pass
+ # Apply each adapter with mixing weights
+ if route.routing_scores:
+ for adapter, score in zip(active_adapters, route.routing_scores):
+ # Apply adapter transformation
+ # output = adapter.apply(output, weight=score)
+ pass
 
-        return output
+ return output
 ```
 
 ### With Agent Orchestrator
@@ -544,33 +544,33 @@ class AdapterEnabledModel(nn.Module):
 from agents.orchestrator import AgentOrchestrator
 
 class SMoAOrchestrator(AgentOrchestrator):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.smoa = create_sparse_adapter_mixture()
+ def __init__(self, *args, **kwargs):
+ super().__init__(*args, **kwargs)
+ self.smoa = create_sparse_adapter_mixture()
 
-    async def execute_task(self, task, context):
-        # Route to specialized adapters
-        route = await self.smoa.query_adapters(
-            task.description,
-            metadata={
-                "task": task.type,
-                "domain": task.domain
-            }
-        )
+ async def execute_task(self, task, context):
+ # Route to specialized adapters
+ route = await self.smoa.query_adapters(
+ task.description,
+ metadata={
+ "task": task.type,
+ "domain": task.domain
+ }
+ )
 
-        # Use adapters for task
-        task.adapters = route.adapter_ids
+ # Use adapters for task
+ task.adapters = route.adapter_ids
 
-        # Execute with specialized adapters
-        result = await super().execute_task(task, context)
+ # Execute with specialized adapters
+ result = await super().execute_task(task, context)
 
-        # Update adapter statistics
-        for adapter_id in route.adapter_ids:
-            adapter = self.smoa.library.get_adapter(adapter_id)
-            adapter.usage_count += 1
-            adapter.success_rate = result.success_rate
+ # Update adapter statistics
+ for adapter_id in route.adapter_ids:
+ adapter = self.smoa.library.get_adapter(adapter_id)
+ adapter.usage_count += 1
+ adapter.success_rate = result.success_rate
 
-        return result
+ return result
 ```
 
 ## Advanced Topics
@@ -583,22 +583,22 @@ Use custom embeddings for better routing:
 from sentence_transformers import SentenceTransformer
 
 class CustomAdapterEmbedder(AdapterEmbedder):
-    def __init__(self):
-        super().__init__(embedding_dim=768)
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+ def __init__(self):
+ super().__init__(embedding_dim=768)
+ self.model = SentenceTransformer('all-MiniLM-L6-v2')
 
-    def embed_adapter(self, adapter):
-        # Create text description
-        text = f"{adapter.specialization.value} "
-        text += " ".join(adapter.domain_tags)
-        text += " ".join(adapter.skill_tags)
+ def embed_adapter(self, adapter):
+ # Create text description
+ text = f"{adapter.specialization.value} "
+ text += " ".join(adapter.domain_tags)
+ text += " ".join(adapter.skill_tags)
 
-        # Encode with sentence transformer
-        embedding = self.model.encode(text)
-        return embedding
+ # Encode with sentence transformer
+ embedding = self.model.encode(text)
+ return embedding
 
-    def embed_query(self, query, metadata=None):
-        return self.model.encode(query)
+ def embed_query(self, query, metadata=None):
+ return self.model.encode(query)
 
 # Use custom embedder
 config = SMoAConfig()
@@ -616,30 +616,30 @@ Train a router network for better performance:
 import torch.nn as nn
 
 class LearnedRouter(nn.Module):
-    def __init__(self, query_dim, num_adapters):
-        super().__init__()
-        self.query_encoder = nn.Linear(query_dim, 256)
-        self.adapter_encoder = nn.Linear(query_dim, 256)
-        self.scorer = nn.Sequential(
-            nn.Linear(512, 128),
-            nn.ReLU(),
-            nn.Linear(128, 1),
-            nn.Sigmoid()
-        )
+ def __init__(self, query_dim, num_adapters):
+ super().__init__()
+ self.query_encoder = nn.Linear(query_dim, 256)
+ self.adapter_encoder = nn.Linear(query_dim, 256)
+ self.scorer = nn.Sequential(
+ nn.Linear(512, 128),
+ nn.ReLU(),
+ nn.Linear(128, 1),
+ nn.Sigmoid()
+ )
 
-    def forward(self, query_emb, adapter_embs):
-        # Encode query
-        q = self.query_encoder(query_emb)
+ def forward(self, query_emb, adapter_embs):
+ # Encode query
+ q = self.query_encoder(query_emb)
 
-        # Score each adapter
-        scores = []
-        for adapter_emb in adapter_embs:
-            a = self.adapter_encoder(adapter_emb)
-            combined = torch.cat([q, a], dim=-1)
-            score = self.scorer(combined)
-            scores.append(score)
+ # Score each adapter
+ scores = []
+ for adapter_emb in adapter_embs:
+ a = self.adapter_encoder(adapter_emb)
+ combined = torch.cat([q, a], dim=-1)
+ score = self.scorer(combined)
+ scores.append(score)
 
-        return torch.stack(scores)
+ return torch.stack(scores)
 
 # Train router
 router_net = LearnedRouter(query_dim=768, num_adapters=1000)
@@ -653,76 +653,76 @@ Create a marketplace for discovering adapters:
 
 ```python
 class AdapterMarketplace:
-    def __init__(self, smoa):
-        self.smoa = smoa
-        self.registry = {}
+ def __init__(self, smoa):
+ self.smoa = smoa
+ self.registry = {}
 
-    def publish_adapter(self, adapter, metadata):
-        """Publish adapter to marketplace."""
-        self.registry[adapter.adapter_id] = {
-            "adapter": adapter,
-            "metadata": metadata,
-            "downloads": 0,
-            "rating": 0.0
-        }
+ def publish_adapter(self, adapter, metadata):
+ """Publish adapter to marketplace."""
+ self.registry[adapter.adapter_id] = {
+ "adapter": adapter,
+ "metadata": metadata,
+ "downloads": 0,
+ "rating": 0.0
+ }
 
-    def search_adapters(self, query, filters=None):
-        """Search for adapters in marketplace."""
-        results = []
+ def search_adapters(self, query, filters=None):
+ """Search for adapters in marketplace."""
+ results = []
 
-        for adapter_id, info in self.registry.items():
-            adapter = info["adapter"]
+ for adapter_id, info in self.registry.items():
+ adapter = info["adapter"]
 
-            # Filter by criteria
-            if filters:
-                if "domain" in filters and filters["domain"] not in adapter.domain_tags:
-                    continue
-                if "min_rating" in filters and info["rating"] < filters["min_rating"]:
-                    continue
+ # Filter by criteria
+ if filters:
+ if "domain" in filters and filters["domain"] not in adapter.domain_tags:
+ continue
+ if "min_rating" in filters and info["rating"] < filters["min_rating"]:
+ continue
 
-            results.append({
-                "adapter_id": adapter_id,
-                "specialization": adapter.specialization.value,
-                "domains": adapter.domain_tags,
-                "skills": adapter.skill_tags,
-                "rating": info["rating"],
-                "downloads": info["downloads"]
-            })
+ results.append({
+ "adapter_id": adapter_id,
+ "specialization": adapter.specialization.value,
+ "domains": adapter.domain_tags,
+ "skills": adapter.skill_tags,
+ "rating": info["rating"],
+ "downloads": info["downloads"]
+ })
 
-        return results
+ return results
 
-    def install_adapter(self, adapter_id):
-        """Install adapter from marketplace."""
-        if adapter_id in self.registry:
-            adapter = self.registry[adapter_id]["adapter"]
-            self.smoa.library.register_adapter(adapter)
-            self.registry[adapter_id]["downloads"] += 1
-            return adapter
-        return None
+ def install_adapter(self, adapter_id):
+ """Install adapter from marketplace."""
+ if adapter_id in self.registry:
+ adapter = self.registry[adapter_id]["adapter"]
+ self.smoa.library.register_adapter(adapter)
+ self.registry[adapter_id]["downloads"] += 1
+ return adapter
+ return None
 
 # Usage
 marketplace = AdapterMarketplace(smoa)
 
 # Publish adapter
 marketplace.publish_adapter(
-    adapter,
-    metadata={
-        "name": "Medical Radiology Diagnosis",
-        "description": "Specialized for chest X-ray analysis",
-        "author": "research_team",
-        "version": "1.0.0"
-    }
+ adapter,
+ metadata={
+ "name": "Medical Radiology Diagnosis",
+ "description": "Specialized for chest X-ray analysis",
+ "author": "research_team",
+ "version": "1.0.0"
+ }
 )
 
 # Search and install
 results = marketplace.search_adapters(
-    "medical diagnosis",
-    filters={"domain": "medical", "min_rating": 4.0}
+ "medical diagnosis",
+ filters={"domain": "medical", "min_rating": 4.0}
 )
 
 for result in results:
-    adapter = marketplace.install_adapter(result["adapter_id"])
-    print(f"Installed: {result['adapter_id']}")
+ adapter = marketplace.install_adapter(result["adapter_id"])
+ print(f"Installed: {result['adapter_id']}")
 ```
 
 ## Best Practices
@@ -825,13 +825,13 @@ See `training/sparse_mixture_adapters.py` for complete API documentation.
 
 The Sparse Mixture of Adapters system enables **infinite specialization at constant cost** through:
 
-1. ✅ **Massive scale** (billions of adapters)
-2. ✅ **Sparse activation** (only 3-5 active)
-3. ✅ **Intelligent routing** (sub-millisecond)
-4. ✅ **Zero overhead** (< 0.01% inference cost)
-5. ✅ **Constant memory** (LRU caching)
-6. ✅ **Auto-optimization** (merge/prune)
+1. **Massive scale** (billions of adapters)
+2. **Sparse activation** (only 3-5 active)
+3. **Intelligent routing** (sub-millisecond)
+4. **Zero overhead** (< 0.01% inference cost)
+5. **Constant memory** (LRU caching)
+6. **Auto-optimization** (merge/prune)
 
 This represents a paradigm shift from "one adapter per task" to "billions of micro-specializations" with no inference cost penalty.
 
-**Result**: Model capabilities can grow infinitely while maintaining constant computational cost! 🚀
+**Result**: Model capabilities can grow infinitely while maintaining constant computational cost!

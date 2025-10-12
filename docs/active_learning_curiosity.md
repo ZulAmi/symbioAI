@@ -4,7 +4,7 @@
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Key Features](#key-features)
@@ -18,7 +18,7 @@
 
 ---
 
-## 🎯 Overview
+## Overview
 
 The Active Learning & Curiosity-Driven Exploration system dramatically reduces the need for labeled data by intelligently selecting which samples to label. It combines:
 
@@ -48,20 +48,20 @@ Intelligent sample selection:
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 ### 1. **Multiple Acquisition Functions**
 
 Select samples using various strategies:
 
-| Function               | Description                     | Use Case                   |
+| Function | Description | Use Case |
 | ---------------------- | ------------------------------- | -------------------------- |
-| **Uncertainty**        | Maximum entropy/uncertainty     | General purpose            |
-| **Margin**             | Smallest margin between classes | Multi-class classification |
-| **BALD**               | Bayesian disagreement           | Deep learning              |
-| **Query-by-Committee** | Ensemble disagreement           | Ensemble models            |
-| **Information Gain**   | Expected information gain       | Exploration                |
-| **Diversity**          | Maximize diversity              | Coverage                   |
+| **Uncertainty** | Maximum entropy/uncertainty | General purpose |
+| **Margin** | Smallest margin between classes | Multi-class classification |
+| **BALD** | Bayesian disagreement | Deep learning |
+| **Query-by-Committee** | Ensemble disagreement | Ensemble models |
+| **Information Gain** | Expected information gain | Exploration |
+| **Diversity** | Maximize diversity | Coverage |
 
 ### 2. **Curiosity-Driven Exploration**
 
@@ -112,28 +112,28 @@ Control labeling costs:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                 Active Learning Engine                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ Uncertainty  │  │  Curiosity   │  │  Diversity   │     │
-│  │  Estimator   │  │   Engine     │  │  Selector    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-│                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │ Hard Example │  │  Self-Paced  │  │   Budget     │     │
-│  │    Miner     │  │  Curriculum  │  │   Manager    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-│                                                              │
-├─────────────────────────────────────────────────────────────┤
-│                      Data Pools                              │
-├─────────────────────────────────────────────────────────────┤
-│  Unlabeled Pool  │  Labeled Pool  │  Pending Requests      │
-└─────────────────────────────────────────────────────────────┘
+
+ Active Learning Engine
+
+
+
+ Uncertainty Curiosity Diversity
+ Estimator Engine Selector
+
+
+
+ Hard Example Self-Paced Budget
+ Miner Curriculum Manager
+
+
+
+ Data Pools
+
+ Unlabeled Pool Labeled Pool Pending Requests
+
 ```
 
 ### Components
@@ -182,7 +182,7 @@ Manages difficulty progression:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -191,16 +191,16 @@ Manages difficulty progression:
 # No additional dependencies required
 ```
 
-### Basic Usage (3 lines!)
+### Basic Usage (!)
 
 ```python
 from training.active_learning_curiosity import create_active_learning_engine
 
 # Create engine
 engine = create_active_learning_engine(
-    acquisition_function="uncertainty",
-    batch_size=10,
-    enable_curiosity=True
+ acquisition_function="uncertainty",
+ batch_size=10,
+ enable_curiosity=True
 )
 
 # Add unlabeled data
@@ -217,56 +217,56 @@ import asyncio
 from training.active_learning_curiosity import create_active_learning_engine
 
 async def active_learning_workflow():
-    # 1. Create engine
-    engine = create_active_learning_engine(
-        acquisition_function="bald",  # Bayesian active learning
-        batch_size=20,
-        enable_curiosity=True,
-        labeling_budget=1000  # Max 1000 labels
-    )
+ # 1. Create engine
+ engine = create_active_learning_engine(
+ acquisition_function="bald", # Bayesian active learning
+ batch_size=20,
+ enable_curiosity=True,
+ labeling_budget=1000 # Max 1000 labels
+ )
 
-    # 2. Add unlabeled data
-    unlabeled_samples = [
-        (f"sample_{i}", {"data": load_sample(i)})
-        for i in range(10000)
-    ]
+ # 2. Add unlabeled data
+ unlabeled_samples = [
+ (f"sample_{i}", {"data": load_sample(i)})
+ for i in range(10000)
+ ]
 
-    features = {
-        f"sample_{i}": extract_features(load_sample(i))
-        for i in range(10000)
-    }
+ features = {
+ f"sample_{i}": extract_features(load_sample(i))
+ for i in range(10000)
+ }
 
-    await engine.add_unlabeled_samples(unlabeled_samples, features)
+ await engine.add_unlabeled_samples(unlabeled_samples, features)
 
-    # 3. Active learning loop
-    for round_num in range(50):  # 50 rounds
-        # Query next batch
-        requests = await engine.query_next_batch(model, batch_size=20)
+ # 3. Active learning loop
+ for round_num in range(50): # 50 rounds
+ # Query next batch
+ requests = await engine.query_next_batch(model, batch_size=20)
 
-        if not requests:
-            break  # Budget exhausted
+ if not requests:
+ break # Budget exhausted
 
-        # Send to human labelers
-        labels = await send_to_labelers(requests)
+ # Send to human labelers
+ labels = await send_to_labelers(requests)
 
-        # Provide labels
-        for req, label in zip(requests, labels):
-            await engine.provide_label(req.request_id, label)
+ # Provide labels
+ for req, label in zip(requests, labels):
+ await engine.provide_label(req.request_id, label)
 
-        # Retrain model with new labels
-        labeled_data = engine.labeled_pool
-        model = train_model(labeled_data)
+ # Retrain model with new labels
+ labeled_data = engine.labeled_pool
+ model = train_model(labeled_data)
 
-        # Monitor progress
-        stats = engine.get_statistics()
-        print(f"Round {round_num}: {stats['total_labels_acquired']} labels")
+ # Monitor progress
+ stats = engine.get_statistics()
+ print(f"Round {round_num}: {stats['total_labels_acquired']} labels")
 
 asyncio.run(active_learning_workflow())
 ```
 
 ---
 
-## 📖 Detailed Guide
+## Detailed Guide
 
 ### Acquisition Functions
 
@@ -276,7 +276,7 @@ Select samples with highest uncertainty:
 
 ```python
 engine = create_active_learning_engine(
-    acquisition_function="uncertainty"
+ acquisition_function="uncertainty"
 )
 ```
 
@@ -290,7 +290,7 @@ Select samples with smallest margin:
 
 ```python
 engine = create_active_learning_engine(
-    acquisition_function="margin"
+ acquisition_function="margin"
 )
 ```
 
@@ -306,8 +306,8 @@ Select samples with highest information gain:
 from training.active_learning_curiosity import ActiveLearningConfig, AcquisitionFunction
 
 config = ActiveLearningConfig(
-    acquisition_function=AcquisitionFunction.BALD,
-    dropout_samples=10  # MC Dropout samples
+ acquisition_function=AcquisitionFunction.BALD,
+ dropout_samples=10 # MC Dropout samples
 )
 engine = ActiveLearningEngine(config)
 ```
@@ -322,10 +322,10 @@ Balance exploration vs. exploitation:
 
 ```python
 config = ActiveLearningConfig(
-    enable_curiosity=True,
-    curiosity_weight=0.3,    # Weight of curiosity signal
-    novelty_weight=0.2,       # Weight of novelty
-    diversity_weight=0.2      # Weight of diversity
+ enable_curiosity=True,
+ curiosity_weight=0.3, # Weight of curiosity signal
+ novelty_weight=0.2, # Weight of novelty
+ diversity_weight=0.2 # Weight of diversity
 )
 ```
 
@@ -338,9 +338,9 @@ Enable self-paced learning:
 
 ```python
 config = ActiveLearningConfig(
-    enable_self_paced=True,
-    difficulty_threshold=0.7,  # Start difficulty
-    curriculum_speed=0.1       # How fast to increase
+ enable_self_paced=True,
+ difficulty_threshold=0.7, # Start difficulty
+ curriculum_speed=0.1 # How fast to increase
 )
 ```
 
@@ -357,14 +357,14 @@ Find challenging cases:
 ```python
 # Mine hard examples
 hard_examples = await engine.mine_hard_examples(
-    model,
-    top_k=100  # Top 100 hardest
+ model,
+ top_k=100 # Top 100 hardest
 )
 
 # Use for focused training
 for example in hard_examples:
-    # Prioritize these for labeling or augmentation
-    pass
+ # Prioritize these for labeling or augmentation
+ pass
 ```
 
 ### Budget Management
@@ -373,8 +373,8 @@ Control costs:
 
 ```python
 config = ActiveLearningConfig(
-    labeling_budget=1000,      # Max 1000 labels
-    max_queries_per_sample=1   # Query each sample once
+ labeling_budget=1000, # Max 1000 labels
+ max_queries_per_sample=1 # Query each sample once
 )
 ```
 
@@ -384,14 +384,14 @@ Ensure coverage:
 
 ```python
 config = ActiveLearningConfig(
-    enable_diversity_filter=True,
-    min_diversity_distance=0.5  # Min distance between samples
+ enable_diversity_filter=True,
+ min_diversity_distance=0.5 # Min distance between samples
 )
 ```
 
 ---
 
-## 📊 API Reference
+## API Reference
 
 ### ActiveLearningEngine
 
@@ -409,9 +409,9 @@ ActiveLearningEngine(config: Optional[ActiveLearningConfig] = None)
 
 ```python
 async def add_unlabeled_samples(
-    self,
-    samples: List[Tuple[str, Any]],
-    features: Optional[Dict[str, np.ndarray]] = None
+ self,
+ samples: List[Tuple[str, Any]],
+ features: Optional[Dict[str, np.ndarray]] = None
 )
 ```
 
@@ -426,9 +426,9 @@ Add unlabeled samples to the pool.
 
 ```python
 async def query_next_batch(
-    self,
-    model: Any,
-    batch_size: Optional[int] = None
+ self,
+ model: Any,
+ batch_size: Optional[int] = None
 ) -> List[LabelRequest]
 ```
 
@@ -445,9 +445,9 @@ Query the next batch of samples to label.
 
 ```python
 async def provide_label(
-    self,
-    request_id: str,
-    label: Any
+ self,
+ request_id: str,
+ label: Any
 )
 ```
 
@@ -462,9 +462,9 @@ Provide label for a request.
 
 ```python
 async def mine_hard_examples(
-    self,
-    model: Any,
-    top_k: int = 100
+ self,
+ model: Any,
+ top_k: int = 100
 ) -> List[UnlabeledSample]
 ```
 
@@ -494,33 +494,33 @@ Configuration for active learning.
 ```python
 @dataclass
 class ActiveLearningConfig:
-    # Acquisition
-    acquisition_function: AcquisitionFunction = AcquisitionFunction.UNCERTAINTY
-    sampling_strategy: SamplingStrategy = SamplingStrategy.WEIGHTED_COMBINATION
-    batch_size: int = 10
+ # Acquisition
+ acquisition_function: AcquisitionFunction = AcquisitionFunction.UNCERTAINTY
+ sampling_strategy: SamplingStrategy = SamplingStrategy.WEIGHTED_COMBINATION
+ batch_size: int = 10
 
-    # Curiosity
-    enable_curiosity: bool = True
-    curiosity_weight: float = 0.3
-    novelty_weight: float = 0.2
-    diversity_weight: float = 0.2
+ # Curiosity
+ enable_curiosity: bool = True
+ curiosity_weight: float = 0.3
+ novelty_weight: float = 0.2
+ diversity_weight: float = 0.2
 
-    # Ensemble
-    ensemble_size: int = 5
-    dropout_samples: int = 10
+ # Ensemble
+ ensemble_size: int = 5
+ dropout_samples: int = 10
 
-    # Curriculum
-    enable_self_paced: bool = True
-    difficulty_threshold: float = 0.7
-    curriculum_speed: float = 0.1
+ # Curriculum
+ enable_self_paced: bool = True
+ difficulty_threshold: float = 0.7
+ curriculum_speed: float = 0.1
 
-    # Mining
-    hard_example_ratio: float = 0.3
-    boundary_threshold: float = 0.1
+ # Mining
+ hard_example_ratio: float = 0.3
+ boundary_threshold: float = 0.1
 
-    # Budget
-    labeling_budget: Optional[int] = None
-    max_queries_per_sample: int = 1
+ # Budget
+ labeling_budget: Optional[int] = None
+ max_queries_per_sample: int = 1
 ```
 
 ### LabelRequest
@@ -530,19 +530,19 @@ Request for human labeling.
 ```python
 @dataclass
 class LabelRequest:
-    request_id: str
-    sample: UnlabeledSample
-    priority: float
-    rationale: str
-    difficulty_estimate: float
-    time_estimate_seconds: float
-    acquisition_function: AcquisitionFunction
-    expected_information_gain: float
+ request_id: str
+ sample: UnlabeledSample
+ priority: float
+ rationale: str
+ difficulty_estimate: float
+ time_estimate_seconds: float
+ acquisition_function: AcquisitionFunction
+ expected_information_gain: float
 ```
 
 ---
 
-## 📈 Performance & ROI
+## Performance & ROI
 
 ### Label Efficiency
 
@@ -560,11 +560,11 @@ class LabelRequest:
 
 ### Accuracy Comparison
 
-| Dataset  | Random (10k labels) | Active (1k labels) | Improvement        |
+| Dataset | Random (10k labels) | Active (1k labels) | Improvement |
 | -------- | ------------------- | ------------------ | ------------------ |
-| MNIST    | 98.5%               | 98.3%              | -0.2% (negligible) |
-| CIFAR-10 | 85.0%               | 84.5%              | -0.5% (negligible) |
-| Custom   | 92.0%               | 91.8%              | -0.2% (negligible) |
+| MNIST | 98.5% | 98.3% | -0.2% (negligible) |
+| CIFAR-10 | 85.0% | 84.5% | -0.5% (negligible) |
+| Custom | 92.0% | 91.8% | -0.2% (negligible) |
 
 **Result**: Achieve near-identical accuracy with 10x fewer labels!
 
@@ -572,14 +572,14 @@ class LabelRequest:
 
 ```
 Traditional ML:
-  Labels: 10,000 × $1 = $10,000
-  Training: 100 epochs × $50 = $5,000
-  Total: $15,000
+ Labels: 10,000 × $1 = $10,000
+ Training: 100 epochs × $50 = $5,000
+ Total: $15,000
 
 Symbio AI:
-  Labels: 1,000 × $1 = $1,000
-  Training: 30 epochs × $50 = $1,500
-  Total: $2,500
+ Labels: 1,000 × $1 = $1,000
+ Training: 30 epochs × $50 = $1,500
+ Total: $2,500
 
 Savings: $12,500 (83% reduction)
 ```
@@ -588,21 +588,21 @@ Savings: $12,500 (83% reduction)
 
 ```
 Traditional ML:
-  Labeling: 10,000 labels × 30s = 83 hours
-  Training: 100 epochs × 10min = 16.7 hours
-  Total: ~100 hours
+ Labeling: 10,000 labels × 30s = 83 hours
+ Training: 100 epochs × 10min = 16.7 hours
+ Total: ~100 hours
 
 Symbio AI:
-  Labeling: 1,000 labels × 30s = 8.3 hours
-  Training: 30 epochs × 10min = 5 hours
-  Total: ~13 hours
+ Labeling: 1,000 labels × 30s = 8.3 hours
+ Training: 30 epochs × 10min = 5 hours
+ Total: ~13 hours
 
 Savings: 87 hours (87% reduction)
 ```
 
 ---
 
-## 🔌 Integration
+## Integration
 
 ### With Existing ML Pipeline
 
@@ -617,36 +617,36 @@ engine = create_active_learning_engine()
 await engine.add_unlabeled_samples(all_data, features)
 
 for _ in range(50):
-    requests = await engine.query_next_batch(model)
-    labels = label_batch(requests)
-    for req, label in zip(requests, labels):
-        await engine.provide_label(req.request_id, label)
+ requests = await engine.query_next_batch(model)
+ labels = label_batch(requests)
+ for req, label in zip(requests, labels):
+ await engine.provide_label(req.request_id, label)
 
-    model = train(engine.labeled_pool)
+ model = train(engine.labeled_pool)
 ```
 
 ### With Human Labeling Platform
 
 ```python
 async def integrate_with_labeling_platform():
-    # Query batch
-    requests = await engine.query_next_batch(model)
+ # Query batch
+ requests = await engine.query_next_batch(model)
 
-    # Send to platform (e.g., Amazon MTurk, Label Studio)
-    task_ids = []
-    for req in requests:
-        task_id = labeling_platform.create_task(
-            data=req.sample.data,
-            priority=req.priority,
-            instructions=req.rationale,
-            time_estimate=req.time_estimate_seconds
-        )
-        task_ids.append((task_id, req.request_id))
+ # Send to platform (e.g., Amazon MTurk, Label Studio)
+ task_ids = []
+ for req in requests:
+ task_id = labeling_platform.create_task(
+ data=req.sample.data,
+ priority=req.priority,
+ instructions=req.rationale,
+ time_estimate=req.time_estimate_seconds
+ )
+ task_ids.append((task_id, req.request_id))
 
-    # Wait for completion
-    for task_id, request_id in task_ids:
-        label = await labeling_platform.wait_for_completion(task_id)
-        await engine.provide_label(request_id, label)
+ # Wait for completion
+ for task_id, request_id in task_ids:
+ label = await labeling_platform.wait_for_completion(task_id)
+ await engine.provide_label(request_id, label)
 ```
 
 ### With Continual Learning
@@ -664,15 +664,15 @@ labels = await get_labels(requests)
 
 # Continual learning learns without forgetting
 for req, label in zip(requests, labels):
-    await al_engine.provide_label(req.request_id, label)
-    cl_engine.add_sample(req.sample.data, label)
+ await al_engine.provide_label(req.request_id, label)
+ cl_engine.add_sample(req.sample.data, label)
 
 cl_engine.train_step(model, batch, optimizer, task)
 ```
 
 ---
 
-## 🏆 Competitive Advantages
+## Competitive Advantages
 
 ### 1. **10x Label Reduction**
 
@@ -724,7 +724,7 @@ cl_engine.train_step(model, batch, optimizer, task)
 
 ---
 
-## 🎓 Research Foundations
+## Research Foundations
 
 This system is based on cutting-edge research:
 
@@ -736,15 +736,15 @@ This system is based on cutting-edge research:
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Issue: Low diversity in selected samples
 
 **Solution**: Increase diversity weight
 
 ```python
-config.diversity_weight = 0.5  # Higher diversity
-config.min_diversity_distance = 0.7  # Stricter threshold
+config.diversity_weight = 0.5 # Higher diversity
+config.min_diversity_distance = 0.7 # Stricter threshold
 ```
 
 ### Issue: Curriculum progresses too fast/slow
@@ -752,9 +752,9 @@ config.min_diversity_distance = 0.7  # Stricter threshold
 **Solution**: Adjust curriculum speed
 
 ```python
-config.curriculum_speed = 0.05  # Slower
+config.curriculum_speed = 0.05 # Slower
 # or
-config.curriculum_speed = 0.2  # Faster
+config.curriculum_speed = 0.2 # Faster
 ```
 
 ### Issue: Too many hard examples selected
@@ -762,13 +762,13 @@ config.curriculum_speed = 0.2  # Faster
 **Solution**: Balance with easier examples
 
 ```python
-config.enable_self_paced = True  # Enable curriculum
-config.hard_example_ratio = 0.2  # Reduce hard example ratio
+config.enable_self_paced = True # Enable curriculum
+config.hard_example_ratio = 0.2 # Reduce hard example ratio
 ```
 
 ---
 
-## 📚 Next Steps
+## Next Steps
 
 1. **Run the demo**: `python examples/active_learning_curiosity_demo.py`
 2. **Integrate with your data**: Connect to your unlabeled pool
@@ -778,15 +778,15 @@ config.hard_example_ratio = 0.2  # Reduce hard example ratio
 
 ---
 
-## 🌟 Summary
+## Summary
 
 Active Learning + Curiosity = **Game-Changing Label Efficiency**
 
-- ✅ 10x fewer labels needed
-- ✅ 3x faster training
-- ✅ 90% cost savings
-- ✅ Better models
-- ✅ Automatic discovery
-- ✅ Enterprise-ready
+- 10x fewer labels needed
+- 3x faster training
+- 90% cost savings
+- Better models
+- Automatic discovery
+- Enterprise-ready
 
-This is the future of efficient machine learning! 🚀
+This is the future of efficient machine learning!

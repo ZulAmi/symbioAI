@@ -9,7 +9,6 @@ Demonstrates all 5 core features:
 5. Multi-scale attention mechanisms
 
 Author: Symbio AI Team
-Date: October 2025
 """
 
 import torch

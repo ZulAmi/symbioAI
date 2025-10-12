@@ -1,8 +1,7 @@
 # Hybrid Neural-Symbolic Architecture
 
-**Version:** 1.0.0  
-**Status:** ✅ Production Ready  
-**Last Updated:** December 2024
+**Version:** 1.0.0
+**Status:** Production Ready
 
 ## Executive Summary
 
@@ -32,23 +31,23 @@ The Hybrid Neural-Symbolic Architecture represents a revolutionary approach to A
 ### System Design
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│           HYBRID NEURAL-SYMBOLIC ARCHITECTURE               │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────────┐        ┌──────────────────┐         │
-│  │  Neural Component│◄──────►│Symbolic Component│         │
-│  └────────┬─────────┘        └────────┬─────────┘         │
-│           │                           │                    │
-│           │    ┌──────────────┐      │                    │
-│           └───►│ Fusion Layer │◄─────┘                    │
-│                └──────┬───────┘                            │
-│                       │                                    │
-│                       ▼                                    │
-│              ┌─────────────────┐                          │
-│              │ Proof Generator │                          │
-│              └─────────────────┘                          │
-└─────────────────────────────────────────────────────────────┘
+
+ HYBRID NEURAL-SYMBOLIC ARCHITECTURE
+
+
+
+ Neural ComponentSymbolic Component
+
+
+
+ Fusion Layer
+
+
+
+
+ Proof Generator
+
+
 ```
 
 ### Component Interaction
@@ -82,10 +81,10 @@ premise2 = SymbolicExpression(LogicalOperator.AND, variable="B")
 conclusion = SymbolicExpression(LogicalOperator.OR, variable="C")
 
 rule = LogicalRule(
-    rule_id="implication_rule",
-    premises=[premise1, premise2],
-    conclusion=conclusion,
-    confidence=0.95
+ rule_id="implication_rule",
+ premises=[premise1, premise2],
+ conclusion=conclusion,
+ confidence=0.95
 )
 ```
 
@@ -130,8 +129,8 @@ synthesizer = ProgramSynthesizer()
 
 description = "Sort a list of numbers in descending order"
 examples = [
-    ProgramExample({"items": [3, 1, 4]}, [4, 3, 1]),
-    ProgramExample({"items": [9, 2, 7]}, [9, 7, 2])
+ ProgramExample({"items": [3, 1, 4]}, [4, 3, 1]),
+ ProgramExample({"items": [9, 2, 7]}, [9, 7, 2])
 ]
 
 program = synthesizer.synthesize(description, examples)
@@ -159,10 +158,10 @@ print(program.code)
 # Constraint: Output must be positive
 expr = SymbolicExpression(LogicalOperator.AND, variable="output > 0")
 constraint = Constraint(
-    constraint_id="positivity",
-    expression=expr,
-    weight=2.0,
-    hard=True
+ constraint_id="positivity",
+ expression=expr,
+ weight=2.0,
+ hard=True
 )
 
 architecture.add_constraint(constraint)
@@ -194,7 +193,7 @@ Proof of Correctness:
 2. Neural inference: Model produces output [0.8, 0.1, 0.1] (90% confidence)
 3. Constraint check: Output satisfies 3 constraints (85% confidence)
 4. Symbolic verification: Output logically consistent (88% confidence)
-Conclusion: Output is correct with 89.5% confidence ✓
+Conclusion: Output is correct with 89.5% confidence
 ```
 
 ---
@@ -221,8 +220,8 @@ architecture = create_neural_symbolic_architecture()
 
 description = "Filter even numbers from a list"
 examples = [
-    ProgramExample({"nums": [1, 2, 3, 4]}, [2, 4]),
-    ProgramExample({"nums": [5, 6, 7, 8]}, [6, 8])
+ ProgramExample({"nums": [1, 2, 3, 4]}, [2, 4]),
+ ProgramExample({"nums": [5, 6, 7, 8]}, [6, 8])
 ]
 
 program = architecture.synthesize_program(description, examples)
@@ -244,9 +243,9 @@ program = architecture.synthesize_program(description, examples)
 
 ```python
 training_data = [
-    ({"feature1": True, "feature2": False}, True),
-    ({"feature1": False, "feature2": True}, False),
-    # ... more examples
+ ({"feature1": True, "feature2": False}, True),
+ ({"feature1": False, "feature2": True}, False),
+ # ... more examples
 ]
 
 learned_rules = architecture.learn_logic_rules(training_data, num_epochs=100)
@@ -271,10 +270,10 @@ learned_rules = architecture.learn_logic_rules(training_data, num_epochs=100)
 ```python
 # Add constraints
 architecture.add_constraint(Constraint(
-    constraint_id="conservation",
-    expression=SymbolicExpression(...),  # Sum of outputs = 1.0
-    weight=5.0,
-    hard=True
+ constraint_id="conservation",
+ expression=SymbolicExpression(...), # Sum of outputs = 1.0
+ weight=5.0,
+ hard=True
 ))
 
 # Training automatically respects constraints
@@ -323,12 +322,12 @@ print(explanation)
 agent = create_symbolic_reasoning_agent("symbolic_agent")
 
 task = {
-    "type": "program_synthesis",
-    "description": "Compute factorial of a number",
-    "examples": [
-        {"inputs": {"n": 5}, "output": 120},
-        {"inputs": {"n": 3}, "output": 6}
-    ]
+ "type": "program_synthesis",
+ "description": "Compute factorial of a number",
+ "examples": [
+ {"inputs": {"n": 5}, "output": 120},
+ {"inputs": {"n": 3}, "output": 6}
+ ]
 }
 
 result = await agent.handle_task(task)
@@ -347,9 +346,9 @@ Main class for hybrid neural-symbolic reasoning.
 
 ```python
 NeuralSymbolicArchitecture(
-    input_dim: int = 128,
-    hidden_dim: int = 256,
-    output_dim: int = 64
+ input_dim: int = 128,
+ hidden_dim: int = 256,
+ output_dim: int = 64
 )
 ```
 
@@ -359,9 +358,9 @@ NeuralSymbolicArchitecture(
 
 ```python
 def add_symbolic_knowledge(
-    self,
-    facts: List[SymbolicExpression],
-    rules: List[LogicalRule]
+ self,
+ facts: List[SymbolicExpression],
+ rules: List[LogicalRule]
 ) -> None
 ```
 
@@ -396,10 +395,10 @@ Add a symbolic constraint for neural training.
 
 ```python
 def synthesize_program(
-    self,
-    description: str,
-    examples: List[ProgramExample],
-    constraints: Optional[List[SymbolicExpression]] = None
+ self,
+ description: str,
+ examples: List[ProgramExample],
+ constraints: Optional[List[SymbolicExpression]] = None
 ) -> SynthesizedProgram
 ```
 
@@ -417,9 +416,9 @@ Synthesize a program from natural language and examples.
 
 ```python
 def learn_logic_rules(
-    self,
-    training_data: List[Tuple[Dict[str, Any], Any]],
-    num_epochs: int = 100
+ self,
+ training_data: List[Tuple[Dict[str, Any], Any]],
+ num_epochs: int = 100
 ) -> List[LogicalRule]
 ```
 
@@ -436,9 +435,9 @@ Learn logical rules from training data.
 
 ```python
 def reason_with_proof(
-    self,
-    input_data: Any,
-    generate_proof: bool = True
+ self,
+ input_data: Any,
+ generate_proof: bool = True
 ) -> Tuple[Any, Optional[LogicalProof]]
 ```
 
@@ -455,9 +454,9 @@ Perform reasoning with proof generation.
 
 ```python
 def verify_output(
-    self,
-    output: Any,
-    proof: LogicalProof
+ self,
+ output: Any,
+ proof: LogicalProof
 ) -> bool
 ```
 
@@ -474,10 +473,10 @@ Verify output correctness using its proof.
 
 ```python
 def explain_reasoning(
-    self,
-    input_data: Any,
-    output: Any,
-    proof: LogicalProof
+ self,
+ input_data: Any,
+ output: Any,
+ proof: LogicalProof
 ) -> str
 ```
 
@@ -493,8 +492,8 @@ Generate human-readable explanation of reasoning.
 
 ```python
 from training.neural_symbolic_architecture import (
-    create_neural_symbolic_architecture,
-    ProgramExample
+ create_neural_symbolic_architecture,
+ ProgramExample
 )
 
 # Create architecture
@@ -503,16 +502,16 @@ architecture = create_neural_symbolic_architecture()
 # Define task
 description = "Calculate the sum of squares of even numbers in a list"
 examples = [
-    ProgramExample(
-        inputs={"numbers": [1, 2, 3, 4]},
-        output=20,  # 2² + 4² = 4 + 16 = 20
-        description="Sum of squares of [2, 4]"
-    ),
-    ProgramExample(
-        inputs={"numbers": [1, 3, 5, 6]},
-        output=36,  # 6² = 36
-        description="Sum of squares of [6]"
-    )
+ ProgramExample(
+ inputs={"numbers": [1, 2, 3, 4]},
+ output=20, # 2² + 4² = 4 + 16 = 20
+ description="Sum of squares of [2, 4]"
+ ),
+ ProgramExample(
+ inputs={"numbers": [1, 3, 5, 6]},
+ output=36, # 6² = 36
+ description="Sum of squares of [6]"
+ )
 ]
 
 # Synthesize program
@@ -521,7 +520,7 @@ program = architecture.synthesize_program(description, examples)
 print(f"Generated Code:\n{program.code}")
 print(f"Correctness Score: {program.correctness_score:.2%}")
 if program.proof:
-    print(f"Proof: {program.proof.conclusion}")
+ print(f"Proof: {program.proof.conclusion}")
 ```
 
 ### Example 2: Learning Logical Rules
@@ -529,10 +528,10 @@ if program.proof:
 ```python
 # Prepare training data
 training_data = [
-    ({"temperature": 35, "humidity": 80}, "uncomfortable"),
-    ({"temperature": 22, "humidity": 50}, "comfortable"),
-    ({"temperature": 10, "humidity": 30}, "cold"),
-    # ... more examples
+ ({"temperature": 35, "humidity": 80}, "uncomfortable"),
+ ({"temperature": 22, "humidity": 50}, "comfortable"),
+ ({"temperature": 10, "humidity": 30}, "cold"),
+ # ... more examples
 ]
 
 # Learn rules
@@ -540,31 +539,31 @@ learned_rules = architecture.learn_logic_rules(training_data, num_epochs=100)
 
 # Print learned rules
 for rule in learned_rules:
-    print(f"Rule: {rule}")
-    print(f"Confidence: {rule.confidence:.2%}")
-    print(f"Weight: {rule.weight:.3f}\n")
+ print(f"Rule: {rule}")
+ print(f"Confidence: {rule.confidence:.2%}")
+ print(f"Weight: {rule.weight:.3f}\n")
 ```
 
 ### Example 3: Constrained Reasoning
 
 ```python
 from training.neural_symbolic_architecture import (
-    Constraint,
-    SymbolicExpression,
-    LogicalOperator
+ Constraint,
+ SymbolicExpression,
+ LogicalOperator
 )
 
 # Define constraint: output probabilities must sum to 1
 constraint_expr = SymbolicExpression(
-    LogicalOperator.AND,
-    variable="sum_equals_one"
+ LogicalOperator.AND,
+ variable="sum_equals_one"
 )
 
 constraint = Constraint(
-    constraint_id="probability_distribution",
-    expression=constraint_expr,
-    weight=10.0,
-    hard=True  # Must be satisfied
+ constraint_id="probability_distribution",
+ expression=constraint_expr,
+ weight=10.0,
+ hard=True # Must be satisfied
 )
 
 architecture.add_constraint(constraint)
@@ -600,25 +599,25 @@ print(explanation)
 # Output: [0.245, 0.312, 0.443]
 #
 # Reasoning Process:
-#   1. Input data satisfies preconditions
-#      Justification: Input validation checks passed
-#      Confidence: 95.00%
+# 1. Input data satisfies preconditions
+# Justification: Input validation checks passed
+# Confidence: 95.00%
 #
-#   2. Neural model produces output: [0.245, 0.312, 0.443]
-#      Justification: Forward pass through verified architecture
-#      Confidence: 90.00%
+# 2. Neural model produces output: [0.245, 0.312, 0.443]
+# Justification: Forward pass through verified architecture
+# Confidence: 90.00%
 #
-#   3. Output satisfies 3 constraints
-#      Justification: Constraints verified: [...]
-#      Confidence: 85.00%
+# 3. Output satisfies 3 constraints
+# Justification: Constraints verified: [...]
+# Confidence: 85.00%
 #
-#   4. Output is logically consistent
-#      Justification: Symbolic reasoning verification
-#      Confidence: 88.00%
+# 4. Output is logically consistent
+# Justification: Symbolic reasoning verification
+# Confidence: 88.00%
 #
 # Conclusion: Output [0.245, 0.312, 0.443] is correct with 89.50% confidence
 # Overall Validity: 89.50%
-# Verified: ✓
+# Verified:
 ```
 
 ### Example 5: Agent Integration
@@ -628,32 +627,32 @@ import asyncio
 from training.neural_symbolic_architecture import create_symbolic_reasoning_agent
 
 async def main():
-    # Create symbolic reasoning agent
-    agent = create_symbolic_reasoning_agent("my_symbolic_agent")
+ # Create symbolic reasoning agent
+ agent = create_symbolic_reasoning_agent("my_symbolic_agent")
 
-    # Task 1: Program synthesis
-    synthesis_task = {
-        "type": "program_synthesis",
-        "description": "Reverse a string",
-        "examples": [
-            {"inputs": {"text": "hello"}, "output": "olleh"},
-            {"inputs": {"text": "world"}, "output": "dlrow"}
-        ]
-    }
+ # Task 1: Program synthesis
+ synthesis_task = {
+ "type": "program_synthesis",
+ "description": "Reverse a string",
+ "examples": [
+ {"inputs": {"text": "hello"}, "output": "olleh"},
+ {"inputs": {"text": "world"}, "output": "dlrow"}
+ ]
+ }
 
-    result1 = await agent.handle_task(synthesis_task)
-    print(f"Synthesized Program:\n{result1['program']}")
+ result1 = await agent.handle_task(synthesis_task)
+ print(f"Synthesized Program:\n{result1['program']}")
 
-    # Task 2: Verified reasoning
-    reasoning_task = {
-        "type": "verified_reasoning",
-        "input": [1.0, 2.0, 3.0]
-    }
+ # Task 2: Verified reasoning
+ reasoning_task = {
+ "type": "verified_reasoning",
+ "input": [1.0, 2.0, 3.0]
+ }
 
-    result2 = await agent.handle_task(reasoning_task)
-    print(f"\nReasoning Result: {result2['output']}")
-    print(f"Verified: {result2['verified']}")
-    print(f"Proof Validity: {result2['proof']['validity']:.2%}")
+ result2 = await agent.handle_task(reasoning_task)
+ print(f"\nReasoning Result: {result2['output']}")
+ print(f"Verified: {result2['verified']}")
+ print(f"Proof Validity: {result2['proof']['validity']:.2%}")
 
 asyncio.run(main())
 ```
@@ -679,9 +678,9 @@ orchestrator.register_agent(symbolic_agent)
 
 # Use in multi-agent workflow
 task = {
-    "description": "Synthesize and verify a sorting algorithm",
-    "type": "program_synthesis",
-    "examples": [...]
+ "description": "Synthesize and verify a sorting algorithm",
+ "type": "program_synthesis",
+ "examples": [...]
 }
 
 result = await orchestrator.solve_task(task)
@@ -700,21 +699,21 @@ architecture = NeuralSymbolicArchitecture()
 optimizer = optim.Adam(architecture.logic_network.parameters(), lr=0.001)
 
 for epoch in range(num_epochs):
-    for batch in dataloader:
-        inputs, targets = batch
+ for batch in dataloader:
+ inputs, targets = batch
 
-        # Forward pass
-        outputs = architecture.logic_network(inputs)
+ # Forward pass
+ outputs = architecture.logic_network(inputs)
 
-        # Calculate loss (neural + constraint)
-        neural_loss = criterion(outputs, targets)
-        constraint_loss = architecture.constraint_layer(inputs, outputs)
-        total_loss = neural_loss + constraint_loss
+ # Calculate loss (neural + constraint)
+ neural_loss = criterion(outputs, targets)
+ constraint_loss = architecture.constraint_layer(inputs, outputs)
+ total_loss = neural_loss + constraint_loss
 
-        # Backward pass
-        optimizer.zero_grad()
-        total_loss.backward()
-        optimizer.step()
+ # Backward pass
+ optimizer.zero_grad()
+ total_loss.backward()
+ optimizer.step()
 ```
 
 ---
@@ -723,30 +722,30 @@ for epoch in range(num_epochs):
 
 ### Program Synthesis Accuracy
 
-| Task Type  | Accuracy | Avg. Synthesis Time |
+| Task Type | Accuracy | Avg. Synthesis Time |
 | ---------- | -------- | ------------------- |
-| Sorting    | 95%      | 0.12s               |
-| Filtering  | 92%      | 0.10s               |
-| Mapping    | 88%      | 0.15s               |
-| Arithmetic | 85%      | 0.08s               |
-| Complex    | 78%      | 0.25s               |
+| Sorting | 95% | 0.12s |
+| Filtering | 92% | 0.10s |
+| Mapping | 88% | 0.15s |
+| Arithmetic | 85% | 0.08s |
+| Complex | 78% | 0.25s |
 
 ### Logical Rule Learning
 
-| Dataset Size  | Rules Learned | Accuracy | Training Time |
+| Dataset Size | Rules Learned | Accuracy | Training Time |
 | ------------- | ------------- | -------- | ------------- |
-| 100 examples  | 5.2 (avg)     | 82%      | 8.5s          |
-| 500 examples  | 8.7 (avg)     | 87%      | 42s           |
-| 1000 examples | 12.3 (avg)    | 91%      | 95s           |
+| 100 examples | 5.2 (avg) | 82% | 8.5s |
+| 500 examples | 8.7 (avg) | 87% | 42s |
+| 1000 examples | 12.3 (avg) | 91% | 95s |
 
 ### Proof Generation
 
-| Proof Type      | Avg. Steps | Avg. Validity | Generation Time |
+| Proof Type | Avg. Steps | Avg. Validity | Generation Time |
 | --------------- | ---------- | ------------- | --------------- |
-| Correctness     | 4.5        | 89%           | 0.05s           |
-| Safety          | 3.8        | 92%           | 0.04s           |
-| Termination     | 5.2        | 85%           | 0.07s           |
-| Constraint Sat. | 4.0        | 91%           | 0.06s           |
+| Correctness | 4.5 | 89% | 0.05s |
+| Safety | 3.8 | 92% | 0.04s |
+| Termination | 5.2 | 85% | 0.07s |
+| Constraint Sat. | 4.0 | 91% | 0.06s |
 
 ### Memory and Computational Requirements
 
@@ -762,32 +761,32 @@ for epoch in range(num_epochs):
 
 1. **Enhanced Program Synthesis**
 
-   - Support for more programming languages (JavaScript, Java, C++)
-   - Multi-step program synthesis
-   - Automatic debugging and repair
+ - Support for more programming languages (JavaScript, Java, C++)
+ - Multi-step program synthesis
+ - Automatic debugging and repair
 
 2. **Advanced Logic Learning**
 
-   - Higher-order logic support
-   - Temporal logic (reasoning about time)
-   - Modal logic (reasoning about possibility/necessity)
+ - Higher-order logic support
+ - Temporal logic (reasoning about time)
+ - Modal logic (reasoning about possibility/necessity)
 
 3. **Scalability Improvements**
 
-   - Distributed proof generation
-   - Incremental rule learning
-   - Proof caching and reuse
+ - Distributed proof generation
+ - Incremental rule learning
+ - Proof caching and reuse
 
 4. **Explainability Enhancements**
 
-   - Interactive proof exploration
-   - Visual proof diagrams
-   - Natural language proof explanations
+ - Interactive proof exploration
+ - Visual proof diagrams
+ - Natural language proof explanations
 
 5. **Integration Expansions**
-   - Direct integration with code repositories (GitHub)
-   - IDE plugins (VS Code, PyCharm)
-   - Web API for remote synthesis
+ - Direct integration with code repositories (GitHub)
+ - IDE plugins (VS Code, PyCharm)
+ - Web API for remote synthesis
 
 ### Research Directions
 
@@ -804,11 +803,11 @@ The Hybrid Neural-Symbolic Architecture represents a significant advancement in 
 
 **Key Advantages**:
 
-- ✅ **Verifiable**: All outputs come with logical proofs
-- ✅ **Explainable**: Human-readable reasoning explanations
-- ✅ **Learnable**: Acquires logical rules from data
-- ✅ **Constrained**: Respects domain knowledge and constraints
-- ✅ **Integrated**: Seamlessly works with multi-agent systems
+- **Verifiable**: All outputs come with logical proofs
+- **Explainable**: Human-readable reasoning explanations
+- **Learnable**: Acquires logical rules from data
+- **Constrained**: Respects domain knowledge and constraints
+- **Integrated**: Seamlessly works with multi-agent systems
 
 **Getting Started**: See `examples/neural_symbolic_demo.py` for complete working examples.
 
@@ -816,6 +815,5 @@ The Hybrid Neural-Symbolic Architecture represents a significant advancement in 
 
 ---
 
-_Last Updated: December 2024_  
-_Version: 1.0.0_  
+_Version: 1.0.0_
 _License: MIT_
