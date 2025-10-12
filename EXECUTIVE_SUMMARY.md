@@ -1,4 +1,4 @@
-# 🎯 Symbio AI: Executive Summary
+# Symbio AI: Executive Summary
 
 ## What It Is
 

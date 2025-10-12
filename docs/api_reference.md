@@ -93,7 +93,7 @@ await data_manager.add_dataset("new_data", my_dataframe, "csv")
 
 # Stream large dataset
 async for batch in data_manager.stream_dataset("large_dataset"):
-    process_batch(batch)
+ process_batch(batch)
 ```
 
 #### Methods
@@ -140,10 +140,10 @@ await registry.initialize()
 
 # Create base model
 model_id = await registry.create_base_model(
-    name="my_transformer",
-    framework=ModelFramework.PYTORCH,
-    architecture="transformer",
-    parameters=1000000
+ name="my_transformer",
+ framework=ModelFramework.PYTORCH,
+ architecture="transformer",
+ parameters=1000000
 )
 
 # Get model
@@ -201,10 +201,10 @@ await orchestrator.initialize()
 
 # Create and submit task
 task = Task(
-    id="inference_task_1",
-    task_type=TaskType.INFERENCE,
-    priority=MessagePriority.HIGH,
-    payload={"model_id": "my_model", "inputs": data}
+ id="inference_task_1",
+ task_type=TaskType.INFERENCE,
+ priority=MessagePriority.HIGH,
+ payload={"model_id": "my_model", "inputs": data}
 )
 task_id = await orchestrator.submit_task(task)
 
@@ -254,15 +254,15 @@ await manager.initialize()
 
 # Start evolutionary training
 training_config = EvolutionaryConfig(
-    population_size=50,
-    max_generations=100,
-    mutation_rate=0.1
+ population_size=50,
+ max_generations=100,
+ mutation_rate=0.1
 )
 
 training_id = await manager.start_evolutionary_training(
-    "experiment_1",
-    model_registry,
-    config=training_config
+ "experiment_1",
+ model_registry,
+ config=training_config
 )
 
 # Check training status
@@ -310,20 +310,20 @@ await benchmark_system.initialize()
 
 # Evaluate single model
 results = await benchmark_system.evaluate_model(
-    model,
-    suite_names=["standard", "adversarial"]
+ model,
+ suite_names=["standard", "adversarial"]
 )
 
 # Compare multiple models
 comparison = await benchmark_system.compare_models(
-    [model1, model2, model3],
-    suite_names=["comprehensive"]
+ [model1, model2, model3],
+ suite_names=["comprehensive"]
 )
 
 # Run ablation study
 ablation = await benchmark_system.run_ablation_study(
-    base_model,
-    [variant1, variant2, variant3]
+ base_model,
+ [variant1, variant2, variant3]
 )
 ```
 
@@ -354,11 +354,11 @@ All async operations may raise exceptions. Wrap in try-catch blocks:
 
 ```python
 try:
-    result = await data_manager.load_dataset("nonexistent")
+ result = await data_manager.load_dataset("nonexistent")
 except ValueError as e:
-    print(f"Dataset not found: {e}")
+ print(f"Dataset not found: {e}")
 except Exception as e:
-    print(f"Unexpected error: {e}")
+ print(f"Unexpected error: {e}")
 ```
 
 ## Logging
@@ -388,40 +388,40 @@ from training.manager import EvolutionaryConfig
 from agents.orchestrator import Task, TaskType, MessagePriority
 
 async def main():
-    # Initialize system
-    system = SymbioAI()
+ # Initialize system
+ system = SymbioAI()
 
-    # Create and register a model
-    model_id = await system.model_registry.create_base_model(
-        name="my_classifier",
-        framework=ModelFramework.PYTORCH,
-        architecture="resnet50"
-    )
+ # Create and register a model
+ model_id = await system.model_registry.create_base_model(
+ name="my_classifier",
+ framework=ModelFramework.PYTORCH,
+ architecture="resnet50"
+ )
 
-    # Start evolutionary training
-    training_id = await system.training_manager.start_evolutionary_training(
-        "my_experiment",
-        system.model_registry,
-        config=EvolutionaryConfig(population_size=20)
-    )
+ # Start evolutionary training
+ training_id = await system.training_manager.start_evolutionary_training(
+ "my_experiment",
+ system.model_registry,
+ config=EvolutionaryConfig(population_size=20)
+ )
 
-    # Submit inference task
-    task = Task(
-        id="test_inference",
-        task_type=TaskType.INFERENCE,
-        priority=MessagePriority.NORMAL,
-        payload={"model_id": model_id, "inputs": test_data}
-    )
-    await system.orchestrator.submit_task(task)
+ # Submit inference task
+ task = Task(
+ id="test_inference",
+ task_type=TaskType.INFERENCE,
+ priority=MessagePriority.NORMAL,
+ payload={"model_id": model_id, "inputs": test_data}
+ )
+ await system.orchestrator.submit_task(task)
 
-    # Evaluate model
-    model = await system.model_registry.get_model(model_id)
-    results = await system.benchmark_suite.evaluate_model(model)
+ # Evaluate model
+ model = await system.model_registry.get_model(model_id)
+ results = await system.benchmark_suite.evaluate_model(model)
 
-    print(f"Evaluation results: {results}")
+ print(f"Evaluation results: {results}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+ asyncio.run(main())
 ```
 
 ### Custom Agent
@@ -430,19 +430,19 @@ if __name__ == "__main__":
 from agents.orchestrator import Agent, AgentCapabilities, TaskType
 
 class CustomAgent(Agent):
-    def __init__(self, agent_id: str):
-        capabilities = AgentCapabilities(
-            supported_tasks=[TaskType.INFERENCE],
-            max_concurrent_tasks=3,
-            performance_metrics={"speed": 95.0},
-            resource_requirements={"memory": "2GB"},
-            specializations=["custom_models"]
-        )
-        super().__init__(agent_id, capabilities)
+ def __init__(self, agent_id: str):
+ capabilities = AgentCapabilities(
+ supported_tasks=[TaskType.INFERENCE],
+ max_concurrent_tasks=3,
+ performance_metrics={"speed": 95.0},
+ resource_requirements={"memory": "2GB"},
+ specializations=["custom_models"]
+ )
+ super().__init__(agent_id, capabilities)
 
-    async def execute_task(self, task):
-        # Custom task execution logic
-        return {"result": "custom_processing_complete"}
+ async def execute_task(self, task):
+ # Custom task execution logic
+ return {"result": "custom_processing_complete"}
 
 # Register with orchestrator
 custom_agent = CustomAgent("my_custom_agent")
@@ -455,27 +455,27 @@ await orchestrator._register_agent(custom_agent)
 from evaluation.benchmarks import Benchmark, BenchmarkType, BenchmarkResult
 
 class CustomBenchmark(Benchmark):
-    def __init__(self):
-        super().__init__("custom_test", "My Custom Test", BenchmarkType.ACCURACY)
+ def __init__(self):
+ super().__init__("custom_test", "My Custom Test", BenchmarkType.ACCURACY)
 
-    async def run(self, model, test_data):
-        # Custom benchmark logic
-        score = await self.evaluate_custom_metric(model, test_data)
+ async def run(self, model, test_data):
+ # Custom benchmark logic
+ score = await self.evaluate_custom_metric(model, test_data)
 
-        return BenchmarkResult(
-            benchmark_id=self.benchmark_id,
-            model_id=model.metadata.id,
-            benchmark_type=self.benchmark_type,
-            metric_type=MetricType.CLASSIFICATION_ACCURACY,
-            score=score,
-            metadata={},
-            execution_time=0.1,
-            timestamp=datetime.now().isoformat(),
-            passed=score > 0.8
-        )
+ return BenchmarkResult(
+ benchmark_id=self.benchmark_id,
+ model_id=model.metadata.id,
+ benchmark_type=self.benchmark_type,
+ metric_type=MetricType.CLASSIFICATION_ACCURACY,
+ score=score,
+ metadata={},
+ execution_time=0.1,
+ timestamp=datetime.now().isoformat(),
+ passed=score > 0.8
+ )
 
-    def validate_model(self, model):
-        return True
+ def validate_model(self, model):
+ return True
 
 # Register with benchmark system
 benchmark_system.runner.register_benchmark(CustomBenchmark())

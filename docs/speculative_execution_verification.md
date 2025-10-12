@@ -44,12 +44,12 @@ Speculative execution that:
 ```
 Benchmark: Complex Reasoning Tasks
 
-Single-Path Reasoning:     72% accuracy, 150ms latency
+Single-Path Reasoning: 72% accuracy, 150ms latency
 Speculative (3 hypotheses): 84% accuracy, 180ms latency (+12% accuracy, +20% time)
 Speculative (5 hypotheses): 89% accuracy, 240ms latency (+17% accuracy, +60% time)
-Draft-Verify Pipeline:     87% accuracy, 120ms latency (+15% accuracy, -20% time)
+Draft-Verify Pipeline: 87% accuracy, 120ms latency (+15% accuracy, -20% time)
 
-🎯 Result: 30-50% better quality with verified confidence!
+ Result: 30-50% better quality with verified confidence!
 ```
 
 ## Key Features
@@ -59,8 +59,8 @@ Draft-Verify Pipeline:     87% accuracy, 120ms latency (+15% accuracy, -20% time
 ```python
 # Generate multiple hypotheses in parallel
 engine = create_speculative_execution_engine(
-    num_hypotheses=5,
-    reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH
+ num_hypotheses=5,
+ reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH
 )
 
 result = await engine.execute(query)
@@ -72,12 +72,12 @@ result = await engine.execute(query)
 ```python
 # Multiple verification methods
 config = SpeculativeExecutionConfig(
-    verification_methods=[
-        VerificationMethod.SELF_CONSISTENCY,
-        VerificationMethod.LOGICAL_VERIFICATION,
-        VerificationMethod.CONFIDENCE_SCORING,
-        VerificationMethod.CROSS_VALIDATION
-    ]
+ verification_methods=[
+ VerificationMethod.SELF_CONSISTENCY,
+ VerificationMethod.LOGICAL_VERIFICATION,
+ VerificationMethod.CONFIDENCE_SCORING,
+ VerificationMethod.CROSS_VALIDATION
+ ]
 )
 ```
 
@@ -98,8 +98,8 @@ print(f"Final score: {result.combined_score:.3f}")
 ```python
 # Fast drafts + slow verification
 engine = create_speculative_execution_engine(
-    use_draft_verify=True,
-    draft_model_speed_multiplier=10.0  # 10x faster
+ use_draft_verify=True,
+ draft_model_speed_multiplier=10.0 # 10x faster
 )
 
 # Generates fast drafts, verifies with accurate model
@@ -111,9 +111,9 @@ result = await engine.execute(query, use_draft_verify=True)
 ```python
 # Easy integration with agent systems
 result = await speculative_agent_task(
-    task_description="Analyze sentiment",
-    context={"domain": "nlp"},
-    engine=engine
+ task_description="Analyze sentiment",
+ context={"domain": "nlp"},
+ engine=engine
 )
 ```
 
@@ -122,70 +122,69 @@ result = await speculative_agent_task(
 ### System Components
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│              Speculative Execution Engine                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │          Hypothesis Generator                             │  │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐          │  │
-│  │  │ Hypothesis │ │ Hypothesis │ │ Hypothesis │  ... (N)  │  │
-│  │  │     1      │ │     2      │ │     3      │          │  │
-│  │  └────────────┘ └────────────┘ └────────────┘          │  │
-│  │                                                           │  │
-│  │  Strategies: Beam Search | Diverse Beam | Parallel       │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                          │                                      │
-│                          ▼                                      │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │          Hypothesis Verifier                              │  │
-│  │                                                           │  │
-│  │  ┌──────────────────┐  ┌──────────────────┐            │  │
-│  │  │ Self-Consistency │  │ Logical Coherence│            │  │
-│  │  └──────────────────┘  └──────────────────┘            │  │
-│  │  ┌──────────────────┐  ┌──────────────────┐            │  │
-│  │  │Confidence Scoring│  │ Cross-Validation │            │  │
-│  │  └──────────────────┘  └──────────────────┘            │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                          │                                      │
-│                          ▼                                      │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │          Hypothesis Merger                                │  │
-│  │                                                           │  │
-│  │  Strategies:                                             │  │
-│  │  • Weighted Average (confidence-based)                   │  │
-│  │  • Best-of-N (highest score)                             │  │
-│  │  • Ensemble Vote (democratic)                            │  │
-│  │  • Sequential Refinement (iterative)                     │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                          │                                      │
-│                          ▼                                      │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │          Final Verified Hypothesis                        │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                   │
-└───────────────────────────────────────────────────────────────┘
 
-           ALTERNATIVE: Draft-Verify Pipeline
+ Speculative Execution Engine
 
-┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│  Fast Draft  │  →   │  Fast Draft  │  →   │  Fast Draft  │
-│  Generator   │      │  Generator   │      │  Generator   │
-│  (10x speed) │      │  (10x speed) │      │  (10x speed) │
-└──────┬───────┘      └──────┬───────┘      └──────┬───────┘
-       │                     │                     │
-       └─────────────────────┴─────────────────────┘
-                            │
-                            ▼
-              ┌────────────────────────────┐
-              │  Slow Verification Model   │
-              │  (95% accuracy)            │
-              └────────────┬───────────────┘
-                           │
-                           ▼
-              ┌────────────────────────────┐
-              │  Best Verified Hypothesis  │
-              └────────────────────────────┘
+
+
+ Hypothesis Generator
+
+ Hypothesis Hypothesis Hypothesis ... (N)
+ 1 2 3
+
+
+ Strategies: Beam Search | Diverse Beam | Parallel
+
+
+
+
+ Hypothesis Verifier
+
+
+ Self-Consistency Logical Coherence
+
+
+ Confidence Scoring Cross-Validation
+
+
+
+
+
+ Hypothesis Merger
+
+ Strategies:
+ • Weighted Average (confidence-based)
+ • Best-of-N (highest score)
+ • Ensemble Vote (democratic)
+ • Sequential Refinement (iterative)
+
+
+
+
+ Final Verified Hypothesis
+
+
+
+ ALTERNATIVE: Draft-Verify Pipeline
+
+
+ Fast Draft → Fast Draft → Fast Draft
+ Generator Generator Generator
+ (10x speed) (10x speed) (10x speed)
+
+
+
+
+
+
+ Slow Verification Model
+ (95% accuracy)
+
+
+
+
+ Best Verified Hypothesis
+
 ```
 
 ### Core Classes
@@ -195,21 +194,21 @@ result = await speculative_agent_task(
 ```python
 @dataclass
 class Hypothesis:
-    """A single reasoning hypothesis."""
-    hypothesis_id: str
-    content: Any  # The actual answer
-    reasoning_path: List[str]  # Steps taken
+ """A single reasoning hypothesis."""
+ hypothesis_id: str
+ content: Any # The actual answer
+ reasoning_path: List[str] # Steps taken
 
-    # Scores
-    confidence: float
-    verification_score: float
-    consistency_score: float
-    combined_score: float
+ # Scores
+ confidence: float
+ verification_score: float
+ consistency_score: float
+ combined_score: float
 
-    # Metadata
-    num_steps: int
-    verified: bool
-    verification_method: Optional[VerificationMethod]
+ # Metadata
+ num_steps: int
+ verified: bool
+ verification_method: Optional[VerificationMethod]
 ```
 
 #### 2. SpeculativeExecutionConfig
@@ -217,48 +216,48 @@ class Hypothesis:
 ```python
 @dataclass
 class SpeculativeExecutionConfig:
-    """Configuration for speculative execution."""
-    # Generation
-    num_hypotheses: int = 5
-    max_reasoning_depth: int = 10
-    beam_width: int = 3
+ """Configuration for speculative execution."""
+ # Generation
+ num_hypotheses: int = 5
+ max_reasoning_depth: int = 10
+ beam_width: int = 3
 
-    # Strategy
-    reasoning_strategy: ReasoningStrategy
-    verification_methods: List[VerificationMethod]
-    merge_strategy: MergeStrategy
+ # Strategy
+ reasoning_strategy: ReasoningStrategy
+ verification_methods: List[VerificationMethod]
+ merge_strategy: MergeStrategy
 
-    # Weights
-    confidence_weight: float = 0.4
-    verification_weight: float = 0.4
-    consistency_weight: float = 0.2
+ # Weights
+ confidence_weight: float = 0.4
+ verification_weight: float = 0.4
+ consistency_weight: float = 0.2
 
-    # Draft-verify
-    use_draft_verify: bool = True
-    draft_model_speed_multiplier: float = 10.0
+ # Draft-verify
+ use_draft_verify: bool = True
+ draft_model_speed_multiplier: float = 10.0
 ```
 
 #### 3. SpeculativeExecutionEngine
 
 ```python
 class SpeculativeExecutionEngine:
-    """Main engine for speculative execution."""
+ """Main engine for speculative execution."""
 
-    async def execute(
-        self,
-        query: str,
-        context: Optional[Dict] = None
-    ) -> Hypothesis:
-        """Execute speculative reasoning."""
+ async def execute(
+ self,
+ query: str,
+ context: Optional[Dict] = None
+ ) -> Hypothesis:
+ """Execute speculative reasoning."""
 
-    async def batch_execute(
-        self,
-        queries: List[str]
-    ) -> List[Hypothesis]:
-        """Execute multiple queries in parallel."""
+ async def batch_execute(
+ self,
+ queries: List[str]
+ ) -> List[Hypothesis]:
+ """Execute multiple queries in parallel."""
 
-    def get_statistics(self) -> Dict[str, Any]:
-        """Get execution statistics."""
+ def get_statistics(self) -> Dict[str, Any]:
+ """Get execution statistics."""
 ```
 
 ## Usage Guide
@@ -267,13 +266,13 @@ class SpeculativeExecutionEngine:
 
 ```python
 from training.speculative_execution_verification import (
-    create_speculative_execution_engine
+ create_speculative_execution_engine
 )
 
 # Create engine
 engine = create_speculative_execution_engine(
-    num_hypotheses=5,
-    use_draft_verify=False
+ num_hypotheses=5,
+ use_draft_verify=False
 )
 
 # Execute query
@@ -288,26 +287,26 @@ print(f"Verified: {result.verified}")
 
 ```python
 from training.speculative_execution_verification import (
-    SpeculativeExecutionEngine,
-    SpeculativeExecutionConfig,
-    ReasoningStrategy,
-    VerificationMethod,
-    MergeStrategy
+ SpeculativeExecutionEngine,
+ SpeculativeExecutionConfig,
+ ReasoningStrategy,
+ VerificationMethod,
+ MergeStrategy
 )
 
 # Custom configuration
 config = SpeculativeExecutionConfig(
-    num_hypotheses=8,
-    reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
-    verification_methods=[
-        VerificationMethod.SELF_CONSISTENCY,
-        VerificationMethod.LOGICAL_VERIFICATION,
-        VerificationMethod.CONFIDENCE_SCORING
-    ],
-    merge_strategy=MergeStrategy.WEIGHTED_AVERAGE,
-    confidence_weight=0.4,
-    verification_weight=0.4,
-    consistency_weight=0.2
+ num_hypotheses=8,
+ reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
+ verification_methods=[
+ VerificationMethod.SELF_CONSISTENCY,
+ VerificationMethod.LOGICAL_VERIFICATION,
+ VerificationMethod.CONFIDENCE_SCORING
+ ],
+ merge_strategy=MergeStrategy.WEIGHTED_AVERAGE,
+ confidence_weight=0.4,
+ verification_weight=0.4,
+ consistency_weight=0.2
 )
 
 engine = SpeculativeExecutionEngine(config)
@@ -319,29 +318,29 @@ result = await engine.execute(query)
 ```python
 # Process multiple queries
 queries = [
-    "Explain photosynthesis",
-    "What is machine learning?",
-    "How do vaccines work?"
+ "Explain photosynthesis",
+ "What is machine learning?",
+ "How do vaccines work?"
 ]
 
 results = await engine.batch_execute(queries)
 
 for query, result in zip(queries, results):
-    print(f"{query}: {result.combined_score:.3f}")
+ print(f"{query}: {result.combined_score:.3f}")
 ```
 
 ### Integration with Agent Systems
 
 ```python
 from training.speculative_execution_verification import (
-    speculative_agent_task
+ speculative_agent_task
 )
 
 # Use with agent orchestrator
 result = await speculative_agent_task(
-    task_description="Analyze customer feedback",
-    context={"domain": "nlp", "priority": "high"},
-    engine=engine
+ task_description="Analyze customer feedback",
+ context={"domain": "nlp", "priority": "high"},
+ engine=engine
 )
 
 print(f"Confidence: {result['confidence']:.3f}")
@@ -492,43 +491,43 @@ MergeStrategy.SEQUENTIAL_REFINEMENT
 
 1. **Draft Generation** (Fast Model)
 
-   - Generate 5-10 draft answers quickly
-   - Use faster, less accurate model
-   - 10x speedup vs accurate model
+ - Generate 5-10 draft answers quickly
+ - Use faster, less accurate model
+ - 10x speedup vs accurate model
 
 2. **Verification** (Accurate Model)
 
-   - Verify each draft with accurate model
-   - Filter out incorrect drafts
-   - Keep only verified answers
+ - Verify each draft with accurate model
+ - Filter out incorrect drafts
+ - Keep only verified answers
 
 3. **Selection**
-   - Select best verified draft
-   - Fallback to best draft if none verified
-   - Return final answer
+ - Select best verified draft
+ - Fallback to best draft if none verified
+ - Return final answer
 
 ### Configuration
 
 ```python
 engine = create_speculative_execution_engine(
-    use_draft_verify=True,
-    draft_model_speed_multiplier=10.0,  # 10x faster
-    draft_model_accuracy=0.7,           # 70% accurate
-    verification_model_accuracy=0.95    # 95% accurate
+ use_draft_verify=True,
+ draft_model_speed_multiplier=10.0, # 10x faster
+ draft_model_accuracy=0.7, # 70% accurate
+ verification_model_accuracy=0.95 # 95% accurate
 )
 ```
 
 ### Performance
 
 ```
-Draft generation:  50ms (5 drafts)
-Verification:      30ms (verify 5 drafts)
-Total:            80ms
+Draft generation: 50ms (5 drafts)
+Verification: 30ms (verify 5 drafts)
+Total: 80ms
 
-vs Standard:      150ms (5 hypotheses with full reasoning)
+vs Standard: 150ms (5 hypotheses with full reasoning)
 
-Speedup:          1.9x faster!
-Quality:          Similar or better (verified)
+Speedup: 1.9x faster!
+Quality: Similar or better (verified)
 ```
 
 ## API Reference
@@ -537,15 +536,15 @@ Quality:          Similar or better (verified)
 
 ```python
 def create_speculative_execution_engine(
-    num_hypotheses: int = 5,
-    beam_width: int = 3,
-    reasoning_strategy: ReasoningStrategy = DIVERSE_BEAM_SEARCH,
-    verification_methods: Optional[List[VerificationMethod]] = None,
-    merge_strategy: MergeStrategy = WEIGHTED_AVERAGE,
-    use_draft_verify: bool = True,
-    **kwargs
+ num_hypotheses: int = 5,
+ beam_width: int = 3,
+ reasoning_strategy: ReasoningStrategy = DIVERSE_BEAM_SEARCH,
+ verification_methods: Optional[List[VerificationMethod]] = None,
+ merge_strategy: MergeStrategy = WEIGHTED_AVERAGE,
+ use_draft_verify: bool = True,
+ **kwargs
 ) -> SpeculativeExecutionEngine:
-    """Create speculative execution engine with custom config."""
+ """Create speculative execution engine with custom config."""
 ```
 
 ### SpeculativeExecutionEngine Methods
@@ -554,78 +553,78 @@ def create_speculative_execution_engine(
 
 ```python
 async def execute(
-    self,
-    query: str,
-    context: Optional[Dict[str, Any]] = None,
-    use_draft_verify: Optional[bool] = None
+ self,
+ query: str,
+ context: Optional[Dict[str, Any]] = None,
+ use_draft_verify: Optional[bool] = None
 ) -> Hypothesis:
-    """
-    Execute speculative reasoning with verification.
+ """
+ Execute speculative reasoning with verification.
 
-    Args:
-        query: Input query
-        context: Optional context dictionary
-        use_draft_verify: Override config setting
+ Args:
+ query: Input query
+ context: Optional context dictionary
+ use_draft_verify: Override config setting
 
-    Returns:
-        Verified hypothesis with scores
-    """
+ Returns:
+ Verified hypothesis with scores
+ """
 ```
 
 #### `batch_execute()`
 
 ```python
 async def batch_execute(
-    self,
-    queries: List[str],
-    contexts: Optional[List[Dict]] = None
+ self,
+ queries: List[str],
+ contexts: Optional[List[Dict]] = None
 ) -> List[Hypothesis]:
-    """
-    Execute multiple queries in parallel.
+ """
+ Execute multiple queries in parallel.
 
-    Returns:
-        List of verified hypotheses
-    """
+ Returns:
+ List of verified hypotheses
+ """
 ```
 
 #### `get_statistics()`
 
 ```python
 def get_statistics(self) -> Dict[str, Any]:
-    """
-    Get execution statistics.
+ """
+ Get execution statistics.
 
-    Returns:
-        {
-            "total_queries": int,
-            "total_hypotheses_generated": int,
-            "avg_verification_rate": float,
-            "avg_latency_ms": float
-        }
-    """
+ Returns:
+ {
+ "total_queries": int,
+ "total_hypotheses_generated": int,
+ "avg_verification_rate": float,
+ "avg_latency_ms": float
+ }
+ """
 ```
 
 ### speculative_agent_task()
 
 ```python
 async def speculative_agent_task(
-    task_description: str,
-    context: Optional[Dict[str, Any]] = None,
-    engine: Optional[SpeculativeExecutionEngine] = None
+ task_description: str,
+ context: Optional[Dict[str, Any]] = None,
+ engine: Optional[SpeculativeExecutionEngine] = None
 ) -> Dict[str, Any]:
-    """
-    Helper for agent orchestrator integration.
+ """
+ Helper for agent orchestrator integration.
 
-    Returns:
-        {
-            "result": Any,
-            "confidence": float,
-            "verified": bool,
-            "combined_score": float,
-            "reasoning_path": List[str],
-            "latency_ms": float
-        }
-    """
+ Returns:
+ {
+ "result": Any,
+ "confidence": float,
+ "verified": bool,
+ "combined_score": float,
+ "reasoning_path": List[str],
+ "latency_ms": float
+ }
+ """
 ```
 
 ## Examples
@@ -637,17 +636,17 @@ import asyncio
 from training.speculative_execution_verification import *
 
 async def simple_example():
-    engine = create_speculative_execution_engine(
-        num_hypotheses=5
-    )
+ engine = create_speculative_execution_engine(
+ num_hypotheses=5
+ )
 
-    result = await engine.execute(
-        "What are the benefits of renewable energy?"
-    )
+ result = await engine.execute(
+ "What are the benefits of renewable energy?"
+ )
 
-    print(f"Answer: {result.content}")
-    print(f"Score: {result.combined_score:.3f}")
-    print(f"Verified: {result.verified}")
+ print(f"Answer: {result.content}")
+ print(f"Score: {result.combined_score:.3f}")
+ print(f"Verified: {result.verified}")
 
 asyncio.run(simple_example())
 ```
@@ -656,21 +655,21 @@ asyncio.run(simple_example())
 
 ```python
 async def custom_verification():
-    engine = create_speculative_execution_engine(
-        num_hypotheses=6,
-        verification_methods=[
-            VerificationMethod.SELF_CONSISTENCY,
-            VerificationMethod.LOGICAL_VERIFICATION,
-            VerificationMethod.CROSS_VALIDATION
-        ]
-    )
+ engine = create_speculative_execution_engine(
+ num_hypotheses=6,
+ verification_methods=[
+ VerificationMethod.SELF_CONSISTENCY,
+ VerificationMethod.LOGICAL_VERIFICATION,
+ VerificationMethod.CROSS_VALIDATION
+ ]
+ )
 
-    result = await engine.execute(
-        "Explain how blockchain ensures security"
-    )
+ result = await engine.execute(
+ "Explain how blockchain ensures security"
+ )
 
-    print(f"Verification score: {result.verification_score:.3f}")
-    print(f"Methods used: {result.verification_details.keys()}")
+ print(f"Verification score: {result.verification_score:.3f}")
+ print(f"Methods used: {result.verification_details.keys()}")
 
 asyncio.run(custom_verification())
 ```
@@ -679,20 +678,20 @@ asyncio.run(custom_verification())
 
 ```python
 async def draft_verify_example():
-    engine = create_speculative_execution_engine(
-        use_draft_verify=True,
-        draft_model_speed_multiplier=10.0
-    )
+ engine = create_speculative_execution_engine(
+ use_draft_verify=True,
+ draft_model_speed_multiplier=10.0
+ )
 
-    result = await engine.execute(
-        "Design a caching strategy for web applications",
-        use_draft_verify=True
-    )
+ result = await engine.execute(
+ "Design a caching strategy for web applications",
+ use_draft_verify=True
+ )
 
-    stats = result.verification_details['pipeline_stats']
-    print(f"Draft time: {stats['draft_time_ms']:.2f}ms")
-    print(f"Verify time: {stats['verify_time_ms']:.2f}ms")
-    print(f"Total: {stats['total_time_ms']:.2f}ms")
+ stats = result.verification_details['pipeline_stats']
+ print(f"Draft time: {stats['draft_time_ms']:.2f}ms")
+ print(f"Verify time: {stats['verify_time_ms']:.2f}ms")
+ print(f"Total: {stats['total_time_ms']:.2f}ms")
 
 asyncio.run(draft_verify_example())
 ```
@@ -702,13 +701,13 @@ asyncio.run(draft_verify_example())
 ### Hypothesis Count vs Quality
 
 ```
-Hypotheses  | Accuracy | Latency  | Verification Rate
+Hypotheses | Accuracy | Latency | Verification Rate
 ------------|----------|----------|------------------
-1 (baseline)| 72%      | 150ms    | N/A
-3           | 84%      | 180ms    | 76%
-5           | 89%      | 240ms    | 82%
-8           | 91%      | 350ms    | 85%
-10          | 92%      | 450ms    | 87%
+1 (baseline)| 72% | 150ms | N/A
+3 | 84% | 180ms | 76%
+5 | 89% | 240ms | 82%
+8 | 91% | 350ms | 85%
+10 | 92% | 450ms | 87%
 
 Sweet spot: 5-6 hypotheses
 ```
@@ -716,12 +715,12 @@ Sweet spot: 5-6 hypotheses
 ### Reasoning Strategy Comparison
 
 ```
-Strategy              | Quality | Diversity | Speed
+Strategy | Quality | Diversity | Speed
 ----------------------|---------|-----------|-------
-Beam Search           | 85%     | Low       | Fast
-Diverse Beam Search   | 89%     | High      | Medium
-Parallel Sampling     | 87%     | Very High | Medium
-Branching Reasoning   | 86%     | Medium    | Slow
+Beam Search | 85% | Low | Fast
+Diverse Beam Search | 89% | High | Medium
+Parallel Sampling | 87% | Very High | Medium
+Branching Reasoning | 86% | Medium | Slow
 
 Best: Diverse Beam Search (balance of quality + diversity)
 ```
@@ -729,12 +728,12 @@ Best: Diverse Beam Search (balance of quality + diversity)
 ### Verification Method Impact
 
 ```
-Method               | Precision | Recall | Overhead
+Method | Precision | Recall | Overhead
 ---------------------|-----------|--------|----------
-Self-Consistency     | 88%       | 82%    | +15ms
-Logical Verification | 76%       | 85%    | +20ms
-Confidence Scoring   | 82%       | 90%    | +5ms
-Cross-Validation     | 92%       | 79%    | +30ms
+Self-Consistency | 88% | 82% | +15ms
+Logical Verification | 76% | 85% | +20ms
+Confidence Scoring | 82% | 90% | +5ms
+Cross-Validation | 92% | 79% | +30ms
 
 Recommended: Self-Consistency + Confidence Scoring
 ```
@@ -742,11 +741,11 @@ Recommended: Self-Consistency + Confidence Scoring
 ### Draft-Verify Performance
 
 ```
-Configuration      | Latency | Quality | Speedup
+Configuration | Latency | Quality | Speedup
 -------------------|---------|---------|--------
-Standard (5 hyps)  | 240ms   | 89%     | 1.0x
-Draft-Verify (5)   | 120ms   | 87%     | 2.0x
-Draft-Verify (10)  | 180ms   | 90%     | 1.3x
+Standard (5 hyps) | 240ms | 89% | 1.0x
+Draft-Verify (5) | 120ms | 87% | 2.0x
+Draft-Verify (10) | 180ms | 90% | 1.3x
 
 Result: 2x speedup with similar quality!
 ```
@@ -771,9 +770,9 @@ engine = create_speculative_execution_engine(num_hypotheses=8)
 ```python
 # Best balance of quality and diversity
 config = SpeculativeExecutionConfig(
-    reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
-    beam_width=3,
-    diversity_penalty=0.5
+ reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
+ beam_width=3,
+ diversity_penalty=0.5
 )
 ```
 
@@ -782,8 +781,8 @@ config = SpeculativeExecutionConfig(
 ```python
 # Recommended combination
 verification_methods = [
-    VerificationMethod.SELF_CONSISTENCY,    # High reliability
-    VerificationMethod.CONFIDENCE_SCORING    # Low overhead
+ VerificationMethod.SELF_CONSISTENCY, # High reliability
+ VerificationMethod.CONFIDENCE_SCORING # Low overhead
 ]
 ```
 
@@ -792,8 +791,8 @@ verification_methods = [
 ```python
 # When speed matters
 engine = create_speculative_execution_engine(
-    use_draft_verify=True,
-    draft_model_speed_multiplier=10.0
+ use_draft_verify=True,
+ draft_model_speed_multiplier=10.0
 )
 ```
 
@@ -802,16 +801,16 @@ engine = create_speculative_execution_engine(
 ```python
 # For critical accuracy
 config = SpeculativeExecutionConfig(
-    confidence_weight=0.3,
-    verification_weight=0.5,  # Prioritize verification
-    consistency_weight=0.2
+ confidence_weight=0.3,
+ verification_weight=0.5, # Prioritize verification
+ consistency_weight=0.2
 )
 
 # For speed
 config = SpeculativeExecutionConfig(
-    confidence_weight=0.6,  # Trust model confidence
-    verification_weight=0.3,
-    consistency_weight=0.1
+ confidence_weight=0.6, # Trust model confidence
+ verification_weight=0.3,
+ consistency_weight=0.1
 )
 ```
 
@@ -821,18 +820,18 @@ config = SpeculativeExecutionConfig(
 stats = engine.get_statistics()
 
 if stats['avg_verification_rate'] < 0.7:
-    print("Low verification rate - adjust thresholds")
+ print("Low verification rate - adjust thresholds")
 
 if stats['avg_latency_ms'] > 500:
-    print("High latency - reduce hypotheses or use draft-verify")
+ print("High latency - reduce hypotheses or use draft-verify")
 ```
 
 ### 7. Enable Caching
 
 ```python
 config = SpeculativeExecutionConfig(
-    enable_caching=True,  # Cache hypothesis generation
-    parallel_execution=True  # Parallel verification
+ enable_caching=True, # Cache hypothesis generation
+ parallel_execution=True # Parallel verification
 )
 ```
 
@@ -844,10 +843,10 @@ config = SpeculativeExecutionConfig(
 
 ```python
 config = SpeculativeExecutionConfig(
-    verification_threshold=0.6,  # Lower from 0.7
-    verification_methods=[
-        VerificationMethod.CONFIDENCE_SCORING  # More lenient
-    ]
+ verification_threshold=0.6, # Lower from 0.7
+ verification_methods=[
+ VerificationMethod.CONFIDENCE_SCORING # More lenient
+ ]
 )
 ```
 
@@ -858,12 +857,12 @@ config = SpeculativeExecutionConfig(
 ```python
 # Option 1: Draft-verify
 engine = create_speculative_execution_engine(
-    use_draft_verify=True
+ use_draft_verify=True
 )
 
 # Option 2: Fewer hypotheses
 engine = create_speculative_execution_engine(
-    num_hypotheses=3  # Down from 5
+ num_hypotheses=3 # Down from 5
 )
 ```
 
@@ -873,8 +872,8 @@ engine = create_speculative_execution_engine(
 
 ```python
 config = SpeculativeExecutionConfig(
-    reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
-    diversity_penalty=0.7  # Increase from 0.5
+ reasoning_strategy=ReasoningStrategy.DIVERSE_BEAM_SEARCH,
+ diversity_penalty=0.7 # Increase from 0.5
 )
 ```
 
@@ -884,12 +883,12 @@ config = SpeculativeExecutionConfig(
 
 ```python
 config = SpeculativeExecutionConfig(
-    num_hypotheses=8,  # More hypotheses
-    verification_methods=[
-        VerificationMethod.SELF_CONSISTENCY,
-        VerificationMethod.LOGICAL_VERIFICATION,
-        VerificationMethod.CROSS_VALIDATION
-    ]
+ num_hypotheses=8, # More hypotheses
+ verification_methods=[
+ VerificationMethod.SELF_CONSISTENCY,
+ VerificationMethod.LOGICAL_VERIFICATION,
+ VerificationMethod.CROSS_VALIDATION
+ ]
 )
 ```
 

@@ -26,7 +26,6 @@
       "target_tasks": [],
       "transfer_efficiency": {},
       "task_embedding": null,
-      "created_at": "2025-10-10T14:53:44.001178"
     },
     "vision_object_detection": {
       "task_id": "vision_object_detection",
@@ -55,7 +54,6 @@
       "target_tasks": [],
       "transfer_efficiency": {},
       "task_embedding": null,
-      "created_at": "2025-10-10T14:53:44.001363"
     },
     "nlp_sentiment_analysis": {
       "task_id": "nlp_sentiment_analysis",
@@ -83,7 +81,6 @@
       "target_tasks": [],
       "transfer_efficiency": {},
       "task_embedding": null,
-      "created_at": "2025-10-10T14:53:44.001366"
     },
     "nlp_text_summarization": {
       "task_id": "nlp_text_summarization",
@@ -112,7 +109,6 @@
       "target_tasks": [],
       "transfer_efficiency": {},
       "task_embedding": null,
-      "created_at": "2025-10-10T14:53:44.001368"
     },
     "audio_speech_recognition": {
       "task_id": "audio_speech_recognition",
@@ -141,7 +137,6 @@
       "target_tasks": [],
       "transfer_efficiency": {},
       "task_embedding": null,
-      "created_at": "2025-10-10T14:53:44.001370"
     }
   },
   "transfer_edges": [
@@ -162,7 +157,6 @@
       "adaptation_required": 0.0,
       "transfer_attempts": 0,
       "successful_transfers": 0,
-      "last_transfer": "2025-10-10T14:53:44.001674",
       "optimal_transfer_strategy": "",
       "failure_modes": []
     },
@@ -182,7 +176,6 @@
       "adaptation_required": 0.0,
       "transfer_attempts": 0,
       "successful_transfers": 0,
-      "last_transfer": "2025-10-10T14:53:44.001703",
       "optimal_transfer_strategy": "",
       "failure_modes": []
     },
@@ -203,7 +196,6 @@
       "adaptation_required": 0.0,
       "transfer_attempts": 1,
       "successful_transfers": 1,
-      "last_transfer": "2025-10-10T14:53:44.503066",
       "optimal_transfer_strategy": "",
       "failure_modes": []
     },
@@ -224,7 +216,6 @@
       "adaptation_required": 0.0,
       "transfer_attempts": 0,
       "successful_transfers": 0,
-      "last_transfer": "2025-10-10T14:53:44.001733",
       "optimal_transfer_strategy": "",
       "failure_modes": []
     },
@@ -242,7 +233,6 @@
       "adaptation_required": 0.0,
       "transfer_attempts": 1,
       "successful_transfers": 1,
-      "last_transfer": "2025-10-10T14:53:44.503045",
       "optimal_transfer_strategy": "",
       "failure_modes": []
     }
@@ -270,7 +260,6 @@
       "adaptive_adjustments": 0,
       "skipped_tasks": [],
       "repeated_tasks": [],
-      "created_at": "2025-10-10T14:53:44.502963",
       "completed_at": null
     },
     "curriculum_vision_object_detection_1760075624.503002": {
@@ -295,7 +284,6 @@
       "adaptive_adjustments": 0,
       "skipped_tasks": [],
       "repeated_tasks": [],
-      "created_at": "2025-10-10T14:53:44.503007",
       "completed_at": null
     }
   },
@@ -318,7 +306,6 @@
       "performance_gain": 0.1,
       "sample_efficiency_gain": 0.15,
       "convergence_speed_gain": 0.125,
-      "timestamp": "2025-10-10T14:53:44.503045"
     },
     {
       "source_task": "nlp_sentiment_analysis",
@@ -327,38 +314,32 @@
       "performance_gain": 0.1,
       "sample_efficiency_gain": 0.15,
       "convergence_speed_gain": 0.125,
-      "timestamp": "2025-10-10T14:53:44.503066"
     }
   ],
   "discovery_log": [
     {
-      "timestamp": "2025-10-10T14:53:44.001680",
       "source": "vision_object_detection",
       "target": "vision_image_classification",
       "relation": "weakly_similar",
       "transfer_coefficient": 0.5
     },
     {
-      "timestamp": "2025-10-10T14:53:44.001705",
       "source": "nlp_sentiment_analysis",
       "target": "vision_image_classification",
       "relation": "complementary",
       "transfer_coefficient": 0.38
     },
     {
-      "timestamp": "2025-10-10T14:53:44.001715",
       "source": "nlp_sentiment_analysis",
       "target": "nlp_text_summarization",
       "relation": "weakly_similar",
       "transfer_coefficient": 0.5
     },
     {
-      "timestamp": "2025-10-10T14:53:44.001735",
       "source": "nlp_text_summarization",
       "target": "nlp_sentiment_analysis",
       "relation": "weakly_similar",
       "transfer_coefficient": 0.5
     }
   ],
-  "exported_at": "2025-10-10T14:53:44.504042"
 }

@@ -1,7 +1,7 @@
 # Compositional Concept Learning
 
-**Version**: 1.0.0  
-**Status**: ✅ Production Ready  
+**Version**: 1.0.0
+**Status**: Production Ready
 **Last Updated**: January 2025
 
 ## Overview
@@ -30,25 +30,25 @@ The Compositional Concept Learning system enables Symbio AI to learn reusable sy
 
 ```
 CompositionalConceptLearner
-├── ObjectEncoder (Slot Attention)
-│   ├── SlotAttentionModule
-│   └── Slot Binding System
-├── ConceptLibrary
-│   ├── Primitive Concepts
-│   ├── Composite Concepts
-│   └── Relations
-├── RelationNetwork
-│   ├── Pairwise Encoders
-│   └── Multi-Head Attention
-├── CompositionFunction
-│   ├── Neural Operators
-│   └── Operation Selector
-├── ConceptDisentangler
-│   ├── DisentangledVAE (β-VAE)
-│   └── Factor Manipulator
-└── ConceptHierarchy
-    ├── Parent-Child Links
-    └── Abstraction Levels
+ ObjectEncoder (Slot Attention)
+ SlotAttentionModule
+ Slot Binding System
+ ConceptLibrary
+ Primitive Concepts
+ Composite Concepts
+ Relations
+ RelationNetwork
+ Pairwise Encoders
+ Multi-Head Attention
+ CompositionFunction
+ Neural Operators
+ Operation Selector
+ ConceptDisentangler
+ DisentangledVAE (β-VAE)
+ Factor Manipulator
+ ConceptHierarchy
+ Parent-Child Links
+ Abstraction Levels
 ```
 
 ### Data Structures
@@ -58,18 +58,18 @@ CompositionalConceptLearner
 ```python
 @dataclass
 class Concept:
-    """Represents a learned symbolic concept"""
-    concept_id: str
-    name: str
-    concept_type: ConceptType  # primitive, composite, abstract, relation
-    embedding: np.ndarray
-    confidence: float
-    examples: List[Any]
-    parent_concepts: List[str]
-    child_concepts: List[str]
-    relations: Dict[str, 'ConceptRelation']
-    abstraction_level: int
-    metadata: Dict[str, Any]
+ """Represents a learned symbolic concept"""
+ concept_id: str
+ name: str
+ concept_type: ConceptType # primitive, composite, abstract, relation
+ embedding: np.ndarray
+ confidence: float
+ examples: List[Any]
+ parent_concepts: List[str]
+ child_concepts: List[str]
+ relations: Dict[str, 'ConceptRelation']
+ abstraction_level: int
+ metadata: Dict[str, Any]
 ```
 
 #### ConceptRelation
@@ -77,14 +77,14 @@ class Concept:
 ```python
 @dataclass
 class ConceptRelation:
-    """Represents a relation between concepts"""
-    relation_id: str
-    relation_type: str
-    source_concept_id: str
-    target_concept_id: str
-    strength: float
-    confidence: float
-    metadata: Dict[str, Any]
+ """Represents a relation between concepts"""
+ relation_id: str
+ relation_type: str
+ source_concept_id: str
+ target_concept_id: str
+ strength: float
+ confidence: float
+ metadata: Dict[str, Any]
 ```
 
 #### ObjectRepresentation
@@ -92,12 +92,12 @@ class ConceptRelation:
 ```python
 @dataclass
 class ObjectRepresentation:
-    """Object-centric representation with slots"""
-    object_id: str
-    slots: List[Slot]
-    binding_type: BindingType
-    features: np.ndarray
-    concept_assignments: Dict[str, float]
+ """Object-centric representation with slots"""
+ object_id: str
+ slots: List[Slot]
+ binding_type: BindingType
+ features: np.ndarray
+ concept_assignments: Dict[str, float]
 ```
 
 ## Key Features
@@ -113,9 +113,9 @@ class ObjectRepresentation:
 ```
 1. Initialize K slots randomly
 2. For each iteration:
-   a. Compute attention weights (slot → input)
-   b. Update slots via weighted aggregation
-   c. Apply GRU update
+ a. Compute attention weights (slot → input)
+ b. Update slots via weighted aggregation
+ c. Apply GRU update
 3. Return bound object slots
 ```
 
@@ -123,8 +123,8 @@ class ObjectRepresentation:
 
 ```python
 learner = CompositionalConceptLearner(
-    num_slots=5,
-    slot_dim=64
+ num_slots=5,
+ slot_dim=64
 )
 
 # Encode scene into objects
@@ -136,10 +136,10 @@ object_reps = learner.encode_objects(scene_input)
 
 ```
 Object 1 (ID: obj_123_0):
-  • Number of slots: 64
-  • Binding strength: 0.85
-  • Concept: red_circle
-  • Features: [0.23, -0.45, 0.78, ...]
+ • Number of slots: 64
+ • Binding strength: 0.85
+ • Concept: red_circle
+ • Features: [0.23, -0.45, 0.78, ...]
 ```
 
 ### 2. Learning Primitive Concepts
@@ -157,18 +157,18 @@ Object 1 (ID: obj_123_0):
 ```python
 # Learn color concept
 learner.learn_concept(
-    name="red",
-    concept_type=ConceptType.ATTRIBUTE,
-    examples=[red_obj_1, red_obj_2, ...],
-    confidence_threshold=0.9
+ name="red",
+ concept_type=ConceptType.ATTRIBUTE,
+ examples=[red_obj_1, red_obj_2, ...],
+ confidence_threshold=0.9
 )
 
 # Learn shape concept
 learner.learn_concept(
-    name="circle",
-    concept_type=ConceptType.OBJECT,
-    examples=[circle_1, circle_2, ...],
-    confidence_threshold=0.9
+ name="circle",
+ concept_type=ConceptType.OBJECT,
+ examples=[circle_1, circle_2, ...],
+ confidence_threshold=0.9
 )
 ```
 
@@ -176,11 +176,11 @@ learner.learn_concept(
 
 ```
 Concept: red
-  • ID: concept_abc123
-  • Type: attribute
-  • Embedding: 128-dim vector
-  • Confidence: 95.0%
-  • Examples: 10
+ • ID: concept_abc123
+ • Type: attribute
+ • Embedding: 128-dim vector
+ • Confidence: 95.0%
+ • Examples: 10
 ```
 
 ### 3. Compositional Concept Building
@@ -200,16 +200,16 @@ Concept: red
 ```python
 # Simple composition
 red_circle = learner.compose_concepts(
-    components=["red", "circle"],
-    operation="attribute_binding",
-    name="red_circle"
+ components=["red", "circle"],
+ operation="attribute_binding",
+ name="red_circle"
 )
 
 # Higher-order composition
 scene = learner.compose_concepts(
-    components=["red_circle", "blue_square"],
-    operation="conjunction",
-    name="scene_pattern"
+ components=["red_circle", "blue_square"],
+ operation="conjunction",
+ name="scene_pattern"
 )
 ```
 
@@ -217,15 +217,15 @@ scene = learner.compose_concepts(
 
 ```
 Composite: red_circle
-  • Components: ['red', 'circle']
-  • Operation: attribute_binding
-  • Abstraction level: 1
-  • Confidence: 95.0%
+ • Components: ['red', 'circle']
+ • Operation: attribute_binding
+ • Abstraction level: 1
+ • Confidence: 95.0%
 
 Meta-Composite: scene_pattern
-  • Components: ['red_circle', 'blue_square']
-  • Abstraction level: 2
-  • Description: "red_circle AND blue_square"
+ • Components: ['red_circle', 'blue_square']
+ • Abstraction level: 2
+ • Description: "red_circle AND blue_square"
 ```
 
 ### 4. Relation Discovery
@@ -243,9 +243,9 @@ Meta-Composite: scene_pattern
 
 ```
 RelationNetwork(
-  Pairwise Encoder: [concept_i, concept_j] → relation_vector
-  Multi-Head Attention: Aggregate relation evidence
-  Relation Classifier: Predict relation type + strength
+ Pairwise Encoder: [concept_i, concept_j] → relation_vector
+ Multi-Head Attention: Aggregate relation evidence
+ Relation Classifier: Predict relation type + strength
 )
 ```
 
@@ -254,8 +254,8 @@ RelationNetwork(
 ```python
 # Discover relations between concepts
 relations = learner.discover_relations(
-    concepts=[concept_1, concept_2, concept_3],
-    relation_types=["spatial_proximity", "semantic_similarity"]
+ concepts=[concept_1, concept_2, concept_3],
+ relation_types=["spatial_proximity", "semantic_similarity"]
 )
 ```
 
@@ -263,18 +263,18 @@ relations = learner.discover_relations(
 
 ```
 Relation 1:
-  • Type: spatial_proximity
-  • Source: red_circle
-  • Target: blue_square
-  • Strength: 0.72
-  • Confidence: 68.2%
+ • Type: spatial_proximity
+ • Source: red_circle
+ • Target: blue_square
+ • Strength: 0.72
+ • Confidence: 68.2%
 
 Relation 2:
-  • Type: semantic_similarity
-  • Source: circle
-  • Target: oval
-  • Strength: 0.89
-  • Confidence: 91.5%
+ • Type: semantic_similarity
+ • Source: circle
+ • Target: oval
+ • Strength: 0.89
+ • Confidence: 91.5%
 ```
 
 ### 5. Hierarchical Organization
@@ -292,16 +292,16 @@ Relation 2:
 
 ```
 Root
-├── Level 0 (Primitives)
-│   ├── red (attribute)
-│   ├── blue (attribute)
-│   ├── circle (object)
-│   └── square (object)
-├── Level 1 (Composites)
-│   ├── red_circle
-│   └── blue_square
-└── Level 2 (Meta-Composites)
-    └── scene_pattern
+ Level 0 (Primitives)
+ red (attribute)
+ blue (attribute)
+ circle (object)
+ square (object)
+ Level 1 (Composites)
+ red_circle
+ blue_square
+ Level 2 (Meta-Composites)
+ scene_pattern
 ```
 
 **Usage**:
@@ -309,8 +309,8 @@ Root
 ```python
 # Build hierarchy
 hierarchy = learner.build_concept_hierarchy(
-    root_concept="scene_pattern",
-    strategy="composition_based"
+ root_concept="scene_pattern",
+ strategy="composition_based"
 )
 
 # Visualize
@@ -343,9 +343,9 @@ Factor 4: rotation (mean: -0.34, std: 0.95)
 ```python
 # Manipulate specific factor
 modified_concept = learner.concept_disentangler.manipulate_factor(
-    concept=red_circle,
-    factor_name="color",
-    delta=0.5  # Shift towards different color
+ concept=red_circle,
+ factor_name="color",
+ delta=0.5 # Shift towards different color
 )
 
 # Result: red_circle → orange_circle
@@ -373,15 +373,15 @@ modified_concept = learner.concept_disentangler.manipulate_factor(
 ```python
 # Find commonalities
 result = learner.reason_about(
-    query="What is common between these objects?",
-    concepts=[red_circle, red_square, red_triangle]
+ query="What is common between these objects?",
+ concepts=[red_circle, red_square, red_triangle]
 )
 # Answer: "All share the 'red' attribute"
 
 # Solve analogy
 result = learner.reason_about(
-    query="red:circle :: blue:?",
-    concepts=[red, circle, blue]
+ query="red:circle :: blue:?",
+ concepts=[red, circle, blue]
 )
 # Answer: blue_circle
 ```
@@ -391,10 +391,10 @@ result = learner.reason_about(
 ```
 Query: "What is common between these objects?"
 Steps:
-  1. Extract concept features
-  2. Compare shared attributes
-  3. Identify common factor: 'red'
-  4. Confidence: 92.3%
+ 1. Extract concept features
+ 2. Compare shared attributes
+ 3. Identify common factor: 'red'
+ 4. Confidence: 92.3%
 Result: "All objects share the 'red' color attribute"
 ```
 
@@ -413,9 +413,9 @@ Result: "All objects share the 'red' color attribute"
 
 ```python
 explanation = learner.explain_concept(
-    concept=red_circle,
-    include_structure=True,
-    include_relations=True
+ concept=red_circle,
+ include_structure=True,
+ include_relations=True
 )
 ```
 
@@ -423,23 +423,23 @@ explanation = learner.explain_concept(
 
 ```
 Concept: red_circle
-  • Type: composite
-  • Description: A composite concept formed by binding the
-    attribute 'red' to the object 'circle'
+ • Type: composite
+ • Description: A composite concept formed by binding the
+ attribute 'red' to the object 'circle'
 
-  Compositional Structure:
-    └─ red_circle
-       ├─ red (attribute, confidence: 95%)
-       └─ circle (object, confidence: 95%)
+ Compositional Structure:
+ red_circle
+ red (attribute, confidence: 95%)
+ circle (object, confidence: 95%)
 
-  Relations:
-    • Similar to: orange_circle (similarity: 0.78)
-    • Contains: red (parent-child)
-    • Spatial proximity to: blue_square (strength: 0.65)
+ Relations:
+ • Similar to: orange_circle (similarity: 0.78)
+ • Contains: red (parent-child)
+ • Spatial proximity to: blue_square (strength: 0.65)
 
-  Abstraction Level: 1
-  Confidence: 95.0%
-  Examples: 10
+ Abstraction Level: 1
+ Confidence: 95.0%
+ Examples: 10
 ```
 
 ## API Reference
@@ -452,14 +452,14 @@ Main class for compositional concept learning.
 
 ```python
 def __init__(
-    self,
-    num_slots: int = 7,
-    slot_dim: int = 64,
-    num_iterations: int = 3,
-    relation_dim: int = 128,
-    latent_dim: int = 64,
-    beta: float = 4.0,
-    device: str = "cpu"
+ self,
+ num_slots: int = 7,
+ slot_dim: int = 64,
+ num_iterations: int = 3,
+ relation_dim: int = 128,
+ latent_dim: int = 64,
+ beta: float = 4.0,
+ device: str = "cpu"
 )
 ```
 
@@ -479,8 +479,8 @@ def __init__(
 
 ```python
 def encode_objects(
-    self,
-    perceptual_input: np.ndarray
+ self,
+ perceptual_input: np.ndarray
 ) -> List[ObjectRepresentation]
 ```
 
@@ -496,11 +496,11 @@ Encode perceptual input into object-centric representations using slot attention
 
 ```python
 def learn_concept(
-    self,
-    name: str,
-    concept_type: ConceptType,
-    examples: List[Any],
-    confidence_threshold: float = 0.8
+ self,
+ name: str,
+ concept_type: ConceptType,
+ examples: List[Any],
+ confidence_threshold: float = 0.8
 ) -> str
 ```
 
@@ -519,10 +519,10 @@ Learn a new concept from examples.
 
 ```python
 def compose_concepts(
-    self,
-    components: List[str],
-    operation: str = "conjunction",
-    name: Optional[str] = None
+ self,
+ components: List[str],
+ operation: str = "conjunction",
+ name: Optional[str] = None
 ) -> str
 ```
 
@@ -540,9 +540,9 @@ Compose multiple concepts into a new composite concept.
 
 ```python
 def discover_relations(
-    self,
-    concepts: List[str],
-    relation_types: Optional[List[str]] = None
+ self,
+ concepts: List[str],
+ relation_types: Optional[List[str]] = None
 ) -> List[ConceptRelation]
 ```
 
@@ -559,10 +559,10 @@ Discover relations between concepts using the relation network.
 
 ```python
 def build_concept_hierarchy(
-    self,
-    root_concept: str,
-    strategy: str = "composition_based",
-    max_depth: int = 5
+ self,
+ root_concept: str,
+ strategy: str = "composition_based",
+ max_depth: int = 5
 ) -> ConceptHierarchy
 ```
 
@@ -580,10 +580,10 @@ Build a hierarchical organization of concepts.
 
 ```python
 def reason_about(
-    self,
-    query: str,
-    concepts: List[str],
-    reasoning_type: str = "commonality"
+ self,
+ query: str,
+ concepts: List[str],
+ reasoning_type: str = "commonality"
 ) -> Dict[str, Any]
 ```
 
@@ -601,11 +601,11 @@ Perform abstract reasoning over concepts.
 
 ```python
 def explain_concept(
-    self,
-    concept: str,
-    include_structure: bool = True,
-    include_relations: bool = True,
-    include_examples: bool = False
+ self,
+ concept: str,
+ include_structure: bool = True,
+ include_relations: bool = True,
+ include_examples: bool = False
 ) -> str
 ```
 
@@ -630,9 +630,9 @@ Learns and manipulates disentangled representations.
 
 ```python
 def learn_disentangled_factors(
-    self,
-    data: np.ndarray,
-    num_epochs: int = 100
+ self,
+ data: np.ndarray,
+ num_epochs: int = 100
 ) -> Dict[str, Any]
 ```
 
@@ -649,10 +649,10 @@ Learn disentangled factors from data using β-VAE.
 
 ```python
 def manipulate_factor(
-    self,
-    concept: Concept,
-    factor_name: str,
-    delta: float
+ self,
+ concept: Concept,
+ factor_name: str,
+ delta: float
 ) -> Concept
 ```
 
@@ -680,22 +680,22 @@ concept_learner = CompositionalConceptLearner()
 # Register with orchestrator
 orchestrator = AgentOrchestrator()
 orchestrator.register_capability(
-    "compositional_concepts",
-    concept_learner
+ "compositional_concepts",
+ concept_learner
 )
 
 # Use in agent workflow
 async def agent_task(task):
-    # Learn concepts from task data
-    concepts = concept_learner.learn_concepts_from_task(task)
+ # Learn concepts from task data
+ concepts = concept_learner.learn_concepts_from_task(task)
 
-    # Reason about concepts
-    result = concept_learner.reason_about(
-        query=task.query,
-        concepts=concepts
-    )
+ # Reason about concepts
+ result = concept_learner.reason_about(
+ query=task.query,
+ concepts=concepts
+ )
 
-    return result
+ return result
 ```
 
 ### Cross-Task Transfer Integration
@@ -706,13 +706,13 @@ from training.cross_task_transfer import CrossTaskTransferEngine
 # Compositional concepts enhance transfer
 transfer_engine = CrossTaskTransferEngine()
 transfer_engine.register_concept_library(
-    concept_learner.concepts
+ concept_learner.concepts
 )
 
 # Transfer learned concepts to new task
 transfer_engine.transfer_concepts(
-    source_task="object_recognition",
-    target_task="scene_understanding"
+ source_task="object_recognition",
+ target_task="scene_understanding"
 )
 ```
 
@@ -724,13 +724,13 @@ from training.neural_symbolic_architecture import NeuralSymbolicReasoner
 # Use concepts as symbolic primitives
 symbolic_reasoner = NeuralSymbolicReasoner()
 symbolic_reasoner.import_concepts(
-    concept_learner.get_all_concepts()
+ concept_learner.get_all_concepts()
 )
 
 # Reason symbolically over learned concepts
 proof = symbolic_reasoner.prove(
-    premises=["red(X)", "circle(X)"],
-    conclusion="red_circle(X)"
+ premises=["red(X)", "circle(X)"],
+ conclusion="red_circle(X)"
 )
 ```
 
@@ -738,14 +738,14 @@ proof = symbolic_reasoner.prove(
 
 ### Computational Complexity
 
-| Operation          | Time Complexity | Space Complexity |
+| Operation | Time Complexity | Space Complexity |
 | ------------------ | --------------- | ---------------- |
-| Slot Attention     | O(K × I × N)    | O(K × D)         |
-| Concept Learning   | O(M × D)        | O(C × D)         |
-| Composition        | O(N × D)        | O(D)             |
-| Relation Discovery | O(C² × D)       | O(C² × R)        |
-| Hierarchy Building | O(C × log C)    | O(C)             |
-| Disentanglement    | O(E × M × D)    | O(M × L)         |
+| Slot Attention | O(K × I × N) | O(K × D) |
+| Concept Learning | O(M × D) | O(C × D) |
+| Composition | O(N × D) | O(D) |
+| Relation Discovery | O(C² × D) | O(C² × R) |
+| Hierarchy Building | O(C × log C) | O(C) |
+| Disentanglement | O(E × M × D) | O(M × L) |
 
 Where:
 
@@ -789,15 +789,15 @@ See `examples/compositional_concept_demo.py` for comprehensive demonstrations of
 
 ```python
 from training.compositional_concept_learning import (
-    CompositionalConceptLearner,
-    ConceptType
+ CompositionalConceptLearner,
+ ConceptType
 )
 import numpy as np
 
 # Initialize learner
 learner = CompositionalConceptLearner(
-    num_slots=5,
-    slot_dim=64
+ num_slots=5,
+ slot_dim=64
 )
 
 # 1. Encode objects from scene
@@ -807,47 +807,47 @@ print(f"Detected {len(objects)} objects")
 
 # 2. Learn primitive concepts
 red_id = learner.learn_concept(
-    name="red",
-    concept_type=ConceptType.ATTRIBUTE,
-    examples=[np.random.randn(128) for _ in range(10)]
+ name="red",
+ concept_type=ConceptType.ATTRIBUTE,
+ examples=[np.random.randn(128) for _ in range(10)]
 )
 
 circle_id = learner.learn_concept(
-    name="circle",
-    concept_type=ConceptType.OBJECT,
-    examples=[np.random.randn(128) for _ in range(10)]
+ name="circle",
+ concept_type=ConceptType.OBJECT,
+ examples=[np.random.randn(128) for _ in range(10)]
 )
 
 # 3. Compose concepts
 red_circle_id = learner.compose_concepts(
-    components=[red_id, circle_id],
-    operation="attribute_binding",
-    name="red_circle"
+ components=[red_id, circle_id],
+ operation="attribute_binding",
+ name="red_circle"
 )
 
 # 4. Discover relations
 relations = learner.discover_relations(
-    concepts=[red_id, circle_id, red_circle_id]
+ concepts=[red_id, circle_id, red_circle_id]
 )
 
 # 5. Build hierarchy
 hierarchy = learner.build_concept_hierarchy(
-    root_concept=red_circle_id,
-    strategy="composition_based"
+ root_concept=red_circle_id,
+ strategy="composition_based"
 )
 
 # 6. Reason about concepts
 result = learner.reason_about(
-    query="What is common between red_circle and red_square?",
-    concepts=[red_circle_id, "red_square"],
-    reasoning_type="commonality"
+ query="What is common between red_circle and red_square?",
+ concepts=[red_circle_id, "red_square"],
+ reasoning_type="commonality"
 )
 
 # 7. Get explanation
 explanation = learner.explain_concept(
-    concept=red_circle_id,
-    include_structure=True,
-    include_relations=True
+ concept=red_circle_id,
+ include_structure=True,
+ include_relations=True
 )
 print(explanation)
 ```
@@ -856,32 +856,32 @@ print(explanation)
 
 ### Compositional Generalization
 
-| Dataset                   | Accuracy | Sample Efficiency | Interpretability |
+| Dataset | Accuracy | Sample Efficiency | Interpretability |
 | ------------------------- | -------- | ----------------- | ---------------- |
-| CLEVR                     | 94.2%    | 5x fewer examples | High             |
-| ShapeWorld                | 97.8%    | 3x fewer examples | High             |
-| Abstract Reasoning Corpus | 89.5%    | 4x fewer examples | Very High        |
+| CLEVR | 94.2% | 5x fewer examples | High |
+| ShapeWorld | 97.8% | 3x fewer examples | High |
+| Abstract Reasoning Corpus | 89.5% | 4x fewer examples | Very High |
 
 ### Comparison with Baselines
 
-| Method                 | CLEVR Acc | Interpretability | Generalization |
+| Method | CLEVR Acc | Interpretability | Generalization |
 | ---------------------- | --------- | ---------------- | -------------- |
-| **Symbio (Ours)**      | **94.2%** | **High**         | **Excellent**  |
-| Neural-Module Networks | 92.1%     | Medium           | Good           |
-| FiLM                   | 97.6%     | Low              | Good           |
-| MAC                    | 98.9%     | Low              | Medium         |
+| **Symbio (Ours)** | **94.2%** | **High** | **Excellent** |
+| Neural-Module Networks | 92.1% | Medium | Good |
+| FiLM | 97.6% | Low | Good |
+| MAC | 98.9% | Low | Medium |
 
 **Key Advantage**: Symbio achieves competitive accuracy with superior interpretability and compositional generalization.
 
 ### Disentanglement Quality
 
-| Dataset   | MIG Score | SAP Score | Modularity |
+| Dataset | MIG Score | SAP Score | Modularity |
 | --------- | --------- | --------- | ---------- |
-| dSprites  | 0.82      | 0.89      | 0.91       |
-| 3D Shapes | 0.78      | 0.85      | 0.88       |
-| CelebA    | 0.71      | 0.79      | 0.83       |
+| dSprites | 0.82 | 0.89 | 0.91 |
+| 3D Shapes | 0.78 | 0.85 | 0.88 |
+| CelebA | 0.71 | 0.79 | 0.83 |
 
-**MIG** = Mutual Information Gap (higher is better)  
+**MIG** = Mutual Information Gap (higher is better)
 **SAP** = Separated Attribute Predictability (higher is better)
 
 ## Research Foundations
@@ -890,27 +890,27 @@ print(explanation)
 
 1. **Slot Attention**
 
-   - Locatello et al. (2020). "Object-Centric Learning with Slot Attention"
-   - NeurIPS 2020
+ - Locatello et al. (2020). "Object-Centric Learning with Slot Attention"
+ - NeurIPS 2020
 
 2. **Disentanglement**
 
-   - Higgins et al. (2017). "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework"
-   - ICLR 2017
+ - Higgins et al. (2017). "β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework"
+ - ICLR 2017
 
 3. **Compositional Learning**
 
-   - Lake et al. (2017). "Building Machines That Learn and Think Like People"
-   - Behavioral and Brain Sciences
+ - Lake et al. (2017). "Building Machines That Learn and Think Like People"
+ - Behavioral and Brain Sciences
 
 4. **Relation Networks**
 
-   - Santoro et al. (2017). "A Simple Neural Network Module for Relational Reasoning"
-   - NeurIPS 2017
+ - Santoro et al. (2017). "A Simple Neural Network Module for Relational Reasoning"
+ - NeurIPS 2017
 
 5. **Abstract Reasoning**
-   - Barrett et al. (2018). "Measuring Abstract Reasoning in Neural Networks"
-   - ICML 2018
+ - Barrett et al. (2018). "Measuring Abstract Reasoning in Neural Networks"
+ - ICML 2018
 
 ## Troubleshooting
 
@@ -920,8 +920,8 @@ print(explanation)
 
 ```python
 learner = CompositionalConceptLearner(
-    num_iterations=5,  # Increase from default 3
-    slot_dim=64
+ num_iterations=5, # Increase from default 3
+ slot_dim=64
 )
 ```
 
@@ -931,13 +931,13 @@ learner = CompositionalConceptLearner(
 
 ```python
 learner = CompositionalConceptLearner(
-    beta=6.0,  # Increase from default 4.0
-    latent_dim=64
+ beta=6.0, # Increase from default 4.0
+ latent_dim=64
 )
 
 learner.concept_disentangler.learn_disentangled_factors(
-    data=training_data,
-    num_epochs=200  # Increase from default 100
+ data=training_data,
+ num_epochs=200 # Increase from default 100
 )
 ```
 
@@ -947,10 +947,10 @@ learner.concept_disentangler.learn_disentangled_factors(
 
 ```python
 concept_id = learner.learn_concept(
-    name="red",
-    concept_type=ConceptType.ATTRIBUTE,
-    examples=[...],  # Add more examples
-    confidence_threshold=0.7  # Lower from default 0.8
+ name="red",
+ concept_type=ConceptType.ATTRIBUTE,
+ examples=[...], # Add more examples
+ confidence_threshold=0.7 # Lower from default 0.8
 )
 ```
 
@@ -972,32 +972,32 @@ learner.relation_network.use_sparse_storage = True
 
 1. **Visual Concept Rendering**
 
-   - Visualize learned concepts
-   - Generate example images
+ - Visualize learned concepts
+ - Generate example images
 
 2. **Interactive Concept Editor**
 
-   - GUI for concept manipulation
-   - Visual hierarchy explorer
+ - GUI for concept manipulation
+ - Visual hierarchy explorer
 
 3. **Concept Transfer API**
 
-   - Export concepts to other systems
-   - Import concepts from external sources
+ - Export concepts to other systems
+ - Import concepts from external sources
 
 4. **Probabilistic Reasoning**
 
-   - Bayesian concept inference
-   - Uncertainty quantification
+ - Bayesian concept inference
+ - Uncertainty quantification
 
 5. **Multi-Modal Concepts**
 
-   - Visual + linguistic concepts
-   - Audio + visual integration
+ - Visual + linguistic concepts
+ - Audio + visual integration
 
 6. **Continual Learning**
-   - Update concepts without catastrophic forgetting
-   - Incremental hierarchy refinement
+ - Update concepts without catastrophic forgetting
+ - Incremental hierarchy refinement
 
 ## References
 
@@ -1016,6 +1016,6 @@ For questions or issues:
 
 ---
 
-**Last Updated**: January 2025  
-**Maintainer**: Symbio AI Team  
+**Last Updated**: January 2025
+**Maintainer**: Symbio AI Team
 **License**: MIT

@@ -1,10 +1,10 @@
 # Recursive Self-Improvement Engine
 
-## 🧠 Revolutionary Meta-Evolutionary Optimization
+## Revolutionary Meta-Evolutionary Optimization
 
 The Recursive Self-Improvement Engine is a groundbreaking system that **improves its own improvement algorithms**. Unlike traditional evolutionary systems that evolve models, this system evolves the evolution strategies themselves, creating a meta-level optimization that compounds improvements over time.
 
-## 🎯 Core Concept
+## Core Concept
 
 ### Traditional Evolution
 
@@ -16,13 +16,13 @@ Models → Evolve Models → Better Models
 
 ```
 Evolution Strategies → Evolve Strategies → Better Strategies
-                     ↓
-            Use Better Strategies to Evolve Models
-                     ↓
-                Better Models Faster
+ ↓
+ Use Better Strategies to Evolve Models
+ ↓
+ Better Models Faster
 ```
 
-## 🚀 Key Innovations
+## Key Innovations
 
 ### 1. **Meta-Evolution**
 
@@ -52,25 +52,25 @@ Evolution Strategies → Evolve Strategies → Better Strategies
 - Enables principled strategy design
 - Reduces trial-and-error in algorithm development
 
-## 🏗️ Architecture
+## Architecture
 
 ### Multi-Level Optimization Hierarchy
 
 ```
 Level 3: Meta-Meta Learning (Future)
-    ↓
+ ↓
 Level 2: Meta-Evolution (Recursive Self-Improvement Engine)
-    ├── Evolution Strategy Genomes
-    ├── Learning Rule Library
-    ├── Performance Attribution
-    └── Strategy Crossover & Mutation
-    ↓
+ Evolution Strategy Genomes
+ Learning Rule Library
+ Performance Attribution
+ Strategy Crossover & Mutation
+ ↓
 Level 1: Base Evolution (Standard Evolutionary Training)
-    ├── Model Population
-    ├── Task Evaluation
-    ├── Fitness Computation
-    └── Model Breeding
-    ↓
+ Model Population
+ Task Evaluation
+ Fitness Computation
+ Model Breeding
+ ↓
 Level 0: Models (Neural Networks)
 ```
 
@@ -116,21 +116,21 @@ Comprehensive metrics for strategy evaluation:
 - Robustness
 - Computational cost
 
-## 📊 Meta-Fitness Calculation
+## Meta-Fitness Calculation
 
 Strategies are evaluated on **meta-objectives**:
 
 ```python
 meta_fitness =
-    0.3 * convergence_speed +        # How fast it finds good solutions
-    0.4 * final_fitness +             # Quality of final solution
-    0.2 * sample_efficiency +         # Efficiency per evaluation
-    0.05 * diversity_maintained +     # Population diversity
-    0.03 * robustness +               # Stability of improvements
-    0.02 * computational_efficiency   # Resource usage
+ 0.3 * convergence_speed + # How fast it finds good solutions
+ 0.4 * final_fitness + # Quality of final solution
+ 0.2 * sample_efficiency + # Efficiency per evaluation
+ 0.05 * diversity_maintained + # Population diversity
+ 0.03 * robustness + # Stability of improvements
+ 0.02 * computational_efficiency # Resource usage
 ```
 
-## 🔬 Example Usage
+## Example Usage
 
 ### Basic Meta-Training
 
@@ -139,22 +139,22 @@ from training.recursive_self_improvement import create_recursive_improvement_eng
 
 # Create engine
 engine = create_recursive_improvement_engine(
-    meta_population_size=20,
-    meta_generations=30,
-    base_task_budget=100
+ meta_population_size=20,
+ meta_generations=30,
+ base_task_budget=100
 )
 
 # Define tasks
 task_evaluators = {
-    "classification": ClassificationEvaluator(),
-    "regression": RegressionEvaluator(),
-    "generation": GenerationEvaluator()
+ "classification": ClassificationEvaluator(),
+ "regression": RegressionEvaluator(),
+ "generation": GenerationEvaluator()
 }
 
 # Run meta-training
 results = await engine.meta_train(
-    task_evaluators=task_evaluators,
-    model_factory=create_model
+ task_evaluators=task_evaluators,
+ model_factory=create_model
 )
 
 # Get best learned strategy
@@ -187,36 +187,36 @@ engine.export_learned_strategies(Path("./strategies.json"))
 
 # Later, load and use
 with open("strategies.json") as f:
-    strategies = json.load(f)
+ strategies = json.load(f)
 
 best = strategies["top_universal_strategies"][0]
 genome = EvolutionStrategyGenome(**best)
 config = genome.to_evolution_config()
 ```
 
-## 🎯 Competitive Advantages
+## Competitive Advantages
 
 ### vs. Sakana AI
 
-| Aspect          | Sakana AI        | Recursive Self-Improvement      |
+| Aspect | Sakana AI | Recursive Self-Improvement |
 | --------------- | ---------------- | ------------------------------- |
-| **Focus**       | Model merging    | Optimization strategy evolution |
-| **Level**       | Model parameters | Meta-level algorithms           |
-| **Learning**    | Fixed evolution  | Self-improving evolution        |
-| **Transfer**    | Model weights    | Optimization strategies         |
-| **Compounding** | Linear           | Exponential (meta-level)        |
+| **Focus** | Model merging | Optimization strategy evolution |
+| **Level** | Model parameters | Meta-level algorithms |
+| **Learning** | Fixed evolution | Self-improving evolution |
+| **Transfer** | Model weights | Optimization strategies |
+| **Compounding** | Linear | Exponential (meta-level) |
 
 ### vs. Traditional Hyperparameter Optimization
 
-| Aspect         | HPO (Optuna, etc.)         | Recursive Self-Improvement |
+| Aspect | HPO (Optuna, etc.) | Recursive Self-Improvement |
 | -------------- | -------------------------- | -------------------------- |
-| **Scope**      | Individual hyperparameters | Complete strategies        |
-| **Learning**   | Per-task                   | Cross-task transfer        |
-| **Adaptation** | Static search              | Evolving search            |
-| **Discovery**  | Predefined space           | Novel combinations         |
-| **Knowledge**  | Doesn't accumulate         | Builds strategy library    |
+| **Scope** | Individual hyperparameters | Complete strategies |
+| **Learning** | Per-task | Cross-task transfer |
+| **Adaptation** | Static search | Evolving search |
+| **Discovery** | Predefined space | Novel combinations |
+| **Knowledge** | Doesn't accumulate | Builds strategy library |
 
-## 📈 Performance Characteristics
+## Performance Characteristics
 
 ### Convergence Properties
 
@@ -232,21 +232,21 @@ config = genome.to_evolution_config()
 - **Base task budget**: 50-200 evaluations per strategy
 - **Tasks for learning**: 3-10 diverse tasks optimal
 
-## 🔧 Configuration Options
+## Configuration Options
 
 ### Meta-Evolution Parameters
 
 ```python
 engine = RecursiveSelfImprovementEngine(
-    meta_population_size=20,           # Number of strategies
-    meta_generations=30,               # Meta-evolution iterations
-    base_task_budget=100,              # Evaluations per strategy
-    objectives=[
-        MetaObjective.CONVERGENCE_SPEED,
-        MetaObjective.FINAL_FITNESS,
-        MetaObjective.SAMPLE_EFFICIENCY,
-        MetaObjective.ROBUSTNESS
-    ]
+ meta_population_size=20, # Number of strategies
+ meta_generations=30, # Meta-evolution iterations
+ base_task_budget=100, # Evaluations per strategy
+ objectives=[
+ MetaObjective.CONVERGENCE_SPEED,
+ MetaObjective.FINAL_FITNESS,
+ MetaObjective.SAMPLE_EFFICIENCY,
+ MetaObjective.ROBUSTNESS
+ ]
 )
 ```
 
@@ -254,28 +254,28 @@ engine = RecursiveSelfImprovementEngine(
 
 ```python
 genome = EvolutionStrategyGenome(
-    # Strategy selection
-    selection_strategy="tournament",    # tournament, roulette, rank, elitism
-    mutation_strategy="adaptive",       # gaussian, svd, dropout, adaptive
-    crossover_strategy="weighted_merge", # averaging, swapping, weighted
+ # Strategy selection
+ selection_strategy="tournament", # tournament, roulette, rank, elitism
+ mutation_strategy="adaptive", # gaussian, svd, dropout, adaptive
+ crossover_strategy="weighted_merge", # averaging, swapping, weighted
 
-    # Hyperparameters
-    population_size=50,
-    elitism_ratio=0.2,
-    mutation_rate=0.1,
-    mutation_strength=0.01,
-    tournament_size=5,
-    diversity_threshold=0.1,
+ # Hyperparameters
+ population_size=50,
+ elitism_ratio=0.2,
+ mutation_rate=0.1,
+ mutation_strength=0.01,
+ tournament_size=5,
+ diversity_threshold=0.1,
 
-    # Advanced options
-    adaptive_mutation=True,
-    fitness_sharing=True,
-    niche_capacity=5,
-    diversity_bonus=0.1
+ # Advanced options
+ adaptive_mutation=True,
+ fitness_sharing=True,
+ niche_capacity=5,
+ diversity_bonus=0.1
 )
 ```
 
-## 🧪 Experimental Results
+## Experimental Results
 
 ### Meta-Learning Efficiency
 
@@ -290,7 +290,7 @@ genome = EvolutionStrategyGenome(
 - Specializes strategies for task characteristics (exploration vs. exploitation)
 - Maintains diversity through fitness sharing and niching
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Short-term (Next 3 Months)
 
@@ -310,7 +310,7 @@ genome = EvolutionStrategyGenome(
 8. **Multi-Modal Strategies**: Unified strategies across vision, language, audio
 9. **Automated Theorem Proving**: Formally verify strategy properties
 
-## 📚 Research Foundations
+## Research Foundations
 
 ### Key Concepts
 
@@ -328,7 +328,7 @@ genome = EvolutionStrategyGenome(
 - Meta-learning with Model-Agnostic Meta-Learning (MAML)
 - Quality Diversity algorithms (MAP-Elites, CycleQD)
 
-## 🤝 Integration Points
+## Integration Points
 
 ### With Marketplace
 
@@ -361,7 +361,7 @@ patterns = FAILURE_MONITOR.get_failure_patterns()
 strategy = engine.select_strategy_for_patterns(patterns)
 ```
 
-## 📖 API Reference
+## API Reference
 
 ### RecursiveSelfImprovementEngine
 
@@ -454,7 +454,7 @@ strategy = engine.select_strategy_for_patterns(patterns)
 - Apply learned gradient transformation
 - **Returns**: Tensor (transformed gradients)
 
-## 🎓 Learning Resources
+## Learning Resources
 
 ### Tutorials
 
@@ -474,7 +474,7 @@ strategy = engine.select_strategy_for_patterns(patterns)
 - "Meta-Evolution: Learning to Evolve Better" (2025)
 - "Causal Attribution in Meta-Optimization" (2025)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -495,7 +495,7 @@ strategy = engine.select_strategy_for_patterns(patterns)
 - A: Adjust meta-objectives for generalization
 - A: Use universal best instead of task-specific
 
-## 📞 Support
+## Support
 
 For questions, issues, or contributions:
 
@@ -505,6 +505,6 @@ For questions, issues, or contributions:
 
 ---
 
-**Symbio AI - Recursive Self-Improvement Engine**  
-_Making AI systems that improve their own improvement_  
-Version 1.0.0 | October 2025
+**Symbio AI - Recursive Self-Improvement Engine**
+_Making AI systems that improve their own improvement_
+Version 1.0.0

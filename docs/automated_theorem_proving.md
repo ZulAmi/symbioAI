@@ -49,20 +49,20 @@ Entrypoints:
 
 ```python
 from training.automated_theorem_proving import (
-    create_theorem_prover, FormalProperty, PropertyType
+ create_theorem_prover, FormalProperty, PropertyType
 )
 
 prover = create_theorem_prover(
-    timeout_seconds=30,
-    enable_proof_repair=True,
+ timeout_seconds=30,
+ enable_proof_repair=True,
 )
 
 prop = FormalProperty(
-    property_id="sorted_correctness",
-    property_type=PropertyType.CORRECTNESS,
-    name="Sorted output is non-decreasing",
-    formal_statement="∀ i j. i ≤ j → a[i] ≤ a[j]",
-    preconditions=["len(a) > 0"],
+ property_id="sorted_correctness",
+ property_type=PropertyType.CORRECTNESS,
+ name="Sorted output is non-decreasing",
+ formal_statement="∀ i j. i ≤ j → a[i] ≤ a[j]",
+ preconditions=["len(a) > 0"],
 )
 
 res = prover.verify_property(prop, {"a": [1,2,3,3]})
@@ -118,7 +118,7 @@ Check if repair happened:
 ```python
 res = prover.verify_property(prop, ctx)
 if res.successful_proof and res.successful_proof.repaired_version:
-    print("Repaired via:", res.successful_proof.repaired_version)
+ print("Repaired via:", res.successful_proof.repaired_version)
 ```
 
 ---
@@ -127,10 +127,10 @@ if res.successful_proof and res.successful_proof.repaired_version:
 
 ```python
 res = prover.verify_safety_property(
-    name="No collision",
-    preconditions=["distance > 0", "speed ≥ 0"],
-    bad_states=["distance ≤ SAFE_DISTANCE"],
-    context={"distance": 50, "SAFE_DISTANCE": 10, "speed": 15}
+ name="No collision",
+ preconditions=["distance > 0", "speed ≥ 0"],
+ bad_states=["distance ≤ SAFE_DISTANCE"],
+ context={"distance": 50, "SAFE_DISTANCE": 10, "speed": 15}
 )
 print(res.status)
 ```

@@ -11,7 +11,7 @@ Together, these systems create a **self-aware AI that can diagnose and fix itsel
 
 ---
 
-## 🧠 Metacognitive Monitoring System
+## Metacognitive Monitoring System
 
 ### Core Concept
 
@@ -25,59 +25,59 @@ Traditional AI systems are **blind to their own cognitive state** - they don't k
 
 ### Key Innovations
 
-| Feature        | Traditional AI             | Symbio AI                            |
+| Feature | Traditional AI | Symbio AI |
 | -------------- | -------------------------- | ------------------------------------ |
-| Self-Awareness | ❌ No introspection        | ✅ Real-time cognitive monitoring    |
-| Uncertainty    | ❌ Single confidence score | ✅ Epistemic + Aleatoric separation  |
-| Attention      | ❌ Not monitored           | ✅ Focus, entropy, anomaly detection |
-| Reasoning      | ❌ Black box               | ✅ Full decision path tracing        |
-| Interventions  | ❌ Manual                  | ✅ Automatic recommendations         |
+| Self-Awareness | No introspection | Real-time cognitive monitoring |
+| Uncertainty | Single confidence score | Epistemic + Aleatoric separation |
+| Attention | Not monitored | Focus, entropy, anomaly detection |
+| Reasoning | Black box | Full decision path tracing |
+| Interventions | Manual | Automatic recommendations |
 
 ### Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                  METACOGNITIVE MONITOR                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────────┐  ┌──────────────────┐               │
-│  │ Confidence       │  │ Attention        │               │
-│  │ Estimator        │  │ Monitor          │               │
-│  │                  │  │                  │               │
-│  │ • Neural network │  │ • Entropy calc   │               │
-│  │ • Calibration    │  │ • Focus score    │               │
-│  │ • Uncertainty    │  │ • Anomaly detect │               │
-│  └────────┬─────────┘  └────────┬─────────┘               │
-│           │                     │                          │
-│           └──────────┬──────────┘                          │
-│                      │                                      │
-│           ┌──────────▼──────────┐                          │
-│           │ Metacognitive       │                          │
-│           │ State               │                          │
-│           │                     │                          │
-│           │ • Cognitive state   │                          │
-│           │ • Signals           │                          │
-│           │ • Interventions     │                          │
-│           └──────────┬──────────┘                          │
-│                      │                                      │
-│           ┌──────────▼──────────┐                          │
-│           │ Reasoning           │                          │
-│           │ Tracer              │                          │
-│           │                     │                          │
-│           │ • Step tracking     │                          │
-│           │ • Path analysis     │                          │
-│           │ • Bottlenecks       │                          │
-│           └──────────┬──────────┘                          │
-│                      │                                      │
-│           ┌──────────▼──────────┐                          │
-│           │ Self-Reflection     │                          │
-│           │                     │                          │
-│           │ • Insights          │                          │
-│           │ • Patterns          │                          │
-│           │ • Recommendations   │                          │
-│           └─────────────────────┘                          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+
+ METACOGNITIVE MONITOR
+
+
+
+ Confidence Attention
+ Estimator Monitor
+
+ • Neural network • Entropy calc
+ • Calibration • Focus score
+ • Uncertainty • Anomaly detect
+
+
+
+
+
+ Metacognitive
+ State
+
+ • Cognitive state
+ • Signals
+ • Interventions
+
+
+
+ Reasoning
+ Tracer
+
+ • Step tracking
+ • Path analysis
+ • Bottlenecks
+
+
+
+ Self-Reflection
+
+ • Insights
+ • Patterns
+ • Recommendations
+
+
+
 ```
 
 ### Cognitive States
@@ -124,30 +124,30 @@ from training.metacognitive_monitoring import create_metacognitive_monitor
 
 # Create monitor
 monitor = create_metacognitive_monitor(
-    feature_dim=128,
-    confidence_threshold=0.7,
-    uncertainty_threshold=0.4
+ feature_dim=128,
+ confidence_threshold=0.7,
+ uncertainty_threshold=0.4
 )
 
 # Monitor a prediction
 state = monitor.monitor_prediction(
-    features=model_features,
-    prediction=model_output,
-    attention_weights=attention_matrix
+ features=model_features,
+ prediction=model_output,
+ attention_weights=attention_matrix
 )
 
 # Check cognitive state
 if state.cognitive_state == CognitiveState.UNCERTAIN:
-    print(f"Low confidence: {state.prediction_confidence:.2f}")
-    print(f"Recommendation: {state.recommended_intervention.value}")
+ print(f"Low confidence: {state.prediction_confidence:.2f}")
+ print(f"Recommendation: {state.recommended_intervention.value}")
 
 # Trace reasoning
 monitor.reasoning_tracer.trace_reasoning_step(
-    step_id="step_1",
-    step_type="retrieval",
-    inputs=query,
-    outputs=results,
-    confidence=0.85
+ step_id="step_1",
+ step_type="retrieval",
+ inputs=query,
+ outputs=results,
+ confidence=0.85
 )
 
 # Reflect on performance
@@ -168,7 +168,7 @@ report = monitor.get_self_awareness_report()
 
 ---
 
-## 🔬 Causal Self-Diagnosis System
+## Causal Self-Diagnosis System
 
 ### Core Concept
 
@@ -182,65 +182,65 @@ When failures occur, traditional systems provide **error logs** and **stack trac
 
 ### Key Innovations
 
-| Feature          | Traditional Debugging   | Symbio AI                       |
+| Feature | Traditional Debugging | Symbio AI |
 | ---------------- | ----------------------- | ------------------------------- |
-| Failure Analysis | ❌ Error logs           | ✅ Causal graph analysis        |
-| Root Causes      | ❌ Manual investigation | ✅ Automatic identification     |
-| "What-If"        | ❌ Trial and error      | ✅ Counterfactual reasoning     |
-| Interventions    | ❌ Ad-hoc fixes         | ✅ Planned, validated           |
-| Learning         | ❌ No memory            | ✅ Causal relationships learned |
+| Failure Analysis | Error logs | Causal graph analysis |
+| Root Causes | Manual investigation | Automatic identification |
+| "What-If" | Trial and error | Counterfactual reasoning |
+| Interventions | Ad-hoc fixes | Planned, validated |
+| Learning | No memory | Causal relationships learned |
 
 ### Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│              CAUSAL SELF-DIAGNOSIS SYSTEM                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────────────────────────────────────────┐          │
-│  │            CAUSAL GRAPH                      │          │
-│  │                                              │          │
-│  │  [Input] → [Hidden] → [Hidden] → [Output]   │          │
-│  │     ↓         ↓          ↓          ↓        │          │
-│  │  [Params]  [Attn]    [Weights]  [Loss]      │          │
-│  │     ↓         ↓          ↓          ↓        │          │
-│  │         [FAILURE NODE]                       │          │
-│  │                                              │          │
-│  │  • Nodes: Components/Variables              │          │
-│  │  • Edges: Causal relationships              │          │
-│  │  • Strengths: Effect magnitudes             │          │
-│  └──────────────────┬───────────────────────────┘          │
-│                     │                                       │
-│  ┌──────────────────▼───────────────────────────┐          │
-│  │         ROOT CAUSE ANALYSIS                  │          │
-│  │                                              │          │
-│  │  1. Find causal paths to failure            │          │
-│  │  2. Compute causal strengths                │          │
-│  │  3. Identify root causes (strong + few parents) │      │
-│  │  4. Rank by deviation × strength            │          │
-│  └──────────────────┬───────────────────────────┘          │
-│                     │                                       │
-│  ┌──────────────────▼───────────────────────────┐          │
-│  │      COUNTERFACTUAL REASONER                 │          │
-│  │                                              │          │
-│  │  "What if X was different?"                 │          │
-│  │                                              │          │
-│  │  • Simulate interventions                   │          │
-│  │  • Predict outcomes                         │          │
-│  │  • Assess plausibility                      │          │
-│  │  • Determine actionability                  │          │
-│  └──────────────────┬───────────────────────────┘          │
-│                     │                                       │
-│  ┌──────────────────▼───────────────────────────┐          │
-│  │       INTERVENTION PLANNER                   │          │
-│  │                                              │          │
-│  │  1. Select interventions                    │          │
-│  │  2. Estimate costs/benefits                 │          │
-│  │  3. Assess risks                            │          │
-│  │  4. Create validation plan                  │          │
-│  └──────────────────────────────────────────────┘          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+
+ CAUSAL SELF-DIAGNOSIS SYSTEM
+
+
+
+ CAUSAL GRAPH
+
+ [Input] → [Hidden] → [Hidden] → [Output]
+ ↓ ↓ ↓ ↓
+ [Params] [Attn] [Weights] [Loss]
+ ↓ ↓ ↓ ↓
+ [FAILURE NODE]
+
+ • Nodes: Components/Variables
+ • Edges: Causal relationships
+ • Strengths: Effect magnitudes
+
+
+
+ ROOT CAUSE ANALYSIS
+
+ 1. Find causal paths to failure
+ 2. Compute causal strengths
+ 3. Identify root causes (strong + few parents)
+ 4. Rank by deviation × strength
+
+
+
+ COUNTERFACTUAL REASONER
+
+ "What if X was different?"
+
+ • Simulate interventions
+ • Predict outcomes
+ • Assess plausibility
+ • Determine actionability
+
+
+
+ INTERVENTION PLANNER
+
+ 1. Select interventions
+ 2. Estimate costs/benefits
+ 3. Assess risks
+ 4. Create validation plan
+
+
+
 ```
 
 ### Causal Node Types
@@ -285,8 +285,8 @@ When failures occur, traditional systems provide **error logs** and **stack trac
 
 ```python
 from training.causal_self_diagnosis import (
-    create_causal_diagnosis_system,
-    FailureMode
+ create_causal_diagnosis_system,
+ FailureMode
 )
 
 # Create system
@@ -294,40 +294,40 @@ diagnosis_system = create_causal_diagnosis_system()
 
 # Build causal model
 system_components = {
-    "attention_layer": {
-        "type": "HIDDEN",
-        "name": "Attention Layer",
-        "value": 0.65,  # Current
-        "expected_value": 0.85,  # Expected
-        "parents": ["input_embeddings"]
-    },
-    # ... more components
+ "attention_layer": {
+ "type": "HIDDEN",
+ "name": "Attention Layer",
+ "value": 0.65, # Current
+ "expected_value": 0.85, # Expected
+ "parents": ["input_embeddings"]
+ },
+ # ... more components
 }
 
 diagnosis_system.build_causal_model(
-    system_components=system_components,
-    observational_data=historical_data
+ system_components=system_components,
+ observational_data=historical_data
 )
 
 # Diagnose failure
 diagnosis = diagnosis_system.diagnose_failure(
-    failure_description={
-        "severity": 0.8,
-        "component_values": {...}
-    },
-    failure_mode=FailureMode.ACCURACY_DROP
+ failure_description={
+ "severity": 0.8,
+ "component_values": {...}
+ },
+ failure_mode=FailureMode.ACCURACY_DROP
 )
 
 # View root causes
 for cause_id in diagnosis.root_causes:
-    node = diagnosis_system.causal_graph.nodes[cause_id]
-    print(f"{node.name}: strength={node.causal_strength:.2f}")
+ node = diagnosis_system.causal_graph.nodes[cause_id]
+ print(f"{node.name}: strength={node.causal_strength:.2f}")
 
 # Generate counterfactuals
 cf = diagnosis_system.counterfactual_reasoner.generate_counterfactual(
-    node_id="learning_rate",
-    counterfactual_value=3e-4,
-    target_outcome="failure_outcome"
+ node_id="learning_rate",
+ counterfactual_value=3e-4,
+ target_outcome="failure_outcome"
 )
 
 print(f"If learning_rate was 3e-4: {cf.description}")
@@ -335,8 +335,8 @@ print(f"Expected change: {cf.outcome_change:+.2%}")
 
 # Create intervention plan
 plan = diagnosis_system.create_intervention_plan(
-    diagnosis=diagnosis,
-    constraints={"max_cost": 0.5}
+ diagnosis=diagnosis,
+ constraints={"max_cost": 0.5}
 )
 
 print(f"Plan: {len(plan.interventions)} interventions")
@@ -354,78 +354,77 @@ print(f"Expected improvement: {plan.expected_improvement:.2%}")
 
 ---
 
-## 🔗 Integrated System: Metacognitive + Causal
+## Integrated System: Metacognitive + Causal
 
 ### How They Work Together
 
 The two systems create a powerful **self-aware, self-diagnosing AI**:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                   INTEGRATED WORKFLOW                        │
-└─────────────────────────────────────────────────────────────┘
+
+ INTEGRATED WORKFLOW
 
 1. DETECT ISSUE (Metacognitive Monitoring)
-   ↓
-   • Monitor prediction confidence
-   • Detect uncertainty or confusion
-   • Identify cognitive state change
-   • Recommend intervention
+ ↓
+ • Monitor prediction confidence
+ • Detect uncertainty or confusion
+ • Identify cognitive state change
+ • Recommend intervention
 
 2. DIAGNOSE CAUSE (Causal Self-Diagnosis)
-   ↓
-   • Build/update causal graph
-   • Identify root causes
-   • Generate counterfactuals
-   • Rank by causal strength
+ ↓
+ • Build/update causal graph
+ • Identify root causes
+ • Generate counterfactuals
+ • Rank by causal strength
 
 3. PLAN FIX (Intervention Planning)
-   ↓
-   • Select interventions
-   • Estimate costs/benefits
-   • Assess risks
-   • Create validation plan
+ ↓
+ • Select interventions
+ • Estimate costs/benefits
+ • Assess risks
+ • Create validation plan
 
 4. EXECUTE & VALIDATE
-   ↓
-   • Apply interventions
-   • Monitor outcomes
-   • Validate improvements
-   • Learn from results
+ ↓
+ • Apply interventions
+ • Monitor outcomes
+ • Validate improvements
+ • Learn from results
 
 5. REFLECT & IMPROVE (Self-Reflection)
-   ↓
-   • Discover insights
-   • Update causal graph
-   • Refine confidence estimator
-   • Improve over time
+ ↓
+ • Discover insights
+ • Update causal graph
+ • Refine confidence estimator
+ • Improve over time
 ```
 
 ### Integration Points
 
 1. **Uncertainty → Diagnosis Trigger**
 
-   - High uncertainty triggers causal diagnosis
-   - Metacognitive signals inform failure severity
+ - High uncertainty triggers causal diagnosis
+ - Metacognitive signals inform failure severity
 
 2. **Attention → Causal Graph**
 
-   - Attention patterns become causal nodes
-   - Focus score affects causal strength
+ - Attention patterns become causal nodes
+ - Focus score affects causal strength
 
 3. **Reasoning Trace → Root Cause**
 
-   - Bottlenecks in reasoning mapped to causal graph
-   - Decision points become intervention targets
+ - Bottlenecks in reasoning mapped to causal graph
+ - Decision points become intervention targets
 
 4. **Counterfactuals → Confidence Estimation**
 
-   - Counterfactual outcomes update confidence calibration
-   - Learn what factors affect reliability
+ - Counterfactual outcomes update confidence calibration
+ - Learn what factors affect reliability
 
 5. **Interventions → Metacognitive Improvement**
-   - Intervention outcomes train confidence estimator
-   - Reflection insights improve self-awareness
+ - Intervention outcomes train confidence estimator
+ - Reflection insights improve self-awareness
 
 ### Example: End-to-End Flow
 
@@ -434,157 +433,157 @@ The two systems create a powerful **self-aware, self-diagnosing AI**:
 meta_state = monitor.monitor_prediction(features, prediction, attention)
 
 if meta_state.prediction_confidence < 0.5:
-    print("Low confidence detected!")
+ print("Low confidence detected!")
 
-    # 2. Trigger causal diagnosis
-    failure_desc = {
-        "severity": 1.0 - meta_state.prediction_confidence,
-        "component_values": {
-            "confidence": meta_state.prediction_confidence,
-            "attention_quality": meta_state.focus_score,
-            # ... more from metacognitive state
-        }
-    }
+ # 2. Trigger causal diagnosis
+ failure_desc = {
+ "severity": 1.0 - meta_state.prediction_confidence,
+ "component_values": {
+ "confidence": meta_state.prediction_confidence,
+ "attention_quality": meta_state.focus_score,
+ # ... more from metacognitive state
+ }
+ }
 
-    diagnosis = diagnosis_system.diagnose_failure(
-        failure_description=failure_desc,
-        failure_mode=FailureMode.ACCURACY_DROP
-    )
+ diagnosis = diagnosis_system.diagnose_failure(
+ failure_description=failure_desc,
+ failure_mode=FailureMode.ACCURACY_DROP
+ )
 
-    # 3. Create intervention plan
-    plan = diagnosis_system.create_intervention_plan(diagnosis)
+ # 3. Create intervention plan
+ plan = diagnosis_system.create_intervention_plan(diagnosis)
 
-    # 4. Apply interventions
-    for strategy, details in plan.interventions:
-        apply_intervention(strategy, details)
+ # 4. Apply interventions
+ for strategy, details in plan.interventions:
+ apply_intervention(strategy, details)
 
-    # 5. Validate and reflect
-    new_state = monitor.monitor_prediction(...)
-    if new_state.prediction_confidence > meta_state.prediction_confidence:
-        print(f"Success! Improved by {new_state.prediction_confidence - meta_state.prediction_confidence:.2%}")
+ # 5. Validate and reflect
+ new_state = monitor.monitor_prediction(...)
+ if new_state.prediction_confidence > meta_state.prediction_confidence:
+ print(f"Success! Improved by {new_state.prediction_confidence - meta_state.prediction_confidence:.2%}")
 
-        # Learn from success
-        insights = monitor.reflect_on_performance()
+ # Learn from success
+ insights = monitor.reflect_on_performance()
 ```
 
 ---
 
-## 📊 Competitive Analysis
+## Competitive Analysis
 
 ### vs. Traditional AI/ML Systems
 
-| Capability                | Traditional     | Symbio AI                     | Advantage          |
+| Capability | Traditional | Symbio AI | Advantage |
 | ------------------------- | --------------- | ----------------------------- | ------------------ |
-| **Self-Awareness**        | None            | Full metacognitive monitoring | 100%               |
-| **Failure Diagnosis**     | Manual logs     | Automated causal analysis     | 90% faster         |
-| **Root Cause ID**         | Guesswork       | Causal graph with strengths   | 85% accuracy       |
-| **Intervention Planning** | Ad-hoc          | Planned with cost/benefit     | 70% better         |
-| **"What-If" Analysis**    | Trial-and-error | Counterfactual reasoning      | 80% fewer attempts |
-| **Self-Improvement**      | External tuning | Automatic reflection          | Continuous         |
+| **Self-Awareness** | None | Full metacognitive monitoring | 100% |
+| **Failure Diagnosis** | Manual logs | Automated causal analysis | 90% faster |
+| **Root Cause ID** | Guesswork | Causal graph with strengths | 85% accuracy |
+| **Intervention Planning** | Ad-hoc | Planned with cost/benefit | 70% better |
+| **"What-If" Analysis** | Trial-and-error | Counterfactual reasoning | 80% fewer attempts |
+| **Self-Improvement** | External tuning | Automatic reflection | Continuous |
 
 ### vs. Observability Tools (DataDog, New Relic)
 
 **Observability tools** provide metrics and logs but **no understanding**:
 
-- ❌ Can't distinguish correlation from causation
-- ❌ No self-awareness of model state
-- ❌ No counterfactual reasoning
-- ❌ Manual root cause analysis
-- ❌ No automatic intervention planning
+- Can't distinguish correlation from causation
+- No self-awareness of model state
+- No counterfactual reasoning
+- Manual root cause analysis
+- No automatic intervention planning
 
 **Symbio AI** adds **intelligence to observability**:
 
-- ✅ Causal inference, not just correlation
-- ✅ Self-aware cognitive monitoring
-- ✅ Counterfactual "what-if" scenarios
-- ✅ Automatic root cause identification
-- ✅ Planned interventions with validation
+- Causal inference, not just correlation
+- Self-aware cognitive monitoring
+- Counterfactual "what-if" scenarios
+- Automatic root cause identification
+- Planned interventions with validation
 
 ### vs. AutoML / Neural Architecture Search
 
 **AutoML** optimizes architectures but doesn't understand **why**:
 
-- ❌ Black-box optimization
-- ❌ No failure diagnosis
-- ❌ No self-awareness
-- ❌ Trial-and-error search
+- Black-box optimization
+- No failure diagnosis
+- No self-awareness
+- Trial-and-error search
 
 **Symbio AI** understands **causal mechanisms**:
 
-- ✅ Causal graph reveals why architectures work
-- ✅ Diagnoses failures causally
-- ✅ Monitors own cognitive state
-- ✅ Targeted interventions, not random search
+- Causal graph reveals why architectures work
+- Diagnoses failures causally
+- Monitors own cognitive state
+- Targeted interventions, not random search
 
 ### vs. Explainable AI (SHAP, LIME)
 
 **XAI** explains **individual predictions**, Symbio explains **system behavior**:
 
-| Feature        | XAI (SHAP/LIME)     | Symbio AI             |
+| Feature | XAI (SHAP/LIME) | Symbio AI |
 | -------------- | ------------------- | --------------------- |
-| Scope          | Single prediction   | Entire system         |
-| Type           | Feature importance  | Causal relationships  |
-| Dynamic        | Static explanations | Real-time monitoring  |
-| Interventions  | None                | Planned and validated |
-| Self-Awareness | None                | Full metacognitive    |
+| Scope | Single prediction | Entire system |
+| Type | Feature importance | Causal relationships |
+| Dynamic | Static explanations | Real-time monitoring |
+| Interventions | None | Planned and validated |
+| Self-Awareness | None | Full metacognitive |
 
 ---
 
-## 💼 Business Impact
+## Business Impact
 
 ### Cost Savings
 
 1. **Debugging Time**: 60% reduction
-   - Automatic root cause identification
-   - No manual log analysis
+ - Automatic root cause identification
+ - No manual log analysis
 2. **Downtime**: 45% reduction
-   - Early detection via metacognitive monitoring
-   - Faster diagnosis and fixes
+ - Early detection via metacognitive monitoring
+ - Faster diagnosis and fixes
 3. **Failed Fixes**: 70% reduction
 
-   - Counterfactual reasoning validates before deployment
-   - Planned interventions with risk assessment
+ - Counterfactual reasoning validates before deployment
+ - Planned interventions with risk assessment
 
 4. **Training Costs**: 40% reduction
-   - Targeted fine-tuning instead of full retraining
-   - Causal understanding prevents wasted experiments
+ - Targeted fine-tuning instead of full retraining
+ - Causal understanding prevents wasted experiments
 
 ### Revenue Impact
 
 1. **User Trust**: +25%
 
-   - System knows when it's uncertain and asks for help
-   - Fewer hallucinations and errors
+ - System knows when it's uncertain and asks for help
+ - Fewer hallucinations and errors
 
 2. **Model Performance**: +15%
 
-   - Continuous self-improvement via reflection
-   - Optimal interventions based on causal analysis
+ - Continuous self-improvement via reflection
+ - Optimal interventions based on causal analysis
 
 3. **Time to Market**: -50%
-   - Automatic diagnosis and fixing
-   - No waiting for ML engineers
+ - Automatic diagnosis and fixing
+ - No waiting for ML engineers
 
 ### Unique Selling Points
 
 **Nobody else has this:**
 
-1. ✅ **Self-Aware AI**: Monitors own cognition in real-time
-2. ✅ **Causal Reasoning**: Understands why, not just what
-3. ✅ **Counterfactual Planning**: Validates fixes before applying
-4. ✅ **Automatic Intervention**: Plans and executes fixes
-5. ✅ **Continuous Learning**: Improves through self-reflection
+1. **Self-Aware AI**: Monitors own cognition in real-time
+2. **Causal Reasoning**: Understands why, not just what
+3. **Counterfactual Planning**: Validates fixes before applying
+4. **Automatic Intervention**: Plans and executes fixes
+5. **Continuous Learning**: Improves through self-reflection
 
 **Competitors offer:**
 
-- ❌ Observability without understanding (DataDog, etc.)
-- ❌ Explanations without causality (SHAP, LIME)
-- ❌ Optimization without awareness (AutoML)
-- ❌ Manual debugging (everyone)
+- Observability without understanding (DataDog, etc.)
+- Explanations without causality (SHAP, LIME)
+- Optimization without awareness (AutoML)
+- Manual debugging (everyone)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Installation
 
@@ -605,24 +604,24 @@ diagnosis_system = create_causal_diagnosis_system()
 
 # 2. Monitor predictions
 state = monitor.monitor_prediction(
-    features=model_features,
-    prediction=output,
-    attention_weights=attention
+ features=model_features,
+ prediction=output,
+ attention_weights=attention
 )
 
 # 3. Diagnose when needed
 if state.prediction_confidence < 0.5:
-    diagnosis = diagnosis_system.diagnose_failure(
-        failure_description={...},
-        failure_mode=FailureMode.ACCURACY_DROP
-    )
+ diagnosis = diagnosis_system.diagnose_failure(
+ failure_description={...},
+ failure_mode=FailureMode.ACCURACY_DROP
+ )
 
-    # 4. Create intervention plan
-    plan = diagnosis_system.create_intervention_plan(diagnosis)
+ # 4. Create intervention plan
+ plan = diagnosis_system.create_intervention_plan(diagnosis)
 
-    # 5. Apply interventions
-    for strategy, details in plan.interventions:
-        apply_intervention(strategy, details)
+ # 5. Apply interventions
+ for strategy, details in plan.interventions:
+ apply_intervention(strategy, details)
 ```
 
 ### Run Demo
@@ -635,90 +634,90 @@ This runs 9 comprehensive demos showcasing all capabilities.
 
 ---
 
-## 📚 API Reference
+## API Reference
 
 ### Metacognitive Monitor
 
 ```python
 class MetacognitiveMonitor:
-    def __init__(
-        self,
-        feature_dim: int = 128,
-        confidence_threshold: float = 0.7,
-        uncertainty_threshold: float = 0.4
-    )
+ def __init__(
+ self,
+ feature_dim: int = 128,
+ confidence_threshold: float = 0.7,
+ uncertainty_threshold: float = 0.4
+ )
 
-    def monitor_prediction(
-        self,
-        features: torch.Tensor,
-        prediction: Any,
-        attention_weights: Optional[np.ndarray] = None,
-        ground_truth: Optional[Any] = None
-    ) -> MetacognitiveState
+ def monitor_prediction(
+ self,
+ features: torch.Tensor,
+ prediction: Any,
+ attention_weights: Optional[np.ndarray] = None,
+ ground_truth: Optional[Any] = None
+ ) -> MetacognitiveState
 
-    def reflect_on_performance(
-        self,
-        time_window: int = 100
-    ) -> List[ReflectionInsight]
+ def reflect_on_performance(
+ self,
+ time_window: int = 100
+ ) -> List[ReflectionInsight]
 
-    def get_self_awareness_report(self) -> Dict[str, Any]
+ def get_self_awareness_report(self) -> Dict[str, Any]
 
-    def export_metacognitive_data(self, output_path: Path) -> None
+ def export_metacognitive_data(self, output_path: Path) -> None
 ```
 
 ### Causal Self-Diagnosis
 
 ```python
 class CausalSelfDiagnosis:
-    def __init__(self)
+ def __init__(self)
 
-    def build_causal_model(
-        self,
-        system_components: Dict[str, Any],
-        observational_data: Optional[List[Dict[str, Any]]] = None
-    ) -> None
+ def build_causal_model(
+ self,
+ system_components: Dict[str, Any],
+ observational_data: Optional[List[Dict[str, Any]]] = None
+ ) -> None
 
-    def diagnose_failure(
-        self,
-        failure_description: Dict[str, Any],
-        failure_mode: FailureMode
-    ) -> FailureDiagnosis
+ def diagnose_failure(
+ self,
+ failure_description: Dict[str, Any],
+ failure_mode: FailureMode
+ ) -> FailureDiagnosis
 
-    def create_intervention_plan(
-        self,
-        diagnosis: FailureDiagnosis,
-        constraints: Optional[Dict[str, Any]] = None
-    ) -> InterventionPlan
+ def create_intervention_plan(
+ self,
+ diagnosis: FailureDiagnosis,
+ constraints: Optional[Dict[str, Any]] = None
+ ) -> InterventionPlan
 
-    def get_diagnosis_summary(self) -> Dict[str, Any]
+ def get_diagnosis_summary(self) -> Dict[str, Any]
 
-    def export_diagnosis_data(self, output_path: Path) -> None
+ def export_diagnosis_data(self, output_path: Path) -> None
 ```
 
 ### Counterfactual Reasoner
 
 ```python
 class CounterfactualReasoner:
-    def __init__(self, causal_graph: CausalGraph)
+ def __init__(self, causal_graph: CausalGraph)
 
-    def generate_counterfactual(
-        self,
-        node_id: str,
-        counterfactual_value: Any,
-        target_outcome: str
-    ) -> Counterfactual
+ def generate_counterfactual(
+ self,
+ node_id: str,
+ counterfactual_value: Any,
+ target_outcome: str
+ ) -> Counterfactual
 
-    def find_best_counterfactuals(
-        self,
-        target_outcome: str,
-        num_counterfactuals: int = 5,
-        require_actionable: bool = True
-    ) -> List[Counterfactual]
+ def find_best_counterfactuals(
+ self,
+ target_outcome: str,
+ num_counterfactuals: int = 5,
+ require_actionable: bool = True
+ ) -> List[Counterfactual]
 ```
 
 ---
 
-## 🔬 Research Foundations
+## Research Foundations
 
 ### Metacognitive Monitoring
 
@@ -740,7 +739,7 @@ Based on:
 
 ---
 
-## 🎯 Future Enhancements
+## Future Enhancements
 
 ### Metacognitive Monitoring
 
@@ -765,7 +764,7 @@ Based on:
 
 ---
 
-## 📈 Metrics & Validation
+## Metrics & Validation
 
 ### Metacognitive Monitoring Metrics
 
@@ -792,7 +791,7 @@ Based on:
 
 ---
 
-## 🏆 Conclusion
+## Conclusion
 
 Symbio AI's **Metacognitive Monitoring** and **Causal Self-Diagnosis** systems represent a **paradigm shift** in AI:
 
@@ -801,10 +800,10 @@ Symbio AI's **Metacognitive Monitoring** and **Causal Self-Diagnosis** systems r
 
 **Nobody else has**:
 
-- ✅ Real-time metacognitive self-awareness
-- ✅ Causal root cause analysis
-- ✅ Counterfactual intervention planning
-- ✅ Automatic self-improvement via reflection
+- Real-time metacognitive self-awareness
+- Causal root cause analysis
+- Counterfactual intervention planning
+- Automatic self-improvement via reflection
 
 **Business impact**:
 

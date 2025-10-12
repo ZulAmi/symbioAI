@@ -137,19 +137,19 @@ Symbio AI is a next-generation modular AI framework designed to surpass existing
 ## Data Flow Architecture
 
 ```
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│ Data Source │───▶│ Data Manager │───▶│ Preprocessing│
-└─────────────┘    └──────────────┘    └─────────────┘
-                           │
-                           ▼
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│ Model Cache │◀───│Model Registry│───▶│ Agent Pool  │
-└─────────────┘    └──────────────┘    └─────────────┘
-                           │                    │
-                           ▼                    ▼
-┌─────────────┐    ┌──────────────┐    ┌─────────────┐
-│Training Mgr │◀───│ Orchestrator │───▶│ Evaluation  │
-└─────────────┘    └──────────────┘    └─────────────┘
+
+ Data Source Data Manager Preprocessing
+
+
+
+
+ Model Cache Model Registry Agent Pool
+
+
+
+
+Training Mgr Orchestrator Evaluation
+
 ```
 
 ## Communication Patterns
@@ -265,7 +265,7 @@ Symbio AI is a next-generation modular AI framework designed to surpass existing
 
 - Neural architecture search (NAS)
 - Meta-learning capabilities
-- **Continual learning without catastrophic forgetting** ✅ **IMPLEMENTED**
+- **Continual learning without catastrophic forgetting** **IMPLEMENTED**
 - Explainable AI integration
 
 ---

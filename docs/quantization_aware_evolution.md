@@ -42,11 +42,11 @@ Evolutionary quantization that:
 ```
 Benchmark: 7B Parameter Transformer Model → Edge Deployment
 
-Baseline (FP32):          7GB, 450ms latency, 2.1J energy
-Manual INT8:              1.8GB, 180ms latency, 0.8J energy, 2.3% accuracy loss
-Our Evolved INT4/INT8:    0.9GB, 110ms latency, 0.4J energy, 1.1% accuracy loss
+Baseline (FP32): 7GB, 450ms latency, 2.1J energy
+Manual INT8: 1.8GB, 180ms latency, 0.8J energy, 2.3% accuracy loss
+Our Evolved INT4/INT8: 0.9GB, 110ms latency, 0.4J energy, 1.1% accuracy loss
 
-🎯 Result: 8x compression, 4x speedup, 5x energy reduction, 50% less accuracy loss!
+ Result: 8x compression, 4x speedup, 5x energy reduction, 50% less accuracy loss!
 ```
 
 ## Key Features
@@ -56,11 +56,11 @@ Our Evolved INT4/INT8:    0.9GB, 110ms latency, 0.4J energy, 1.1% accuracy loss
 ```python
 # Evolution discovers optimal quantization for each layer
 genome = QuantizationGenome(
-    layer_configs={
-        "attention": LayerQuantConfig(weight_bits=8, activation_bits=8),  # Sensitive
-        "ffn": LayerQuantConfig(weight_bits=4, activation_bits=8),        # Regular
-        "embedding": LayerQuantConfig(weight_bits=6, activation_bits=8)   # Moderate
-    }
+ layer_configs={
+ "attention": LayerQuantConfig(weight_bits=8, activation_bits=8), # Sensitive
+ "ffn": LayerQuantConfig(weight_bits=4, activation_bits=8), # Regular
+ "embedding": LayerQuantConfig(weight_bits=6, activation_bits=8) # Moderate
+ }
 )
 ```
 
@@ -76,9 +76,9 @@ genome = QuantizationGenome(
 ```python
 # Optimize for specific hardware
 config = QuantizationEvolutionConfig(
-    hardware_target=HardwareTarget.ARM_NEON,
-    target_latency_ms=50.0,
-    target_memory_mb=100.0
+ hardware_target=HardwareTarget.ARM_NEON,
+ target_latency_ms=50.0,
+ target_memory_mb=100.0
 )
 ```
 
@@ -95,10 +95,10 @@ Supported hardware:
 
 ```python
 config = QuantizationEvolutionConfig(
-    accuracy_weight=0.4,      # Maintain accuracy
-    compression_weight=0.3,    # Reduce size
-    latency_weight=0.2,        # Improve speed
-    energy_weight=0.1          # Save battery
+ accuracy_weight=0.4, # Maintain accuracy
+ compression_weight=0.3, # Reduce size
+ latency_weight=0.2, # Improve speed
+ energy_weight=0.1 # Save battery
 )
 ```
 
@@ -110,11 +110,11 @@ pareto_front = engine.pareto_front
 
 # Choose solution based on constraints
 if deployment == "mobile":
-    best = min(pareto_front, key=lambda g: g.inference_latency_ms)
+ best = min(pareto_front, key=lambda g: g.inference_latency_ms)
 elif deployment == "iot":
-    best = min(pareto_front, key=lambda g: g.energy_per_inference_mj)
+ best = min(pareto_front, key=lambda g: g.energy_per_inference_mj)
 else:
-    best = max(pareto_front, key=lambda g: g.accuracy)
+ best = max(pareto_front, key=lambda g: g.accuracy)
 ```
 
 ## Architecture
@@ -122,38 +122,38 @@ else:
 ### System Components
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                 Quantization Evolution Engine                    │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  Population  │  │  Evolution   │  │   Fitness    │          │
-│  │ Initialization│→ │  Operators   │→ │  Evaluation  │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-│         │                  │                  │                   │
-│         ▼                  ▼                  ▼                   │
-│  ┌──────────────────────────────────────────────────┐          │
-│  │          Quantization Genome Library              │          │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐   │          │
-│  │  │ Genome 1   │ │ Genome 2   │ │ Genome N   │   │          │
-│  │  │ INT4/INT8  │ │ INT8/INT8  │ │ INT2/INT4  │   │          │
-│  │  └────────────┘ └────────────┘ └────────────┘   │          │
-│  └──────────────────────────────────────────────────┘          │
-│                          │                                        │
-│                          ▼                                        │
-│  ┌────────────────────────────────────────────────────┐         │
-│  │         Hardware-Aware Simulation                   │         │
-│  │  • Latency modeling  • Memory profiling             │         │
-│  │  • Energy estimation • Operator support             │         │
-│  └────────────────────────────────────────────────────┘         │
-│                          │                                        │
-│                          ▼                                        │
-│  ┌────────────────────────────────────────────────────┐         │
-│  │           Pareto Front Archive                      │         │
-│  │  Non-dominated solutions across objectives          │         │
-│  └────────────────────────────────────────────────────┘         │
-│                                                                   │
-└───────────────────────────────────────────────────────────────┘
+
+ Quantization Evolution Engine
+
+
+
+ Population Evolution Fitness
+ Initialization→ Operators → Evaluation
+
+
+
+
+ Quantization Genome Library
+
+ Genome 1 Genome 2 Genome N
+ INT4/INT8 INT8/INT8 INT2/INT4
+
+
+
+
+
+ Hardware-Aware Simulation
+ • Latency modeling • Memory profiling
+ • Energy estimation • Operator support
+
+
+
+
+ Pareto Front Archive
+ Non-dominated solutions across objectives
+
+
+
 ```
 
 ### Core Classes
@@ -163,17 +163,17 @@ else:
 ```python
 @dataclass
 class QuantizationGenome:
-    """Represents a complete quantization strategy."""
-    layer_configs: Dict[str, LayerQuantConfig]
-    global_scheme: QuantizationScheme
-    calibration_method: CalibrationMethod
+ """Represents a complete quantization strategy."""
+ layer_configs: Dict[str, LayerQuantConfig]
+ global_scheme: QuantizationScheme
+ calibration_method: CalibrationMethod
 
-    # Fitness metrics
-    accuracy: float
-    compression_ratio: float
-    inference_latency_ms: float
-    memory_footprint_mb: float
-    energy_per_inference_mj: float
+ # Fitness metrics
+ accuracy: float
+ compression_ratio: float
+ inference_latency_ms: float
+ memory_footprint_mb: float
+ energy_per_inference_mj: float
 ```
 
 #### 2. LayerQuantConfig
@@ -181,37 +181,37 @@ class QuantizationGenome:
 ```python
 @dataclass
 class LayerQuantConfig:
-    """Per-layer quantization configuration."""
-    weight_bits: int              # 2, 4, 6, 8, 16
-    activation_bits: int          # 4, 8, 16
-    weight_scheme: QuantizationScheme
-    activation_scheme: QuantizationScheme
-    granularity: QuantizationGranularity
-    use_symmetric: bool
+ """Per-layer quantization configuration."""
+ weight_bits: int # 2, 4, 6, 8, 16
+ activation_bits: int # 4, 8, 16
+ weight_scheme: QuantizationScheme
+ activation_scheme: QuantizationScheme
+ granularity: QuantizationGranularity
+ use_symmetric: bool
 ```
 
 #### 3. QuantizationEvolutionEngine
 
 ```python
 class QuantizationEvolutionEngine:
-    """Main orchestrator for quantization evolution."""
+ """Main orchestrator for quantization evolution."""
 
-    async def run_evolution(
-        self,
-        layer_names: List[str],
-        max_generations: int = 50
-    ) -> Dict[str, Any]:
-        """Run evolutionary quantization search."""
+ async def run_evolution(
+ self,
+ layer_names: List[str],
+ max_generations: int = 50
+ ) -> Dict[str, Any]:
+ """Run evolutionary quantization search."""
 
-    def get_best_genome(self) -> QuantizationGenome:
-        """Get best quantization strategy found."""
+ def get_best_genome(self) -> QuantizationGenome:
+ """Get best quantization strategy found."""
 
-    def export_quantization_config(
-        self,
-        genome: QuantizationGenome,
-        output_path: Path
-    ):
-        """Export configuration for deployment."""
+ def export_quantization_config(
+ self,
+ genome: QuantizationGenome,
+ output_path: Path
+ ):
+ """Export configuration for deployment."""
 ```
 
 ## Usage Guide
@@ -220,27 +220,27 @@ class QuantizationEvolutionEngine:
 
 ```python
 from training.quantization_aware_evolution import (
-    QuantizationEvolutionEngine,
-    QuantizationEvolutionConfig,
-    HardwareTarget
+ QuantizationEvolutionEngine,
+ QuantizationEvolutionConfig,
+ HardwareTarget
 )
 
 # Define model layers
 layer_names = [
-    "embedding",
-    "encoder_layer_0_attention",
-    "encoder_layer_0_ffn",
-    "output_projection"
+ "embedding",
+ "encoder_layer_0_attention",
+ "encoder_layer_0_ffn",
+ "output_projection"
 ]
 
 # Configure evolution
 config = QuantizationEvolutionConfig(
-    population_size=20,
-    max_generations=30,
-    hardware_target=HardwareTarget.ARM_NEON,
-    allow_mixed_precision=True,
-    min_bits=4,
-    max_bits=8
+ population_size=20,
+ max_generations=30,
+ hardware_target=HardwareTarget.ARM_NEON,
+ allow_mixed_precision=True,
+ min_bits=4,
+ max_bits=8
 )
 
 # Run evolution
@@ -257,10 +257,10 @@ print(f"Compression: {best.compression_ratio:.1f}x @ {best.accuracy:.1%}")
 ```python
 # Balanced optimization
 config = QuantizationEvolutionConfig(
-    accuracy_weight=0.4,
-    compression_weight=0.3,
-    latency_weight=0.2,
-    energy_weight=0.1
+ accuracy_weight=0.4,
+ compression_weight=0.3,
+ latency_weight=0.2,
+ energy_weight=0.1
 )
 
 engine = QuantizationEvolutionEngine(config)
@@ -268,8 +268,8 @@ await engine.run_evolution(layer_names)
 
 # Analyze Pareto front
 for genome in engine.pareto_front[:5]:
-    print(f"{genome.accuracy:.1%} | {genome.compression_ratio:.1f}x | "
-          f"{genome.inference_latency_ms:.1f}ms | {genome.energy_per_inference_mj:.2f}mJ")
+ print(f"{genome.accuracy:.1%} | {genome.compression_ratio:.1f}x | "
+ f"{genome.inference_latency_ms:.1f}ms | {genome.energy_per_inference_mj:.2f}mJ")
 ```
 
 ### Extreme Compression
@@ -277,11 +277,11 @@ for genome in engine.pareto_front[:5]:
 ```python
 # INT4/INT2 quantization
 config = QuantizationEvolutionConfig(
-    min_bits=2,  # Allow INT2
-    max_bits=4,  # Max INT4
-    allow_mixed_precision=True,
-    compression_weight=0.5,  # Prioritize compression
-    accuracy_weight=0.3
+ min_bits=2, # Allow INT2
+ max_bits=4, # Max INT4
+ allow_mixed_precision=True,
+ compression_weight=0.5, # Prioritize compression
+ accuracy_weight=0.3
 )
 
 engine = QuantizationEvolutionEngine(config)
@@ -297,26 +297,26 @@ print(f"Extreme compression: {best.compression_ratio:.1f}x")
 ```python
 # Mobile deployment
 mobile_config = QuantizationEvolutionConfig(
-    hardware_target=HardwareTarget.ARM_NEON,
-    target_latency_ms=50.0,
-    target_memory_mb=100.0,
-    latency_weight=0.4,
-    accuracy_weight=0.4
+ hardware_target=HardwareTarget.ARM_NEON,
+ target_latency_ms=50.0,
+ target_memory_mb=100.0,
+ latency_weight=0.4,
+ accuracy_weight=0.4
 )
 
 # IoT deployment (energy-critical)
 iot_config = QuantizationEvolutionConfig(
-    hardware_target=HardwareTarget.QUALCOMM_HEXAGON,
-    target_memory_mb=50.0,
-    energy_weight=0.5,
-    compression_weight=0.3
+ hardware_target=HardwareTarget.QUALCOMM_HEXAGON,
+ target_memory_mb=50.0,
+ energy_weight=0.5,
+ compression_weight=0.3
 )
 
 # Edge server (accuracy-critical)
 server_config = QuantizationEvolutionConfig(
-    hardware_target=HardwareTarget.APPLE_NEURAL_ENGINE,
-    accuracy_weight=0.6,
-    latency_weight=0.3
+ hardware_target=HardwareTarget.APPLE_NEURAL_ENGINE,
+ accuracy_weight=0.6,
+ latency_weight=0.3
 )
 ```
 
@@ -483,38 +483,38 @@ CalibrationMethod.ENTROPY
 ```python
 @dataclass
 class QuantizationEvolutionConfig:
-    """Configuration for quantization evolution."""
+ """Configuration for quantization evolution."""
 
-    # Evolution parameters
-    population_size: int = 20
-    max_generations: int = 50
-    mutation_rate: float = 0.2
-    crossover_rate: float = 0.7
-    elitism_ratio: float = 0.1
+ # Evolution parameters
+ population_size: int = 20
+ max_generations: int = 50
+ mutation_rate: float = 0.2
+ crossover_rate: float = 0.7
+ elitism_ratio: float = 0.1
 
-    # Quantization constraints
-    min_bits: int = 4
-    max_bits: int = 8
-    allow_mixed_precision: bool = True
-    allow_per_channel: bool = True
+ # Quantization constraints
+ min_bits: int = 4
+ max_bits: int = 8
+ allow_mixed_precision: bool = True
+ allow_per_channel: bool = True
 
-    # Hardware target
-    hardware_target: HardwareTarget = HardwareTarget.ARM_NEON
-    target_latency_ms: Optional[float] = None
-    target_memory_mb: Optional[float] = None
-    target_energy_mj: Optional[float] = None
+ # Hardware target
+ hardware_target: HardwareTarget = HardwareTarget.ARM_NEON
+ target_latency_ms: Optional[float] = None
+ target_memory_mb: Optional[float] = None
+ target_energy_mj: Optional[float] = None
 
-    # Multi-objective weights
-    accuracy_weight: float = 0.4
-    compression_weight: float = 0.3
-    latency_weight: float = 0.2
-    energy_weight: float = 0.1
+ # Multi-objective weights
+ accuracy_weight: float = 0.4
+ compression_weight: float = 0.3
+ latency_weight: float = 0.2
+ energy_weight: float = 0.1
 
-    # Advanced options
-    use_sensitivity_analysis: bool = True
-    adaptive_bit_allocation: bool = True
-    enable_caching: bool = True
-    parallel_evaluations: int = 4
+ # Advanced options
+ use_sensitivity_analysis: bool = True
+ adaptive_bit_allocation: bool = True
+ enable_caching: bool = True
+ parallel_evaluations: int = 4
 ```
 
 ### QuantizationEvolutionEngine
@@ -525,68 +525,68 @@ class QuantizationEvolutionConfig:
 
 ```python
 async def run_evolution(
-    self,
-    layer_names: List[str],
-    max_generations: Optional[int] = None,
-    callback: Optional[Callable] = None
+ self,
+ layer_names: List[str],
+ max_generations: Optional[int] = None,
+ callback: Optional[Callable] = None
 ) -> Dict[str, Any]:
-    """
-    Run evolutionary quantization search.
+ """
+ Run evolutionary quantization search.
 
-    Args:
-        layer_names: List of layer names to quantize
-        max_generations: Override config max_generations
-        callback: Progress callback function
+ Args:
+ layer_names: List of layer names to quantize
+ max_generations: Override config max_generations
+ callback: Progress callback function
 
-    Returns:
-        Dict with evolution statistics
-    """
+ Returns:
+ Dict with evolution statistics
+ """
 ```
 
 ##### `get_best_genome()`
 
 ```python
 def get_best_genome(self) -> QuantizationGenome:
-    """
-    Get best quantization strategy found.
+ """
+ Get best quantization strategy found.
 
-    Returns:
-        Best genome by fitness score
-    """
+ Returns:
+ Best genome by fitness score
+ """
 ```
 
 ##### `export_quantization_config()`
 
 ```python
 def export_quantization_config(
-    self,
-    genome: QuantizationGenome,
-    output_path: Path,
-    format: str = "json"
+ self,
+ genome: QuantizationGenome,
+ output_path: Path,
+ format: str = "json"
 ):
-    """
-    Export quantization configuration.
+ """
+ Export quantization configuration.
 
-    Args:
-        genome: Quantization genome to export
-        output_path: Output file path
-        format: Export format ("json" or "yaml")
-    """
+ Args:
+ genome: Quantization genome to export
+ output_path: Output file path
+ format: Export format ("json" or "yaml")
+ """
 ```
 
 ##### `analyze_sensitivity()`
 
 ```python
 async def analyze_sensitivity(
-    self,
-    layer_names: List[str]
+ self,
+ layer_names: List[str]
 ) -> Dict[str, float]:
-    """
-    Analyze per-layer sensitivity to quantization.
+ """
+ Analyze per-layer sensitivity to quantization.
 
-    Returns:
-        Dict mapping layer names to sensitivity scores
-    """
+ Returns:
+ Dict mapping layer names to sensitivity scores
+ """
 ```
 
 ### QuantizationGenome
@@ -596,35 +596,35 @@ async def analyze_sensitivity(
 ```python
 @property
 def average_bits(self) -> float:
-    """Average bit-width across all layers."""
+ """Average bit-width across all layers."""
 
 @property
 def compression_ratio(self) -> float:
-    """Compression ratio vs FP32 baseline."""
+ """Compression ratio vs FP32 baseline."""
 
 @property
 def fitness_score(self) -> float:
-    """Weighted multi-objective fitness."""
+ """Weighted multi-objective fitness."""
 ```
 
 #### Methods
 
 ```python
 def to_dict(self) -> Dict[str, Any]:
-    """Convert to dictionary for serialization."""
+ """Convert to dictionary for serialization."""
 
 @classmethod
 def from_dict(cls, data: Dict[str, Any]) -> "QuantizationGenome":
-    """Create from dictionary."""
+ """Create from dictionary."""
 
 def clone(self) -> "QuantizationGenome":
-    """Create deep copy."""
+ """Create deep copy."""
 
 def mutate(self, mutation_rate: float) -> "QuantizationGenome":
-    """Apply mutation operators."""
+ """Apply mutation operators."""
 
 def crossover(self, other: "QuantizationGenome") -> "QuantizationGenome":
-    """Crossover with another genome."""
+ """Crossover with another genome."""
 ```
 
 ## Examples
@@ -636,23 +636,23 @@ import asyncio
 from training.quantization_aware_evolution import *
 
 async def simple_quantization():
-    # Define layers
-    layers = ["layer1", "layer2", "layer3"]
+ # Define layers
+ layers = ["layer1", "layer2", "layer3"]
 
-    # Basic config
-    config = QuantizationEvolutionConfig(
-        population_size=10,
-        max_generations=20
-    )
+ # Basic config
+ config = QuantizationEvolutionConfig(
+ population_size=10,
+ max_generations=20
+ )
 
-    # Run
-    engine = QuantizationEvolutionEngine(config)
-    await engine.run_evolution(layers)
+ # Run
+ engine = QuantizationEvolutionEngine(config)
+ await engine.run_evolution(layers)
 
-    # Results
-    best = engine.get_best_genome()
-    print(f"Compression: {best.compression_ratio:.1f}x")
-    print(f"Accuracy: {best.accuracy:.2%}")
+ # Results
+ best = engine.get_best_genome()
+ print(f"Compression: {best.compression_ratio:.1f}x")
+ print(f"Accuracy: {best.accuracy:.2%}")
 
 asyncio.run(simple_quantization())
 ```
@@ -661,21 +661,21 @@ asyncio.run(simple_quantization())
 
 ```python
 async def hardware_optimized():
-    layers = ["embedding", "attention", "ffn", "output"]
+ layers = ["embedding", "attention", "ffn", "output"]
 
-    # Optimize for ARM NEON
-    config = QuantizationEvolutionConfig(
-        hardware_target=HardwareTarget.ARM_NEON,
-        target_latency_ms=50.0,
-        latency_weight=0.5,
-        accuracy_weight=0.3
-    )
+ # Optimize for ARM NEON
+ config = QuantizationEvolutionConfig(
+ hardware_target=HardwareTarget.ARM_NEON,
+ target_latency_ms=50.0,
+ latency_weight=0.5,
+ accuracy_weight=0.3
+ )
 
-    engine = QuantizationEvolutionEngine(config)
-    await engine.run_evolution(layers)
+ engine = QuantizationEvolutionEngine(config)
+ await engine.run_evolution(layers)
 
-    best = engine.get_best_genome()
-    print(f"Latency: {best.inference_latency_ms:.1f}ms (target: 50ms)")
+ best = engine.get_best_genome()
+ print(f"Latency: {best.inference_latency_ms:.1f}ms (target: 50ms)")
 
 asyncio.run(hardware_optimized())
 ```
@@ -684,30 +684,30 @@ asyncio.run(hardware_optimized())
 
 ```python
 async def pareto_analysis():
-    layers = [f"layer_{i}" for i in range(12)]
+ layers = [f"layer_{i}" for i in range(12)]
 
-    # Multi-objective
-    config = QuantizationEvolutionConfig(
-        population_size=30,
-        max_generations=50,
-        accuracy_weight=0.25,
-        compression_weight=0.25,
-        latency_weight=0.25,
-        energy_weight=0.25
-    )
+ # Multi-objective
+ config = QuantizationEvolutionConfig(
+ population_size=30,
+ max_generations=50,
+ accuracy_weight=0.25,
+ compression_weight=0.25,
+ latency_weight=0.25,
+ energy_weight=0.25
+ )
 
-    engine = QuantizationEvolutionEngine(config)
-    await engine.run_evolution(layers)
+ engine = QuantizationEvolutionEngine(config)
+ await engine.run_evolution(layers)
 
-    # Analyze Pareto front
-    print(f"Pareto front size: {len(engine.pareto_front)}")
+ # Analyze Pareto front
+ print(f"Pareto front size: {len(engine.pareto_front)}")
 
-    for i, genome in enumerate(engine.pareto_front[:5], 1):
-        print(f"\nSolution {i}:")
-        print(f"  Accuracy: {genome.accuracy:.2%}")
-        print(f"  Compression: {genome.compression_ratio:.1f}x")
-        print(f"  Latency: {genome.inference_latency_ms:.1f}ms")
-        print(f"  Energy: {genome.energy_per_inference_mj:.2f}mJ")
+ for i, genome in enumerate(engine.pareto_front[:5], 1):
+ print(f"\nSolution {i}:")
+ print(f" Accuracy: {genome.accuracy:.2%}")
+ print(f" Compression: {genome.compression_ratio:.1f}x")
+ print(f" Latency: {genome.inference_latency_ms:.1f}ms")
+ print(f" Energy: {genome.energy_per_inference_mj:.2f}mJ")
 
 asyncio.run(pareto_analysis())
 ```
@@ -717,10 +717,10 @@ asyncio.run(pareto_analysis())
 ### Compression vs Accuracy
 
 ```
-INT8 Uniform:        2.1x compression, 0.5% accuracy loss
-INT4 Uniform:        4.2x compression, 3.8% accuracy loss
-Mixed INT4/INT8:     3.1x compression, 1.2% accuracy loss ✓
-Mixed INT2/INT4/INT8: 5.5x compression, 2.1% accuracy loss ✓
+INT8 Uniform: 2.1x compression, 0.5% accuracy loss
+INT4 Uniform: 4.2x compression, 3.8% accuracy loss
+Mixed INT4/INT8: 3.1x compression, 1.2% accuracy loss
+Mixed INT2/INT4/INT8: 5.5x compression, 2.1% accuracy loss
 ```
 
 **Insight**: Mixed-precision significantly improves the accuracy/compression trade-off!
@@ -728,13 +728,13 @@ Mixed INT2/INT4/INT8: 5.5x compression, 2.1% accuracy loss ✓
 ### Hardware Performance
 
 ```
-Platform               | Latency | Energy | Memory
+Platform | Latency | Energy | Memory
 -----------------------|---------|--------|--------
-ARM NEON (FP32)       | 450ms   | 2.1J   | 7.0GB
-ARM NEON (INT8)       | 180ms   | 0.8J   | 1.8GB
-ARM DOT (INT8)        | 120ms   | 0.6J   | 1.8GB
-Hexagon DSP (INT8)    | 140ms   | 0.4J   | 1.8GB  ✓ Best energy
-Apple ANE (INT8)      | 85ms    | 0.5J   | 1.8GB  ✓ Best latency
+ARM NEON (FP32) | 450ms | 2.1J | 7.0GB
+ARM NEON (INT8) | 180ms | 0.8J | 1.8GB
+ARM DOT (INT8) | 120ms | 0.6J | 1.8GB
+Hexagon DSP (INT8) | 140ms | 0.4J | 1.8GB Best energy
+Apple ANE (INT8) | 85ms | 0.5J | 1.8GB Best latency
 ```
 
 ### Evolution Convergence
@@ -742,12 +742,12 @@ Apple ANE (INT8)      | 85ms    | 0.5J   | 1.8GB  ✓ Best latency
 ```
 Generation | Best Fitness | Accuracy | Compression
 -----------|--------------|----------|-------------
-0          | 0.6234       | 92.1%    | 2.1x
-10         | 0.7412       | 94.3%    | 3.2x
-20         | 0.8156       | 95.8%    | 3.8x
-30         | 0.8523       | 96.2%    | 4.1x
-40         | 0.8651       | 96.4%    | 4.2x
-50         | 0.8672       | 96.5%    | 4.2x  ✓ Converged
+0 | 0.6234 | 92.1% | 2.1x
+10 | 0.7412 | 94.3% | 3.2x
+20 | 0.8156 | 95.8% | 3.8x
+30 | 0.8523 | 96.2% | 4.1x
+40 | 0.8651 | 96.4% | 4.2x
+50 | 0.8672 | 96.5% | 4.2x Converged
 ```
 
 **Insight**: Convergence typically occurs within 30-50 generations.
@@ -763,12 +763,12 @@ sensitivity = await engine.analyze_sensitivity(layer_names)
 
 # Allocate bits based on sensitivity
 for layer, score in sensitivity.items():
-    if score > 0.8:
-        print(f"{layer}: HIGH sensitivity → use 8-bit")
-    elif score > 0.5:
-        print(f"{layer}: MEDIUM sensitivity → use 6-bit")
-    else:
-        print(f"{layer}: LOW sensitivity → use 4-bit")
+ if score > 0.8:
+ print(f"{layer}: HIGH sensitivity → use 8-bit")
+ elif score > 0.5:
+ print(f"{layer}: MEDIUM sensitivity → use 6-bit")
+ else:
+ print(f"{layer}: LOW sensitivity → use 4-bit")
 ```
 
 ### 2. Use Mixed-Precision
@@ -776,9 +776,9 @@ for layer, score in sensitivity.items():
 ```python
 # Enable mixed-precision for better trade-offs
 config = QuantizationEvolutionConfig(
-    allow_mixed_precision=True,  # ✓ Recommended
-    min_bits=4,
-    max_bits=8
+ allow_mixed_precision=True, # Recommended
+ min_bits=4,
+ max_bits=8
 )
 ```
 
@@ -787,14 +787,14 @@ config = QuantizationEvolutionConfig(
 ```python
 # For activations: Use percentile or entropy
 LayerQuantConfig(
-    activation_scheme=QuantizationScheme.ASYMMETRIC,
-    calibration_method=CalibrationMethod.PERCENTILE
+ activation_scheme=QuantizationScheme.ASYMMETRIC,
+ calibration_method=CalibrationMethod.PERCENTILE
 )
 
 # For weights: Use MSE for best accuracy
 LayerQuantConfig(
-    weight_scheme=QuantizationScheme.SYMMETRIC,
-    calibration_method=CalibrationMethod.MSE
+ weight_scheme=QuantizationScheme.SYMMETRIC,
+ calibration_method=CalibrationMethod.MSE
 )
 ```
 
@@ -803,9 +803,9 @@ LayerQuantConfig(
 ```python
 # Mobile deployment
 config = QuantizationEvolutionConfig(
-    target_latency_ms=100.0,    # Achievable
-    target_memory_mb=200.0,     # Realistic
-    target_energy_mj=0.5        # Conservative
+ target_latency_ms=100.0, # Achievable
+ target_memory_mb=200.0, # Realistic
+ target_energy_mj=0.5 # Conservative
 )
 ```
 
@@ -814,18 +814,18 @@ config = QuantizationEvolutionConfig(
 ```python
 # Find solution that meets latency requirement
 for genome in engine.pareto_front:
-    if genome.inference_latency_ms <= 50.0:
-        if genome.accuracy >= 0.95:
-            print("Found suitable solution!")
-            break
+ if genome.inference_latency_ms <= 50.0:
+ if genome.accuracy >= 0.95:
+ print("Found suitable solution!")
+ break
 ```
 
 ### 6. Enable Caching for Speed
 
 ```python
 config = QuantizationEvolutionConfig(
-    enable_caching=True,        # ✓ 10x speedup
-    parallel_evaluations=4      # ✓ Use multiple cores
+ enable_caching=True, # 10x speedup
+ parallel_evaluations=4 # Use multiple cores
 )
 ```
 
@@ -833,7 +833,7 @@ config = QuantizationEvolutionConfig(
 
 ```python
 def progress_callback(generation, best_fitness, avg_fitness):
-    print(f"Gen {generation}: Best={best_fitness:.4f}, Avg={avg_fitness:.4f}")
+ print(f"Gen {generation}: Best={best_fitness:.4f}, Avg={avg_fitness:.4f}")
 
 await engine.run_evolution(layers, callback=progress_callback)
 ```
@@ -846,8 +846,8 @@ await engine.run_evolution(layers, callback=progress_callback)
 
 ```python
 config = QuantizationEvolutionConfig(
-    population_size=50,  # Increase from 20
-    mutation_rate=0.3    # Increase from 0.2
+ population_size=50, # Increase from 20
+ mutation_rate=0.3 # Increase from 0.2
 )
 ```
 
@@ -857,9 +857,9 @@ config = QuantizationEvolutionConfig(
 
 ```python
 config = QuantizationEvolutionConfig(
-    min_bits=6,              # Increase from 4
-    accuracy_weight=0.6,     # Prioritize accuracy
-    compression_weight=0.2
+ min_bits=6, # Increase from 4
+ accuracy_weight=0.6, # Prioritize accuracy
+ compression_weight=0.2
 )
 ```
 
@@ -869,9 +869,9 @@ config = QuantizationEvolutionConfig(
 
 ```python
 config = QuantizationEvolutionConfig(
-    hardware_target=HardwareTarget.APPLE_NEURAL_ENGINE,  # Faster hardware
-    latency_weight=0.5,  # Prioritize latency
-    target_latency_ms=75.0  # Relax from 50ms
+ hardware_target=HardwareTarget.APPLE_NEURAL_ENGINE, # Faster hardware
+ latency_weight=0.5, # Prioritize latency
+ target_latency_ms=75.0 # Relax from 50ms
 )
 ```
 
@@ -881,9 +881,9 @@ config = QuantizationEvolutionConfig(
 
 ```python
 config = QuantizationEvolutionConfig(
-    target_memory_mb=100.0,
-    compression_weight=0.5,
-    min_bits=2  # Allow more aggressive compression
+ target_memory_mb=100.0,
+ compression_weight=0.5,
+ min_bits=2 # Allow more aggressive compression
 )
 ```
 
