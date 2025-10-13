@@ -156,7 +156,7 @@ model_cache/
 weights/
 pretrained_models/
 
-# Training artifacts
+# Training artifacts - EXCLUDE ALL LOGS AND RUNS
 runs/
 logs/
 tensorboard/
@@ -164,15 +164,8 @@ wandb/
 mlruns/
 .mlflow/
 
-# Data files
-data/raw/
-data/processed/
-data/interim/
-data/external/
-data/downloads/
-data/cifar*/
-data/MNIST/
-data/FashionMNIST/
+# Data files - EXCLUDE ENTIRE DATA FOLDER
+data/
 symbioai_test_suite/data/
 *.csv
 *.tsv
@@ -275,7 +268,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # ============================================================================
-# Project Specific
+# Project Specific - LARGE FOLDERS TO EXCLUDE
 # ============================================================================
 # Temporary files
 tmp/
@@ -284,12 +277,19 @@ temp/
 *.temp
 .temporary/
 
+# Large project folders that should not be in git
+data/                     # 486M - Dataset files
+experiments/              # 3.3M - Experiment outputs  
+logs/                     # 648K - Log files
+symbioai_test_suite/data/ # Part of 188M test suite data
+
 # Generated files
 requirements-mac.txt
 requirements-filtered.txt
 
-# Test artifacts and reports
-symbioai_test_suite/reports/*.json
+# Test artifacts and reports - EXCLUDE ALL TEST DATA
+symbioai_test_suite/reports/
+symbioai_test_suite/data/
 test_results/
 *.test.log
 coverage_reports/
@@ -337,13 +337,8 @@ build/
 dist/
 *.whl
 
-# Experiments
-experiments/outputs/
-experiments/artifacts/
-experiments/runs/
-experiments/results/
-
-# Benchmark results
+# Experiments - EXCLUDE ALL EXPERIMENT DATA
+experiments/
 benchmark_results/
 *.benchmark
 *.bench
@@ -416,11 +411,10 @@ examples/*_results.*
 !docs/**/*.jpg
 !docs/**/*.svg
 
-# Keep small sample data files for testing
-!data/samples/
-!data/test/
-data/samples/*.large.*
-data/test/*.large.*
+# Keep ONLY small sample files if needed (but exclude large data by default)
+# !data/samples/small_*.txt
+# !data/test/tiny_*.json
+# Uncomment above lines if you need to keep tiny sample files
 
 # Keep configuration templates
 !config/*.template.yaml
