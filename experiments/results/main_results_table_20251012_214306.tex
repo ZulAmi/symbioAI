@@ -1,0 +1,19 @@
+
+\begin{table}[ht]
+\centering
+\caption{Comparison of continual learning methods on standard benchmarks. Best results in \textbf{bold}.}
+\label{tab:main_results}
+\begin{tabular}{l|ccc|ccc|ccc|}
+\toprule
+& \multicolumn{3}{c|}{Split Cifar100} & \multicolumn{3}{c|}{Split Mnist} & \multicolumn{3}{c|}{Permuted Mnist} \\
+Method & ACC & FM $\downarrow$ & BWT & ACC & FM $\downarrow$ & BWT & ACC & FM $\downarrow$ & BWT \\
+\midrule
+Naive Fine-tuning & 0.478 & 0.482 & +0.406 & 0.707 & 0.304 & -0.249 & 0.667 & 0.368 & -0.285 \\
+EWC & 0.602 & 0.188 & -0.150 & 0.867 & 0.103 & -0.072 & 0.777 & 0.144 & -0.132 \\
+Experience Replay & 0.569 & 0.203 & -0.185 & 0.794 & 0.116 & -0.104 & 0.764 & 0.164 & -0.147 \\
+Progressive Networks & 0.676 & 0.002 & -0.004 & 0.919 & 0.000 & +0.001 & 0.831 & 0.003 & -0.019 \\
+Task Adapters & 0.623 & 0.102 & -0.075 & 0.868 & 0.062 & -0.066 & 0.811 & 0.089 & -0.066 \\
+Our Unified Approach & \textbf{0.762} & \textbf{0.073} & \textbf{+0.023} & \textbf{0.905} & \textbf{0.024} & \textbf{+0.015} & \textbf{0.891} & \textbf{0.061} & \textbf{+0.037} \\
+\bottomrule
+\end{tabular}
+\end{table}

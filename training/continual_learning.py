@@ -302,16 +302,16 @@ class ElasticWeightConsolidation:
             model.zero_grad()
             loss.backward()
             
-            # Accumulate squared gradients
+            # Accumulate squared gradients (non-inplace)
             for name, param in model.named_parameters():
                 if param.requires_grad and param.grad is not None:
-                    fisher_diagonal[name] += param.grad.data ** 2
+                    fisher_diagonal[name] = fisher_diagonal[name] + (param.grad.data ** 2)
             
             samples_processed += len(targets)
         
-        # Average Fisher
+        # Average Fisher (non-inplace)
         for name in fisher_diagonal:
-            fisher_diagonal[name] /= samples_processed
+            fisher_diagonal[name] = fisher_diagonal[name] / samples_processed
         
         # Store optimal parameters
         optimal_params = {}

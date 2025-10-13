@@ -373,47 +373,47 @@ Edit `config/default.yaml` to customize system behavior:
 ```yaml
 # Example configuration
 models:
- default_type: "base"
- auto_optimization: true
+  default_type: "base"
+  auto_optimization: true
 
 training:
- strategy: "evolutionary"
- population_size: 50
- generations: 100
+  strategy: "evolutionary"
+  population_size: 50
+  generations: 100
 
 agents:
- max_concurrent_agents: 10
- coordination_strategy: "hierarchical"
+  max_concurrent_agents: 10
+  coordination_strategy: "hierarchical"
 ```
 
 ## Performance Metrics
 
-| Metric | Symbio AI | Sakana AI | Sapient | Improvement |
+| Metric                       | Symbio AI     | Sakana AI | Sapient   | Improvement        |
 | ---------------------------- | ------------- | --------- | --------- | ------------------ |
-| **Meta-Level Learning** | Recursive | | | **Unique Feature** |
-| **Auto Transfer Discovery** | GNN-based | | | **Unique Feature** |
-| **Zero-Shot Synthesis** | Instant | | | **Unique Feature** |
-| **Curriculum Generation** | Automatic | | | **Unique Feature** |
-| **Metacognitive Awareness** | Real-time | | | **Unique Feature** |
-| **Causal Diagnosis** | Automatic | | | **Unique Feature** |
-| Strategy Evolution | 23% better | N/A | N/A | **Revolutionary** |
-| Sample Efficiency (Transfer) | 60% reduction | baseline | N/A | +60% |
-| Training Speed (Curriculum) | 40% faster | baseline | N/A | +40% |
-| Debugging Speed (Causal) | 60% faster | Manual | Manual | **Automated** |
-| Fix Accuracy (Causal) | 70% better | Trial/err | Trial/err | **Validated** |
-| Convergence Speed | 2.3x faster | baseline | N/A | +130% |
-| Cross-Task Transfer Accuracy | 85% | N/A | N/A | **New Capability** |
-| Zero-Shot Performance | 70-80% | N/A | N/A | **Instant Deploy** |
-| Transfer Patterns Discovered | 100+ | Manual | Manual | **10x more** |
-| Root Cause Identification | 85% accuracy | Manual | Manual | **Causal Graph** |
-| Confidence Calibration | <5% error | N/A | N/A | **Self-Aware** |
-| Adaptability Score | 9.2/10 | 7.1/10 | 8.0/10 | +15-30% |
-| Resource Efficiency | 89% | 64% | 72% | +24-39% |
-| Model Accuracy | 94.7% | 91.2% | 93.1% | +1.7-3.8% |
-| Knowledge Transfer Eff. | 85.6% | N/A | Limited | New Feature |
-| Model Compression Ratio | 9:1 | 3:1 | 4:1 | +125-200% |
-| Research Query Speed | 0.15s | Manual | Manual | 99%+ faster |
-| Literature Coverage | 100K+ cites | Limited | Limited | Comprehensive |
+| **Meta-Level Learning**      | Recursive     |           |           | **Unique Feature** |
+| **Auto Transfer Discovery**  | GNN-based     |           |           | **Unique Feature** |
+| **Zero-Shot Synthesis**      | Instant       |           |           | **Unique Feature** |
+| **Curriculum Generation**    | Automatic     |           |           | **Unique Feature** |
+| **Metacognitive Awareness**  | Real-time     |           |           | **Unique Feature** |
+| **Causal Diagnosis**         | Automatic     |           |           | **Unique Feature** |
+| Strategy Evolution           | 23% better    | N/A       | N/A       | **Revolutionary**  |
+| Sample Efficiency (Transfer) | 60% reduction | baseline  | N/A       | +60%               |
+| Training Speed (Curriculum)  | 40% faster    | baseline  | N/A       | +40%               |
+| Debugging Speed (Causal)     | 60% faster    | Manual    | Manual    | **Automated**      |
+| Fix Accuracy (Causal)        | 70% better    | Trial/err | Trial/err | **Validated**      |
+| Convergence Speed            | 2.3x faster   | baseline  | N/A       | +130%              |
+| Cross-Task Transfer Accuracy | 85%           | N/A       | N/A       | **New Capability** |
+| Zero-Shot Performance        | 70-80%        | N/A       | N/A       | **Instant Deploy** |
+| Transfer Patterns Discovered | 100+          | Manual    | Manual    | **10x more**       |
+| Root Cause Identification    | 85% accuracy  | Manual    | Manual    | **Causal Graph**   |
+| Confidence Calibration       | <5% error     | N/A       | N/A       | **Self-Aware**     |
+| Adaptability Score           | 9.2/10        | 7.1/10    | 8.0/10    | +15-30%            |
+| Resource Efficiency          | 89%           | 64%       | 72%       | +24-39%            |
+| Model Accuracy               | 94.7%         | 91.2%     | 93.1%     | +1.7-3.8%          |
+| Knowledge Transfer Eff.      | 85.6%         | N/A       | Limited   | New Feature        |
+| Model Compression Ratio      | 9:1           | 3:1       | 4:1       | +125-200%          |
+| Research Query Speed         | 0.15s         | Manual    | Manual    | 99%+ faster        |
+| Literature Coverage          | 100K+ cites   | Limited   | Limited   | Comprehensive      |
 
 ## Research & Development
 

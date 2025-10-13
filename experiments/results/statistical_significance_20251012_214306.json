@@ -1,0 +1,23 @@
+{
+  "split_cifar100": {
+    "naive_finetuning": 1.482849492130895e-23,
+    "ewc": 8.319893225643451e-17,
+    "experience_replay": 1.8922170931171607e-21,
+    "progressive_nets": 1.7866905541106117e-12,
+    "adapters": 1.1821048502307553e-17
+  },
+  "split_mnist": {
+    "naive_finetuning": 8.568928182579856e-20,
+    "ewc": 3.025436284022959e-09,
+    "experience_replay": 5.265478869705107e-15,
+    "progressive_nets": 9.523575025161395e-05,
+    "adapters": 4.759394064147571e-08
+  },
+  "permuted_mnist": {
+    "naive_finetuning": 1.7168104568162442e-18,
+    "ewc": 6.975497701252397e-17,
+    "experience_replay": 3.19662858935364e-17,
+    "progressive_nets": 4.194850207038886e-12,
+    "adapters": 1.080525404491149e-14
+  }
+}
