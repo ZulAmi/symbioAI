@@ -170,6 +170,10 @@ data/processed/
 data/interim/
 data/external/
 data/downloads/
+data/cifar*/
+data/MNIST/
+data/FashionMNIST/
+symbioai_test_suite/data/
 *.csv
 *.tsv
 *.json
@@ -181,6 +185,11 @@ data/downloads/
 *.npy
 *.npz
 *.mat
+*.tar.gz
+*.tar
+*.zip
+*.7z
+*.rar
 
 # Dataset caches
 .cache/
