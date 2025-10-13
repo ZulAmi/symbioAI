@@ -783,8 +783,8 @@ class MemoryEnhancedMoE(nn.Module):
 
 
 def create_memory_enhanced_moe(
-    input_dim: int,
-    output_dim: int,
+    input_dim: int = 64,
+    output_dim: int = 10,
     num_experts: int = 8,
     hidden_dim: int = 512,
     memory_config: Optional[MemoryConfig] = None

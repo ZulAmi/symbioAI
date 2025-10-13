@@ -145,12 +145,16 @@ dmypy.json
 *.ckpt
 *.safetensors
 *.bin
+*.model
+*.weights
 
 # Model checkpoints
 checkpoints/
 models/checkpoints/
 saved_models/
 model_cache/
+weights/
+pretrained_models/
 
 # Training artifacts
 runs/
@@ -164,22 +168,38 @@ mlruns/
 data/raw/
 data/processed/
 data/interim/
+data/external/
+data/downloads/
 *.csv
 *.tsv
+*.json
+*.jsonl
 *.parquet
 *.feather
 *.hdf5
 *.h5
+*.npy
+*.npz
+*.mat
 
 # Dataset caches
 .cache/
 *.cache
 cache/
 __pycache__/
+data/cache/
 
 # Hugging Face cache
 .huggingface/
 transformers_cache/
+hub/
+
+# PyTorch cache
+.torch/
+torch_cache/
+
+# NVIDIA cache
+.nv/
 
 # ============================================================================
 # IDEs and Editors
@@ -258,7 +278,12 @@ temp/
 # Generated files
 requirements-mac.txt
 requirements-filtered.txt
-requirements-core.txt
+
+# Test artifacts and reports
+symbioai_test_suite/reports/*.json
+test_results/
+*.test.log
+coverage_reports/
 
 # Secrets and credentials
 .secrets/
@@ -307,10 +332,33 @@ dist/
 experiments/outputs/
 experiments/artifacts/
 experiments/runs/
+experiments/results/
 
 # Benchmark results
 benchmark_results/
 *.benchmark
+*.bench
+results/
+outputs/
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.mp3
+*.wav
+*.flac
+*.ogg
+
+# Large images (keep smaller examples)
+*.tiff
+*.tif
+*_large.png
+*_large.jpg
+*_large.jpeg
+*_huge.*
 
 # Monitoring dashboards
 monitoring/dashboards/*.generated.json
@@ -323,6 +371,18 @@ monitoring/dashboards/*.generated.json
 config/local.yaml
 config/*.local.yaml
 config/production.yaml
+config/staging.yaml
+
+# SSH keys and certificates
+*.pub
+privatekey.pub
+id_rsa*
+id_ed25519*
+*.ssh
+
+# GPU/CUDA specific
+*.ptx
+*.cubin
 
 # ============================================================================
 # Keep Important Files
@@ -332,14 +392,45 @@ config/production.yaml
 !QUICKSTART.md
 !READY.md
 !requirements.txt
-!requirements-core.txt
 !config/default.yaml
 !.gitignore
 !pytest.ini
 
-# Keep example notebooks for demos
+# Keep example notebooks for demos (but not output)
 !examples/*.ipynb
+examples/*_output.*
+examples/*_results.*
 
 # Keep important documentation
 !docs/**/*.md
 !docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.svg
+
+# Keep small sample data files for testing
+!data/samples/
+!data/test/
+data/samples/*.large.*
+data/test/*.large.*
+
+# Keep configuration templates
+!config/*.template.yaml
+!config/*.example.yaml
+
+# Keep important project files
+!*.py
+!*.md
+!*.yml
+!*.yaml
+!*.toml
+!*.cfg
+!*.ini
+!*.txt
+!*.sh
+!*.json
+
+# But exclude generated/temporary Python files
+__pycache__/
+*.pyc
+*_generated.py
+*_temp.py
