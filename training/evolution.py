@@ -481,7 +481,7 @@ class PopulationManager:
             for param in model.parameters():
                 if random.random() < self.config.mutation_rate:
                     noise = torch.randn_like(param) * self.config.mutation_strength
-                    param.data.add_(noise)
+                    param.data.copy_(param.data + noise)
     
     def _svd_perturbation_mutation(self, model: nn.Module) -> None:
         """SVD-based parameter perturbation."""
@@ -501,7 +501,7 @@ class PopulationManager:
             for param in model.parameters():
                 if random.random() < self.config.mutation_rate:
                     dropout_mask = torch.rand_like(param) > self.config.mutation_strength
-                    param.data.mul_(dropout_mask.float())
+                    param.data.copy_(param.data * dropout_mask.float())
     
     def _layer_wise_mutation(self, model: nn.Module) -> None:
         """Layer-wise adaptive mutation."""
@@ -511,7 +511,7 @@ class PopulationManager:
                 layer_mutation_strength = self.config.mutation_strength * (1 + i * 0.1)
                 if random.random() < self.config.mutation_rate:
                     noise = torch.randn_like(param) * layer_mutation_strength
-                    param.data.add_(noise)
+                    param.data.copy_(param.data + noise)
     
     def _adaptive_mutation(self, model: nn.Module, agent: AgentModel) -> None:
         """Adaptive mutation based on agent performance."""
@@ -523,7 +523,7 @@ class PopulationManager:
             for param in model.parameters():
                 if random.random() < self.config.mutation_rate:
                     noise = torch.randn_like(param) * adaptive_strength
-                    param.data.add_(noise)
+                    param.data.copy_(param.data + noise)
     
     async def evolve_generation(self) -> None:
         """Execute one generation of evolution."""

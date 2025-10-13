@@ -1,0 +1,18 @@
+
+\begin{table}[ht]
+\centering
+\caption{Ablation study on Split CIFAR-100. Each row removes one component from the full system.}
+\label{tab:ablation}
+\begin{tabular}{lccc}
+\toprule
+Configuration & Average Accuracy & Forgetting Measure & Training Time (min) \\
+\midrule
+Full System & \textbf{0.762} & \textbf{0.073} & 5 \\
+w/o EWC & 0.718 & 0.095 & -9 \\
+w/o Experience Replay & 0.734 & 0.084 & -41 \\
+w/o Progressive Networks & 0.740 & 0.090 & -39 \\
+w/o Task Adapters & 0.715 & 0.098 & -3 \\
+w/o Interference Detection & 0.727 & 0.087 & 19 \\
+\bottomrule
+\end{tabular}
+\end{table}
