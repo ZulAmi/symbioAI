@@ -67,8 +67,8 @@ class CommunicationMessage:
     recipient_ids: List[str]
     mode: CommunicationMode
     content: torch.Tensor  # Learned message representation
-    metadata: Dict[str, Any]
     timestamp: float
+    metadata: Dict[str, Any] = field(default_factory=dict)
     priority: float = 1.0
     
     def to_dict(self) -> Dict[str, Any]:

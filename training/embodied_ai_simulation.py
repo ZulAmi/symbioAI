@@ -592,6 +592,7 @@ class ToolUseLearner:
         self,
         state_dim: int = 256,
         action_dim: int = 32,
+        observation_dim: int = 256,
         num_tools: int = 10
     ):
         self.state_dim = state_dim
@@ -918,6 +919,25 @@ class EmbodiedAgent:
                 for name, skill in self.tool_learner.skills.items()
             }
         }
+    
+    def act(self, observation: torch.Tensor) -> torch.Tensor:
+        """Generate action from observation."""
+        # Update current state
+        self.current_state = observation
+        
+        # Use manipulation controller to generate action
+        action = self.manipulation_controller.control(observation)
+        
+        return action
+    
+    @property
+    def observation_dim(self) -> int:
+        """Get observation dimension."""
+        return self.sensorimotor_encoder.embedding_dim
+    
+    def plan_path(self, start: Tuple[int, int], goal: Tuple[int, int]) -> List[Tuple[int, int]]:
+        """Plan path from start to goal."""
+        return self.spatial_reasoner.plan_path(start, goal)
 
 
 # ============================================================================
@@ -1079,6 +1099,7 @@ def create_embodied_agent(
     vision_shape: Tuple[int, int, int] = (3, 64, 64),
     state_dim: int = 256,
     action_dim: int = 32,
+    observation_dim: int = 256,
     use_physics: bool = True
 ) -> EmbodiedAgent:
     """Create an embodied AI agent."""

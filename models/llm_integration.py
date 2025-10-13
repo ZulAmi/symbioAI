@@ -90,6 +90,20 @@ class LLMConfig:
     custom_params: Dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass
+class LLMRequest:
+    """Request for LLM inference."""
+    prompt: str
+    max_tokens: int = 1024
+    temperature: float = 0.7
+    top_p: float = 0.9
+    top_k: int = 50
+    stream: bool = False
+    provider: Optional[str] = None
+    model_override: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
 @dataclass 
 class LLMResponse:
     """Response from LLM inference."""

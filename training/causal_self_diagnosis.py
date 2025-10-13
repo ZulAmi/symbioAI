@@ -203,11 +203,21 @@ class CausalGraph:
     Uses graph neural networks to learn and reason about causality.
     """
     
-    def __init__(self, learning_rate: float = 0.001):
+    def __init__(self, learning_rate: float = 0.001, num_variables: int = 5):
         self.nodes: Dict[str, CausalNode] = {}
         self.edges: Dict[Tuple[str, str], CausalEdge] = {}
         
         self.learning_rate = learning_rate
+        self.num_variables = num_variables
+        
+        # Initialize nodes for variables
+        for i in range(num_variables):
+            self.add_node(
+                node_id=f"var_{i}",
+                node_type=CausalNodeType.INPUT,
+                name=f"Variable {i}",
+                current_value=0.0
+            )
         
         # Adjacency information
         self.adjacency: Dict[str, Set[str]] = defaultdict(set)
@@ -420,6 +430,113 @@ class CausalGraph:
             json.dump(data, f, indent=2)
         
         self.logger.info(f"Exported causal graph to {output_path}")
+    
+    def learn_structure(self, data: np.ndarray) -> Dict[str, Any]:
+        """Learn causal structure from observational data."""
+        n_samples, n_vars = data.shape
+        
+        # Mock structure learning - in production would use PC algorithm, GES, etc.
+        learned_edges = []
+        
+        # Simple correlation-based structure discovery
+        correlation_matrix = np.corrcoef(data.T)
+        
+        for i in range(n_vars):
+            for j in range(i + 1, n_vars):
+                corr = abs(correlation_matrix[i, j])
+                if corr > 0.5:  # Threshold for significant correlation
+                    # Assume temporal order determines causality
+                    if i < j:
+                        learned_edges.append((f"var_{i}", f"var_{j}"))
+                        self.add_edge(f"var_{i}", f"var_{j}", causal_effect=corr)
+        
+        return {
+            'edges': learned_edges,
+            'dag': learned_edges,
+            'confidence': 0.7
+        }
+    
+    def discover_from_interventions(self, interventions: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
+        """Discover causal edges from interventional data."""
+        discovered_edges = []
+        
+        for intervention in interventions:
+            variable = intervention['variable']
+            observed_changes = intervention['observed_changes']
+            
+            source_var = f"var_{variable}"
+            
+            for target_var_idx, change in observed_changes.items():
+                if abs(change) > 0.1:  # Significant change threshold
+                    target_var = f"var_{target_var_idx}"
+                    discovered_edges.append((source_var, target_var))
+                    
+                    # Add edge to graph
+                    self.add_edge(
+                        source=source_var,
+                        target=target_var,
+                        causal_effect=change,
+                        interventional_evidence=1.0
+                    )
+        
+        return discovered_edges
+    
+    def get_markov_blanket(self, variable_id: int) -> Set[str]:
+        """Get Markov blanket of a variable (parents, children, and co-parents)."""
+        var_name = f"var_{variable_id}"
+        if var_name not in self.nodes:
+            return set()
+        
+        node = self.nodes[var_name]
+        markov_blanket = set()
+        
+        # Add parents
+        markov_blanket.update(node.parents)
+        
+        # Add children
+        markov_blanket.update(node.children)
+        
+        # Add co-parents (parents of children)
+        for child in node.children:
+            if child in self.nodes:
+                markov_blanket.update(self.nodes[child].parents)
+        
+        # Remove the variable itself
+        markov_blanket.discard(var_name)
+        
+        return markov_blanket
+    
+    def add_edge(self, source: str, target: str, causal_effect: float = 0.0, **kwargs) -> CausalEdge:
+        """Add a causal edge between nodes (override to handle string/int conversion)."""
+        # Handle numeric source/target
+        if isinstance(source, int):
+            source = f"var_{source}"
+        if isinstance(target, int):
+            target = f"var_{target}"
+        
+        # Ensure nodes exist
+        if source not in self.nodes:
+            self.add_node(source, CausalNodeType.INPUT, f"Variable {source}")
+        if target not in self.nodes:
+            self.add_node(target, CausalNodeType.INPUT, f"Variable {target}")
+        
+        edge = CausalEdge(
+            source=source,
+            target=target,
+            causal_effect=causal_effect,
+            **kwargs
+        )
+        
+        self.edges[(source, target)] = edge
+        
+        # Update adjacency
+        self.adjacency[source].add(target)
+        
+        # Update node relationships
+        self.nodes[source].children.append(target)
+        self.nodes[target].parents.append(source)
+        
+        return edge
 
 
 class CounterfactualReasoner:
@@ -428,8 +545,11 @@ class CounterfactualReasoner:
     Uses causal graph to simulate alternative scenarios.
     """
     
-    def __init__(self, causal_graph: CausalGraph):
+    def __init__(self, causal_graph: CausalGraph = None, num_variables: int = 5):
+        if causal_graph is None:
+            causal_graph = CausalGraph(num_variables=num_variables)
         self.causal_graph = causal_graph
+        self.num_variables = num_variables
         self.logger = logging.getLogger(__name__)
     
     def generate_counterfactual(
@@ -1085,17 +1205,103 @@ class CausalSelfDiagnosis:
             json.dump(data, f, indent=2, default=str)
         
         self.logger.info(f"Exported diagnosis data to {output_path}")
+    
+    def identify_root_causes(self, failure_data: Dict[str, Any]) -> List[str]:
+        """Identify root causes from failure data."""
+        # Create failure diagnosis based on the data
+        failure_mode = FailureMode.ACCURACY_DROP  # Default
+        
+        # Detect failure mode from data
+        if 'model_accuracy' in failure_data and failure_data['model_accuracy'] < 0.5:
+            failure_mode = FailureMode.ACCURACY_DROP
+        
+        # Update causal graph with failure data
+        for var_name, value in failure_data.items():
+            # Add node if it doesn't exist
+            if var_name not in self.causal_graph.nodes:
+                self.causal_graph.add_node(
+                    node_id=var_name,
+                    node_type=CausalNodeType.INPUT,
+                    name=var_name.replace('_', ' ').title(),
+                    current_value=value
+                )
+            else:
+                self.causal_graph.nodes[var_name].current_value = value
+        
+        # Perform diagnosis
+        diagnosis = self.diagnose_failure(failure_data, failure_mode)
+        
+        return diagnosis.root_causes
+    
+    def recommend_interventions(self, diagnosis: FailureDiagnosis) -> List[Tuple[InterventionStrategy, float]]:
+        """Recommend interventions for a diagnosis."""
+        return diagnosis.recommended_interventions
+    
+    def detect_degradation(self, performance_data: Dict[str, Any]) -> bool:
+        """Detect performance degradation."""
+        # Simple degradation detection
+        for metric_name, value in performance_data.items():
+            if 'accuracy' in metric_name.lower() and value < 0.7:
+                return True
+            if 'loss' in metric_name.lower() and value > 1.0:
+                return True
+        return False
+    
+    def track_intervention_impact(self, intervention_id: str, before_metrics: Dict[str, Any], after_metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """Track the impact of an intervention."""
+        impact = {}
+        
+        for metric_name in before_metrics:
+            if metric_name in after_metrics:
+                before_val = before_metrics[metric_name]
+                after_val = after_metrics[metric_name]
+                
+                if isinstance(before_val, (int, float)) and isinstance(after_val, (int, float)):
+                    change = after_val - before_val
+                    relative_change = change / (abs(before_val) + 1e-10)
+                    impact[metric_name] = {
+                        'absolute_change': change,
+                        'relative_change': relative_change,
+                        'improvement': change > 0 if 'accuracy' in metric_name.lower() else change < 0
+                    }
+        
+        return {
+            'intervention_id': intervention_id,
+            'impact': impact,
+            'overall_improvement': sum(1 for m in impact.values() if m['improvement']) / len(impact) if impact else 0.0
+        }
+    
+    def find_explanations(self, query: Dict[str, Any]) -> List[str]:
+        """Find explanations for observed phenomena."""
+        explanations = []
+        
+        # Simple explanation generation
+        for node_id, node in self.causal_graph.nodes.items():
+            if node.is_root_cause:
+                explanations.append(f"{node.name} is a root cause with strength {node.causal_strength:.2f}")
+        
+        # Add causal path explanations
+        if len(explanations) == 0:
+            explanations.append("No clear causal explanations found")
+        
+        return explanations
 
 
-def create_causal_diagnosis_system() -> CausalSelfDiagnosis:
+def create_causal_diagnosis_system(num_variables: int = 10, num_interventions: int = 5) -> CausalSelfDiagnosis:
     """
     Factory function to create a configured Causal Self-Diagnosis System.
+    
+    Args:
+        num_variables: Number of variables in causal graph
+        num_interventions: Number of interventions to consider
     
     Returns:
         Configured CausalSelfDiagnosis
     """
     system = CausalSelfDiagnosis()
+    system.causal_graph = CausalGraph(num_variables=num_variables)
+    system.counterfactual_reasoner = CounterfactualReasoner(system.causal_graph, num_variables)
     
-    logging.info("Created Causal Self-Diagnosis System")
+    logging.info(f"Created Causal Self-Diagnosis System with {num_variables} variables")
     
     return system

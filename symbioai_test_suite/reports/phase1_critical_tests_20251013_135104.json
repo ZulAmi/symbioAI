@@ -1,0 +1,302 @@
+{
+  "phase": "Phase 1 - Critical Tests",
+  "timestamp": "20251013_135104",
+  "test_suites": {
+    "1. Neural-Symbolic Integration": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": []
+    },
+    "2. Neural-Symbolic Reasoning": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Constraint Satisfaction",
+          "error": "'NeuralSymbolicArchitecture' object has no attribute 'solve_csp'"
+        },
+        {
+          "test": "Knowledge Graph Reasoning",
+          "error": "'SymbolicReasoningAgent' object has no attribute 'query'"
+        },
+        {
+          "test": "Explainable Decisions",
+          "error": "'NeuralSymbolicArchitecture' object has no attribute 'forward_with_explanation'"
+        },
+        {
+          "test": "Hybrid Neural-Symbolic Learning",
+          "error": "'NeuralSymbolicArchitecture' object has no attribute 'train_with_constraints'"
+        },
+        {
+          "test": "Multi-Hop Reasoning",
+          "error": "'SymbolicReasoningAgent' object has no attribute 'multi_hop_query'"
+        }
+      ]
+    },
+    "3. Neural-Symbolic Agents": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Agent Rule Learning",
+          "error": "'SymbolicReasoningAgent' object has no attribute 'learn_rule_from_demonstrations'"
+        },
+        {
+          "test": "Proof-Carrying Execution",
+          "error": "'NeuralSymbolicArchitecture' object has no attribute 'execute_with_proof'"
+        },
+        {
+          "test": "Agent Decision Verification",
+          "error": "'SymbolicReasoningAgent' object has no attribute 'make_decision'"
+        },
+        {
+          "test": "Multi-Agent Symbolic Coordination",
+          "error": "'SymbolicReasoningAgent' object has no attribute 'query'"
+        },
+        {
+          "test": "Symbolic Transfer Learning",
+          "error": "'NeuralSymbolicArchitecture' object has no attribute 'extract_symbolic_rules'"
+        }
+      ]
+    },
+    "4. Causal Discovery": {
+      "total": 5,
+      "passed": 4,
+      "failed": 1,
+      "errors": [
+        {
+          "test": "Root Cause Analysis",
+          "error": "No root causes identified"
+        }
+      ]
+    },
+    "5. Counterfactual Reasoning": {
+      "total": 5,
+      "passed": 1,
+      "failed": 4,
+      "errors": [
+        {
+          "test": "Counterfactual Generation",
+          "error": "CounterfactualReasoner.generate_counterfactual() got an unexpected keyword argument 'actual'"
+        },
+        {
+          "test": "Intervention Effect Prediction",
+          "error": "'CounterfactualReasoner' object has no attribute 'predict_intervention_effect'"
+        },
+        {
+          "test": "Causal Attribution",
+          "error": "'CounterfactualReasoner' object has no attribute 'attribute_outcome'"
+        },
+        {
+          "test": "Counterfactual Fairness",
+          "error": "'CounterfactualReasoner' object has no attribute 'check_counterfactual_fairness'"
+        }
+      ]
+    },
+    "6. Causal Self-Diagnosis": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Automated Failure Diagnosis",
+          "error": "CausalSelfDiagnosis.diagnose_failure() missing 1 required positional argument: 'failure_mode'"
+        },
+        {
+          "test": "Intervention Strategy Recommendation",
+          "error": "'dict' object has no attribute 'recommended_interventions'"
+        },
+        {
+          "test": "Performance Degradation Detection",
+          "error": "'list' object has no attribute 'items'"
+        },
+        {
+          "test": "Self-Healing Intervention",
+          "error": "CausalSelfDiagnosis.diagnose_failure() missing 1 required positional argument: 'failure_mode'"
+        },
+        {
+          "test": "Intervention Impact Tracking",
+          "error": "CausalSelfDiagnosis.track_intervention_impact() got an unexpected keyword argument 'before'"
+        }
+      ]
+    },
+    "7. Multi-Agent Coordination": {
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": []
+    },
+    "8. Emergent Communication": {
+      "total": 5,
+      "passed": 4,
+      "failed": 1,
+      "errors": [
+        {
+          "test": "Communication Protocol Learning",
+          "error": "query should be unbatched 2D or batched 3D tensor but received 4-D query tensor"
+        }
+      ]
+    },
+    "9. Adversarial Multi-Agent": {
+      "total": 5,
+      "passed": 4,
+      "failed": 1,
+      "errors": [
+        {
+          "test": "Strategy Evolution",
+          "error": "'AgentPerformance' object has no attribute 'update_performance'"
+        }
+      ]
+    },
+    "10. COMBINED Strategy Core \u2b50": {
+      "total": 5,
+      "passed": 1,
+      "failed": 4,
+      "errors": [
+        {
+          "test": "Adaptive Strategy Selection",
+          "error": "Task.__init__() got an unexpected keyword argument 'dataset_name'"
+        },
+        {
+          "test": "Interference Detection",
+          "error": "'SymbioAICombined' object has no attribute 'train_step'"
+        },
+        {
+          "test": "Multi-Component Integration",
+          "error": "'SymbioAICombined' object has no attribute 'train_step'"
+        },
+        {
+          "test": "COMBINED vs Individual Strategies",
+          "error": "ContinualLearningStrategy.__init__() missing 3 required positional arguments: 'name', 'model', and 'device'"
+        }
+      ]
+    },
+    "11. COMBINED Task Adapters \u2b50": {
+      "total": 5,
+      "passed": 3,
+      "failed": 2,
+      "errors": [
+        {
+          "test": "Adapter Reuse",
+          "error": "SymbioAICombined.reuse_adapter() got an unexpected keyword argument 'source_task'. Did you mean 'source_task_id'?"
+        },
+        {
+          "test": "Adapter Switching",
+          "error": "Expected more than 1 value per channel when training, got input size torch.Size([1, 256])"
+        }
+      ]
+    },
+    "12. COMBINED Progressive \u2b50": {
+      "total": 5,
+      "passed": 2,
+      "failed": 3,
+      "errors": [
+        {
+          "test": "Forward Transfer",
+          "error": "'SymbioAICombined' object has no attribute 'train_step'"
+        },
+        {
+          "test": "No Backward Interference",
+          "error": "'SymbioAICombined' object has no attribute 'train_step'"
+        },
+        {
+          "test": "Scalability",
+          "error": "'SymbioAICombined' object has no attribute 'train_step'"
+        }
+      ]
+    },
+    "13. Demonstration Learning": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Few-Shot Adaptation",
+          "error": "mat1 and mat2 shapes cannot be multiplied (1x64 and 512x512)"
+        },
+        {
+          "test": "Expert Memory Storage",
+          "error": "mat1 and mat2 shapes cannot be multiplied (1x64 and 512x512)"
+        },
+        {
+          "test": "Demonstration Replay",
+          "error": "mat1 and mat2 shapes cannot be multiplied (1x64 and 512x512)"
+        },
+        {
+          "test": "Expert Specialization",
+          "error": "mat1 and mat2 shapes cannot be multiplied (1x64 and 512x512)"
+        },
+        {
+          "test": "Rapid Task Acquisition",
+          "error": "mat1 and mat2 shapes cannot be multiplied (1x64 and 512x512)"
+        }
+      ]
+    },
+    "14. Embodied Learning": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Embodied Agent Creation",
+          "error": "create_embodied_agent() got an unexpected keyword argument 'tool_dim'"
+        },
+        {
+          "test": "Tool Use Learning",
+          "error": "ToolUseLearner.__init__() got an unexpected keyword argument 'tool_repertoire_size'"
+        },
+        {
+          "test": "Sensorimotor Integration",
+          "error": "'ManipulationController' object has no attribute 'control'"
+        },
+        {
+          "test": "World Model Prediction",
+          "error": "'SensorimotorEncoder' object has no attribute 'embedding_dim'"
+        },
+        {
+          "test": "Spatial Reasoning",
+          "error": "Boolean value of Tensor with more than one value is ambiguous"
+        }
+      ]
+    },
+    "15. Active Learning & Curiosity": {
+      "total": 5,
+      "passed": 0,
+      "failed": 5,
+      "errors": [
+        {
+          "test": "Active Learning System",
+          "error": "ActiveLearningConfig.__init__() got an unexpected keyword argument 'curiosity_signals'. Did you mean 'curiosity_weight'?"
+        },
+        {
+          "test": "Uncertainty Selection",
+          "error": "ActiveLearningConfig.__init__() got an unexpected keyword argument 'curiosity_signals'. Did you mean 'curiosity_weight'?"
+        },
+        {
+          "test": "Curiosity Exploration",
+          "error": "ActiveLearningConfig.__init__() got an unexpected keyword argument 'curiosity_signals'. Did you mean 'curiosity_weight'?"
+        },
+        {
+          "test": "Information Gain",
+          "error": "ActiveLearningConfig.__init__() got an unexpected keyword argument 'curiosity_signals'. Did you mean 'curiosity_weight'?"
+        },
+        {
+          "test": "Efficient Data Acquisition",
+          "error": "ActiveLearningConfig.__init__() got an unexpected keyword argument 'curiosity_signals'. Did you mean 'curiosity_weight'?"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_suites": 15,
+    "total_tests": 75,
+    "total_passed": 29,
+    "total_failed": 46,
+    "suites_passed": 2,
+    "suites_failed": 13
+  },
+  "execution_time": 0.614067792892456
+}
