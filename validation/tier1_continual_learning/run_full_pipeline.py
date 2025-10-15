@@ -48,11 +48,11 @@ def main():
         
         if args.quick:
             print("Running QUICK baseline (1 seed)...")
-            from validation.tier1_continual_learning.run_clean_der_plus_plus import run_der_plus_plus_benchmark
+            from run_clean_der_plus_plus import run_der_plus_plus_benchmark
             run_der_plus_plus_benchmark(seed=42)
         else:
             print("Running FULL baseline (5 seeds)...")
-            from validation.tier1_continual_learning.run_baseline_validation import main as run_baseline
+            from run_baseline_validation import main as run_baseline
             run_baseline()
         
         print("\n✅ Baseline validation complete!")
@@ -63,7 +63,7 @@ def main():
         print("PHASE 2: CAUSAL-DER EXPERIMENTS")
         print("="*80)
         
-        from validation.tier1_continual_learning.run_causal_der_benchmark import run_causal_der_benchmark
+        from run_causal_der_benchmark import run_causal_der_benchmark
         
         if args.quick:
             print("Running QUICK Causal-DER (1 seed)...")
@@ -83,7 +83,7 @@ def main():
         print("PHASE 3: ABLATION STUDIES")
         print("="*80)
         
-        from validation.tier1_continual_learning.run_ablations import main as run_ablations
+        from run_ablations import main as run_ablations
         run_ablations()
         
         print("\n✅ Ablation studies complete!")
@@ -94,7 +94,7 @@ def main():
     print("="*80)
     
     try:
-        from validation.tier1_continual_learning.statistical_analysis import main as run_stats
+        from statistical_analysis import main as run_stats
         run_stats()
         print("\n✅ Statistical analysis complete!")
     except Exception as e:

@@ -60,10 +60,10 @@ def create_split_cifar100(num_tasks=5, data_root='../../data'):
     ])
     
     train_dataset = torchvision.datasets.CIFAR100(
-        root=data_root, train=True, download=True, transform=transform_train
+        root=data_root, train=True, download=False, transform=transform_train
     )
     test_dataset = torchvision.datasets.CIFAR100(
-        root=data_root, train=False, download=True, transform=transform_test
+        root=data_root, train=False, download=False, transform=transform_test
     )
     
     classes_per_task = 100 // num_tasks
@@ -134,7 +134,8 @@ def run_der_plus_plus_benchmark(seed=42, data_root='../../data'):
     model = SimpleResNet18(num_classes=100).to(device)
     
     # DER++ engine (EXACT paper settings)
-    der_engine = DERPlusPlusEngine(alpha=0.5, buffer_size=2000)
+    # Create DER++ engine with BOTH alpha and beta (official implementation)
+    der_engine = DERPlusPlusEngine(alpha=0.5, beta=0.5, buffer_size=2000)
     
     # Optimizer (SGD, NOT AdamW!)
     optimizer = optim.SGD(
@@ -196,7 +197,7 @@ def run_der_plus_plus_benchmark(seed=42, data_root='../../data'):
                 
                 epoch_loss += loss.item()
                 epoch_current += info['current_loss']
-                epoch_replay += info['replay_loss']
+                epoch_replay += info.get('replay_mse_loss', 0.0) + info.get('replay_ce_loss', 0.0)
             
             if (epoch + 1) % 10 == 0:
                 avg_loss = epoch_loss / len(train_loader)

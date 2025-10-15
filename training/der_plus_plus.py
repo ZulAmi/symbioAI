@@ -109,13 +109,15 @@ class DERPlusPlusEngine:
             engine.store(data, target, output, task_id)
     """
     
-    def __init__(self, alpha: float = 0.5, buffer_size: int = 2000):
+    def __init__(self, alpha: float = 0.5, beta: float = 0.5, buffer_size: int = 2000):
         """
         Args:
-            alpha: Distillation weight (0.5 in paper)
+            alpha: MSE distillation weight (0.5 in paper)
+            beta: CE replay weight (0.5 in paper)
             buffer_size: Replay buffer capacity (2000 in paper)
         """
         self.alpha = alpha
+        self.beta = beta
         self.buffer = DERPlusPlusBuffer(capacity=buffer_size)
     
     def compute_loss(
@@ -130,7 +132,8 @@ class DERPlusPlusEngine:
         """
         Compute DER++ loss.
         
-        Loss = CE(current_data) + alpha * MSE(replay_logits, current_model(replay_data))
+        Loss = CE(current_data) + alpha * MSE(replay_logits, model(replay_data)) 
+                                + beta * CE(model(replay_data), replay_targets)
         """
         device = data.device
         
@@ -139,7 +142,8 @@ class DERPlusPlusEngine:
         
         info = {
             'current_loss': current_loss.item(),
-            'replay_loss': 0.0,
+            'replay_mse_loss': 0.0,
+            'replay_ce_loss': 0.0,
             'total_loss': current_loss.item()
         }
         
@@ -167,13 +171,17 @@ class DERPlusPlusEngine:
         else:
             buf_outputs = model(buf_data)
         
-        # DER++ replay loss: MSE between old logits and new logits
-        replay_loss = F.mse_loss(buf_outputs, buf_logits)
+        # DER++ Loss Component 1: MSE between old logits and new logits (alpha)
+        replay_mse_loss = F.mse_loss(buf_outputs, buf_logits)
         
-        # Total loss
-        total_loss = current_loss + self.alpha * replay_loss
+        # DER++ Loss Component 2: CE on replayed samples (beta) - THE MISSING PIECE!
+        replay_ce_loss = F.cross_entropy(buf_outputs, buf_targets)
         
-        info['replay_loss'] = replay_loss.item()
+        # Total loss: current + alpha*MSE + beta*CE
+        total_loss = current_loss + self.alpha * replay_mse_loss + self.beta * replay_ce_loss
+        
+        info['replay_mse_loss'] = replay_mse_loss.item()
+        info['replay_ce_loss'] = replay_ce_loss.item()
         info['total_loss'] = total_loss.item()
         
         return total_loss, info
@@ -204,18 +212,19 @@ class DERPlusPlusEngine:
         }
 
 
-def create_der_plus_plus_engine(alpha: float = 0.5, buffer_size: int = 2000) -> DERPlusPlusEngine:
+def create_der_plus_plus_engine(alpha: float = 0.5, beta: float = 0.5, buffer_size: int = 2000) -> DERPlusPlusEngine:
     """
     Factory function to create DER++ engine with standard settings.
     
     Args:
-        alpha: Distillation weight (default: 0.5 from paper)
+        alpha: MSE distillation weight (default: 0.5 from paper)
+        beta: CE replay weight (default: 0.5 from paper)
         buffer_size: Buffer capacity (default: 2000 from paper)
     
     Returns:
         Configured DERPlusPlusEngine
     """
-    return DERPlusPlusEngine(alpha=alpha, buffer_size=buffer_size)
+    return DERPlusPlusEngine(alpha=alpha, beta=beta, buffer_size=buffer_size)
 
 
 # ============================================================================
@@ -225,8 +234,8 @@ def create_der_plus_plus_engine(alpha: float = 0.5, buffer_size: int = 2000) -> 
 class DERPlusPlusWrapper:
     """Wrapper to make DER++ compatible with advanced CL interface."""
     
-    def __init__(self, alpha: float = 0.5, buffer_size: int = 2000):
-        self.engine = DERPlusPlusEngine(alpha=alpha, buffer_size=buffer_size)
+    def __init__(self, alpha: float = 0.5, beta: float = 0.5, buffer_size: int = 2000):
+        self.engine = DERPlusPlusEngine(alpha=alpha, beta=beta, buffer_size=buffer_size)
         self.use_asymmetric_ce = False  # DER++ uses standard CE
         self.use_contrastive_reg = False
         self.use_gradient_surgery = False

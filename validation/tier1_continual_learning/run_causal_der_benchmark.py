@@ -52,10 +52,10 @@ def create_split_cifar100(num_tasks=5, data_root='../../data'):
     ])
     
     train_dataset = torchvision.datasets.CIFAR100(
-        root=data_root, train=True, download=True, transform=transform_train
+        root=data_root, train=True, download=False, transform=transform_train
     )
     test_dataset = torchvision.datasets.CIFAR100(
-        root=data_root, train=False, download=True, transform=transform_test
+        root=data_root, train=False, download=False, transform=transform_test
     )
     
     classes_per_task = 100 // num_tasks
