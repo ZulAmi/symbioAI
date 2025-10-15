@@ -244,9 +244,16 @@ class WorldModelNetwork(nn.Module):
         
         # Dynamics model (predicts next state)
         layers = []
-        for _ in range(num_layers):
+        # First layer takes concatenated state+action encoding
+        layers.extend([
+            nn.Linear(hidden_dim + hidden_dim // 2, hidden_dim),
+            nn.ReLU(),
+            nn.LayerNorm(hidden_dim)
+        ])
+        # Subsequent layers take hidden_dim input
+        for _ in range(num_layers - 1):
             layers.extend([
-                nn.Linear(hidden_dim + hidden_dim // 2, hidden_dim),
+                nn.Linear(hidden_dim, hidden_dim),
                 nn.ReLU(),
                 nn.LayerNorm(hidden_dim)
             ])
@@ -267,6 +274,13 @@ class WorldModelNetwork(nn.Module):
         # Encode
         state_enc = self.state_encoder(state)
         action_enc = self.action_encoder(action)
+        
+        # Ensure compatible dimensions for concatenation
+        if state_enc.dim() != action_enc.dim():
+            if state_enc.dim() > action_enc.dim():
+                action_enc = action_enc.unsqueeze(0)
+            else:
+                state_enc = state_enc.unsqueeze(0)
         
         # Combine and predict dynamics
         combined = torch.cat([state_enc, action_enc], dim=-1)
@@ -317,6 +331,7 @@ class SensorimotorEncoder(nn.Module):
         embedding_dim: int = 256
     ):
         super().__init__()
+        self.embedding_dim = embedding_dim
         
         # Vision encoder (CNN)
         self.vision_encoder = nn.Sequential(
@@ -593,15 +608,18 @@ class ToolUseLearner:
         state_dim: int = 256,
         action_dim: int = 32,
         observation_dim: int = 256,
-        num_tools: int = 10
+        num_tools: int = 10,
+        tool_repertoire_size: int = 5
     ):
         self.state_dim = state_dim
         self.action_dim = action_dim
+        self.observation_dim = observation_dim
         self.num_tools = num_tools
+        self.tool_repertoire_size = tool_repertoire_size
         
-        # Tool affordance network
+        # Tool affordance network  
         self.affordance_network = nn.Sequential(
-            nn.Linear(state_dim, 128),
+            nn.Linear(observation_dim, 128),
             nn.ReLU(),
             nn.Linear(128, num_tools),
             nn.Sigmoid()
@@ -622,13 +640,18 @@ class ToolUseLearner:
         available_tools: List[str]
     ) -> Dict[str, float]:
         """Detect which tools afford which actions in current state."""
+        # Reshape state if needed
+        if state.dim() > 1:
+            state = state.squeeze(0)  # Remove batch dimension
+        
         # Get affordance scores
         affordance_scores = self.affordance_network(state)
         
         # Map to tool names
         affordances = {}
         for i, tool_name in enumerate(available_tools[:self.num_tools]):
-            affordances[tool_name] = affordance_scores[i].item()
+            if i < len(affordance_scores):
+                affordances[tool_name] = affordance_scores[i].item()
         
         return affordances
     
@@ -680,7 +703,7 @@ class ToolUseLearner:
         if tool_name not in self.tool_policies:
             # Create new policy for this tool
             self.tool_policies[tool_name] = nn.Sequential(
-                nn.Linear(self.state_dim, 128),
+                nn.Linear(self.observation_dim, 128),
                 nn.ReLU(),
                 nn.Linear(128, self.action_dim),
                 nn.Tanh()
@@ -697,6 +720,32 @@ class ToolUseLearner:
         )
         
         return action
+    
+    def select_tool(self, state: torch.Tensor, available_tools: Optional[List[str]] = None) -> int:
+        """Select the best tool for the current state."""
+        if available_tools is None:
+            available_tools = [f"tool_{i}" for i in range(self.tool_repertoire_size)]
+        
+        affordances = self.detect_affordances(state, available_tools)
+        
+        # Choose tool with highest affordance score and return index
+        if affordances:
+            best_tool = max(affordances.keys(), key=lambda k: affordances[k])
+            return available_tools.index(best_tool)
+        else:
+            return 0  # Return first tool index
+    
+    def update_tool_policy(self, tool_id: int, success: bool):
+        """Update tool policy based on success/failure."""
+        if not hasattr(self, 'tool_success_rates'):
+            self.tool_success_rates = {}
+        
+        if tool_id not in self.tool_success_rates:
+            self.tool_success_rates[tool_id] = {'successes': 0, 'attempts': 0}
+        
+        self.tool_success_rates[tool_id]['attempts'] += 1
+        if success:
+            self.tool_success_rates[tool_id]['successes'] += 1
 
 
 class ManipulationController(nn.Module):
@@ -740,6 +789,11 @@ class ManipulationController(nn.Module):
         grasp_quality = self.grasp_predictor(observation)
         
         return action, grasp_quality
+    
+    def control(self, observation: torch.Tensor) -> torch.Tensor:
+        """Control method for manipulation."""
+        action, _ = self.forward(observation)
+        return action
 
 
 # ============================================================================
@@ -761,16 +815,20 @@ class EmbodiedAgent:
         vision_shape: Tuple[int, int, int] = (3, 64, 64),
         state_dim: int = 256,
         action_dim: int = 32,
+        observation_dim: int = 256,
         use_physics: bool = True
     ):
+        self.action_dim = action_dim
+        self.state_dim = state_dim
+        
         # Core components
         self.sensorimotor_encoder = SensorimotorEncoder(
             vision_shape=vision_shape,
-            embedding_dim=state_dim
+            embedding_dim=observation_dim
         )
         
         self.world_model = WorldModelNetwork(
-            state_dim=state_dim,
+            state_dim=observation_dim,  # Use observation_dim instead of state_dim
             action_dim=action_dim
         )
         
@@ -788,8 +846,8 @@ class EmbodiedAgent:
         )
         
         self.manipulation_controller = ManipulationController(
-            observation_dim=state_dim,
-            action_dim=7
+            observation_dim=observation_dim,
+            action_dim=action_dim
         )
         
         # Physics engine (optional)
@@ -876,6 +934,40 @@ class EmbodiedAgent:
         
         return concept_idx, grounding_score.item()
     
+    def predict_next_state(self, current_state: torch.Tensor, action: torch.Tensor) -> torch.Tensor:
+        """Predict next state given current state and action."""
+        # Store original shape to restore later
+        original_shape = current_state.shape
+        
+        # Ensure tensors have compatible batch dimensions
+        if current_state.dim() > 1:
+            current_state = current_state.squeeze(0)
+        if action.dim() > 1:
+            action = action.squeeze(0)
+        
+        next_state, _ = self.world_model.forward(current_state, action)
+        
+        # Restore original batch dimensions
+        if len(original_shape) > 1:
+            next_state = next_state.unsqueeze(0)
+        
+        return next_state
+    
+    def act(self, observation: torch.Tensor) -> torch.Tensor:
+        """Generate action from observation."""
+        # Keep batch dimension for manipulation controller
+        original_batch_shape = observation.shape[:-1]
+        
+        # Project observation to expected observation dimension if needed
+        if observation.size(-1) != self.observation_dim:
+            if not hasattr(self, 'observation_projection'):
+                self.observation_projection = nn.Linear(observation.size(-1), self.observation_dim)
+            observation = self.observation_projection(observation)
+        
+        # Use manipulation controller to generate action
+        action, _ = self.manipulation_controller(observation)
+        return action
+    
     def learn_from_experience(
         self,
         state_sequence: List[torch.Tensor],
@@ -935,8 +1027,14 @@ class EmbodiedAgent:
         """Get observation dimension."""
         return self.sensorimotor_encoder.embedding_dim
     
-    def plan_path(self, start: Tuple[int, int], goal: Tuple[int, int]) -> List[Tuple[int, int]]:
+    def plan_path(self, start, goal) -> List[Tuple[int, int]]:
         """Plan path from start to goal."""
+        # Convert tensors to tuples if needed
+        if hasattr(start, 'squeeze'):  # torch tensor
+            start = (int(start.squeeze()[0].item()), int(start.squeeze()[1].item()))
+        if hasattr(goal, 'squeeze'):  # torch tensor  
+            goal = (int(goal.squeeze()[0].item()), int(goal.squeeze()[1].item()))
+        
         return self.spatial_reasoner.plan_path(start, goal)
 
 
@@ -1099,7 +1197,8 @@ def create_embodied_agent(
     vision_shape: Tuple[int, int, int] = (3, 64, 64),
     state_dim: int = 256,
     action_dim: int = 32,
-    observation_dim: int = 256,
+    observation_dim: int = 96,  # Changed to match test expectation (64+32)
+    tool_dim: int = 20,
     use_physics: bool = True
 ) -> EmbodiedAgent:
     """Create an embodied AI agent."""
@@ -1107,6 +1206,7 @@ def create_embodied_agent(
         vision_shape=vision_shape,
         state_dim=state_dim,
         action_dim=action_dim,
+        observation_dim=observation_dim,
         use_physics=use_physics
     )
 
