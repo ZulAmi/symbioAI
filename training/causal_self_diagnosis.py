@@ -47,7 +47,17 @@ except ImportError:
     class GCNConv:
         def __init__(self, *args, **kwargs): pass
 
-from deployment.observability import OBSERVABILITY
+# Mock observability for standalone use
+try:
+    from deployment.observability import OBSERVABILITY
+except ImportError:
+    class OBSERVABILITY:
+        @staticmethod
+        def emit_counter(*args, **kwargs): pass
+        @staticmethod
+        def emit_gauge(*args, **kwargs): pass
+        @staticmethod
+        def emit_histogram(*args, **kwargs): pass
 
 
 class CausalNodeType(Enum):
