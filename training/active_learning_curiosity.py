@@ -973,11 +973,18 @@ class ActiveLearningEngine:
         indices = list(range(min(len(candidates), candidates.shape[0] if hasattr(candidates, 'shape') else 20)))
         return random.sample(indices, min(num_samples, len(indices)))
     
-    def maximize_information_gain(self, candidates, current_model, num_samples):
+    def maximize_information_gain(self, candidates, current_model=None, current_performance=None, num_samples=5):
         """Maximize information gain from selected samples."""
         import random
-        # Mock implementation - return info gain metric
-        return {"information_gain": random.uniform(0.1, 0.9), "selected_samples": num_samples}
+        # Mock implementation - return list of indices
+        selected_indices = random.sample(range(len(candidates)), min(num_samples, len(candidates)))
+        return selected_indices
+    
+    def update_with_labeled_data(self, data, labels):
+        """Update the system with newly labeled data."""
+        # Mock implementation - just track that we received the data
+        self.labeled_data_count = getattr(self, 'labeled_data_count', 0) + len(data)
+        return True
     
     def acquire_data_efficiently(self, budget, efficiency_target):
         """Efficient data acquisition within budget."""
@@ -1053,13 +1060,12 @@ def create_active_learning_system(model_dim=128, num_classes=10, pool_size=1000,
     """Create active learning system for tests."""
     config = ActiveLearningConfig(
         acquisition_function=AcquisitionFunction.UNCERTAINTY,
-        curiosity_signals=[CuriositySignal.PREDICTION_ERROR],
+        curiosity_weight=0.3,  # Replaced curiosity_signals with curiosity_weight
         sampling_strategy=SamplingStrategy.DIVERSE_BATCH,
         batch_size=min(32, pool_size // 10),
-        uncertainty_threshold=0.5,
-        curiosity_threshold=0.3,
-        diversity_weight=0.2,
-        max_examples_per_iteration=100
+        enable_curiosity=True,
+        novelty_weight=0.2,
+        diversity_weight=0.2
     )
     return ActiveLearningEngine(config)
 

@@ -1,0 +1,210 @@
+# Industry-Standard Continual Learning Configuration
+# Based on published research and production best practices
+
+model:
+  # Architecture configuration
+  architecture: "resnet18"  # Options: resnet18, resnet34, simple_cnn, mlp
+  pretrained: false
+  num_classes: 10
+  
+  # Feature extractor settings
+  feature_dim: 512
+  dropout: 0.3
+  
+  # Task-specific heads
+  use_multihead: true
+  head_hidden_dim: 128
+
+training:
+  # Optimization (DER++ Paper Settings - Buzzega et al. 2020)
+  optimizer: "sgd"  # SGD, NOT AdamW! (Paper uses SGD with momentum)
+  learning_rate: 0.03  # Paper setting (was 0.001 - 30x too small!)
+  momentum: 0.9  # SGD momentum (paper setting)
+  weight_decay: 0.0  # No weight decay for DER++ (paper setting)
+  
+  # Learning rate scheduling
+  scheduler: "none"  # No scheduler for DER++ baseline
+  lr_min_factor: 0.01
+  warmup_epochs: 0
+  
+  # Training parameters (DER++ Paper Settings)
+  batch_size: 32  # Paper setting (was 128 - 4x too large!)
+  epochs_per_task: 50  # Paper setting (was 20 - 2.5x too few!)
+  num_workers: 0  # Set to 0 for MPS (Apple Silicon GPU) compatibility
+  
+  # Gradient management
+  gradient_clip_norm: 1.0  # Standard for continual learning
+  
+  # Validation
+  val_split: 0.15
+  early_stopping_patience: 5
+
+continual_learning:
+  # Strategy selection
+  strategy: "optimized"  # Options: naive, replay, ewc, multihead, optimized
+  
+  # Replay buffer settings (literature standard)
+  replay_buffer_size: 2000  # Per task
+  replay_batch_ratio: 0.5  # 50% of batch from replay
+  reservoir_sampling: true
+  balanced_replay: true
+  
+  # EWC settings (based on Kirkpatrick et al. 2017)
+  ewc_lambda: 400  # Literature standard: 10-400 (NOT 5000!)
+  online_ewc: true
+  ewc_gamma: 0.9  # Exponential moving average factor
+  
+  # Knowledge distillation settings (Hinton et al. 2015)
+  distillation_temperature: 2.0
+  distillation_alpha: 0.5
+  
+  # Task boundaries
+  num_tasks: 5
+  classes_per_task: 2
+
+datasets:
+  # Data directory (relative to project root)
+  data_dir: "../../data"
+  
+  # Augmentation (standard for image classification)
+  use_augmentation: true
+  
+  # MNIST (28x28 grayscale, 10 classes)
+  mnist:
+    train_transforms:
+      - "RandomRotation(10)"
+      - "RandomAffine(degrees=0, translate=(0.1, 0.1))"
+    mean: [0.1307]
+    std: [0.3081]
+  
+  # Fashion-MNIST (28x28 grayscale, 10 classes)
+  fashion_mnist:
+    train_transforms:
+      - "RandomRotation(10)"
+      - "RandomAffine(degrees=0, translate=(0.1, 0.1))"
+    mean: [0.2860]
+    std: [0.3530]
+  
+  # CIFAR-10 (32x32 RGB, 10 classes)
+  # Standard augmentation from He et al. 2016
+  cifar10:
+    train_transforms:
+      - "RandomCrop(32, padding=4)"
+      - "RandomHorizontalFlip()"
+      - "ColorJitter(0.1, 0.1, 0.1)"
+    mean: [0.4914, 0.4822, 0.4465]
+    std: [0.2023, 0.1994, 0.2010]
+  
+  # CIFAR-100 (32x32 RGB, 100 classes)
+  # Used in 100+ continual learning papers
+  cifar100:
+    train_transforms:
+      - "RandomCrop(32, padding=4)"
+      - "RandomHorizontalFlip()"
+      - "ColorJitter(0.1, 0.1, 0.1)"
+    mean: [0.5071, 0.4867, 0.4408]
+    std: [0.2675, 0.2565, 0.2761]
+  
+  # SVHN (32x32 RGB, 10 classes - street view house numbers)
+  # Standard for domain adaptation benchmarks
+  svhn:
+    train_transforms:
+      - "RandomCrop(32, padding=4)"
+      - "ColorJitter(0.2, 0.2, 0.2)"
+    mean: [0.4377, 0.4438, 0.4728]
+    std: [0.1980, 0.2010, 0.1970]
+  
+  # Omniglot (105x105 grayscale, 1623 classes)
+  # Standard for few-shot and meta-learning
+  omniglot:
+    train_transforms:
+      - "Resize(32)"
+      - "RandomRotation(10)"
+      - "RandomAffine(degrees=0, translate=(0.1, 0.1))"
+    mean: [0.0823]
+    std: [0.2660]
+  
+  # TinyImageNet (64x64 RGB, 200 classes)
+  # Most popular ImageNet subset for continual learning
+  # Used in DER++, Co2L, REMIND, etc.
+  tiny_imagenet:
+    train_transforms:
+      - "RandomCrop(64, padding=8)"
+      - "RandomHorizontalFlip()"
+      - "ColorJitter(0.2, 0.2, 0.2, 0.1)"
+      - "RandomRotation(15)"
+    mean: [0.4802, 0.4481, 0.3975]
+    std: [0.2302, 0.2265, 0.2262]
+
+experiment:
+  # Experiment tracking
+  use_tensorboard: true
+  tensorboard_dir: "./runs"
+  
+  # Model checkpointing
+  save_checkpoints: true
+  checkpoint_dir: "./checkpoints"
+  save_best_only: true
+  
+  # Results
+  results_dir: "./validation/results"
+  save_interval: 1  # Save every N tasks
+  
+  # Logging
+  log_level: "INFO"
+  log_interval: 50  # Log every N batches
+  
+  # Reproducibility
+  seed: 42
+  deterministic: true
+
+evaluation:
+  # Metrics to track
+  metrics:
+    - "accuracy"
+    - "forgetting_measure"
+    - "forward_transfer"
+    - "backward_transfer"
+    - "task_retention"
+  
+  # Evaluation batch size (can be larger)
+  eval_batch_size: 256
+  
+  # Success thresholds (realistic based on literature)
+  # Default thresholds for easier datasets (MNIST, Fashion-MNIST, CIFAR-10)
+  thresholds:
+    excellent:
+      avg_accuracy: 0.90
+      forgetting: 0.10
+    good:
+      avg_accuracy: 0.80
+      forgetting: 0.20
+    acceptable:
+      avg_accuracy: 0.70
+      forgetting: 0.30
+  
+  # Dataset-specific thresholds for harder datasets
+  # CIFAR-100 is much harder: 100 classes, only 600 samples per class
+  # Literature shows 50-65% avg accuracy is state-of-the-art for 5-task splits
+  dataset_thresholds:
+    cifar100:
+      excellent:
+        avg_accuracy: 0.65
+        forgetting: 0.15
+      good:
+        avg_accuracy: 0.55
+        forgetting: 0.25
+      acceptable:
+        avg_accuracy: 0.45
+        forgetting: 0.35
+    
+    tiny_imagenet:
+      excellent:
+        avg_accuracy: 0.70
+        forgetting: 0.15
+      good:
+        avg_accuracy: 0.60
+        forgetting: 0.25
+      acceptable:
+        avg_accuracy: 0.50
+        forgetting: 0.35

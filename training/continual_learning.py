@@ -72,6 +72,19 @@ except ImportError:
 
 from registry.adapter_registry import ADAPTER_REGISTRY, AdapterMetadata
 
+# Import advanced continual learning components
+try:
+    from training.advanced_continual_learning import (
+        AdvancedContinualLearningEngine,
+        AdvancedReplayBuffer,
+        AsymmetricCrossEntropyLoss,
+        ContrastiveRegularization,
+        SamplingStrategy as AdvancedSamplingStrategy
+    )
+    ADVANCED_CL_AVAILABLE = True
+except ImportError:
+    ADVANCED_CL_AVAILABLE = False
+
 
 class ForgettingPreventionStrategy(Enum):
     """Strategies to prevent catastrophic forgetting."""
@@ -81,6 +94,7 @@ class ForgettingPreventionStrategy(Enum):
     PROGRESSIVE_NETS = "progressive_neural_networks"  # Add new columns
     ADAPTERS = "task_specific_adapters"  # LoRA, prefix tuning
     COMBINED = "combined_multi_strategy"  # Use multiple strategies
+    ADVANCED = "advanced_beyond_der"  # Advanced CL beyond DER++ (NEW!)
 
 
 class TaskType(Enum):
@@ -1077,9 +1091,13 @@ class ContinualLearningEngine:
         ewc_lambda: float = 1000.0,
         replay_buffer_size: int = 10000,
         use_progressive_nets: bool = False,
-        use_adapters: bool = True
+        use_adapters: bool = True,
+        use_advanced_cl: bool = True
     ):
         self.strategy = strategy
+        
+        # Initialize logger first
+        self.logger = logging.getLogger(__name__)
         
         # Components
         self.ewc = ElasticWeightConsolidation(ewc_lambda=ewc_lambda)
@@ -1090,6 +1108,24 @@ class ContinualLearningEngine:
         self.adapter_manager = TaskAdapterManager() if use_adapters else None
         self.interference_detector = InterferenceDetector()
         
+        # Advanced CL engine (beyond DER++)
+        self.advanced_cl_engine = None
+        if (use_advanced_cl and ADVANCED_CL_AVAILABLE and 
+            strategy in [ForgettingPreventionStrategy.ADVANCED, ForgettingPreventionStrategy.COMBINED]):
+            try:
+                from training.advanced_continual_learning import create_advanced_cl_engine
+                self.advanced_cl_engine = create_advanced_cl_engine(
+                    buffer_capacity=replay_buffer_size,
+                    strategy="uncertainty",
+                    use_asymmetric_ce=True,
+                    use_contrastive_reg=True,
+                    use_gradient_surgery=True,
+                    use_model_ensemble=True
+                )
+                self.logger.info("✅ Advanced CL Engine (Beyond DER++) activated!")
+            except Exception as e:
+                self.logger.warning(f"Could not initialize Advanced CL: {e}")
+        
         # Task tracking
         self.tasks: Dict[str, Task] = {}
         self.task_order: List[str] = []
@@ -1097,8 +1133,6 @@ class ContinualLearningEngine:
         
         # Performance tracking
         self.training_history: Dict[str, List[float]] = defaultdict(list)
-        
-        self.logger = logging.getLogger(__name__)
         
         self.logger.info(
             f"Initialized Continual Learning Engine with strategy: {strategy.value}"
@@ -1203,7 +1237,43 @@ class ContinualLearningEngine:
         # Task loss
         task_loss = F.cross_entropy(outputs, targets)
         
-        # Anti-forgetting regularization
+        # Use Advanced CL if available
+        if self.advanced_cl_engine is not None and self.current_task:
+            task_id = self.task_order.index(self.current_task)
+            
+            # Compute replay loss with distillation
+            total_loss, info = self.advanced_cl_engine.compute_replay_loss(
+                model=model,
+                current_data=inputs,
+                current_target=targets,
+                current_loss=task_loss,
+                task_id=task_id,
+                replay_batch_size=min(32, len(inputs))
+            )
+            
+            # Backward and optimize
+            optimizer.zero_grad()
+            total_loss.backward()
+            optimizer.step()
+            
+            # Store experience in advanced buffer
+            if random.random() < 0.1:  # Store 10% of samples
+                self.advanced_cl_engine.store_experience(
+                    model=model,
+                    data=inputs,
+                    target=targets,
+                    task_id=task_id
+                )
+            
+            return {
+                "loss": info['total_loss'],
+                "task_loss": info['current_loss'],
+                "distillation_loss": info['distillation_loss'],
+                "contrastive_loss": info['contrastive_loss'],
+                "replay_samples": info['replay_samples']
+            }
+        
+        # Fallback to standard anti-forgetting
         total_loss = task_loss
         ewc_loss = torch.tensor(0.0)
         
@@ -1292,6 +1362,20 @@ class ContinualLearningEngine:
             task.task_id, final_performance
         )
         
+        # 5. Finalize advanced CL engine
+        if self.advanced_cl_engine is not None and self.current_task:
+            task_id = self.task_order.index(self.current_task)
+            self.advanced_cl_engine.finish_task(
+                model=model,
+                task_id=task_id,
+                performance=final_performance
+            )
+            finish_info["components_finalized"].append("advanced_cl_engine")
+            
+            # Get advanced statistics
+            advanced_stats = self.advanced_cl_engine.get_statistics()
+            finish_info["advanced_cl_stats"] = advanced_stats
+        
         self.logger.info(
             f"Finished training task {task.task_name}: "
             f"{len(finish_info['components_finalized'])} components finalized"
@@ -1377,6 +1461,10 @@ class ContinualLearningEngine:
                 "adapters": {
                     "enabled": self.adapter_manager is not None,
                     "num_adapters": len(self.adapter_manager.task_adapters) if self.adapter_manager else 0
+                },
+                "advanced_cl": {
+                    "enabled": self.advanced_cl_engine is not None,
+                    "statistics": self.advanced_cl_engine.get_statistics() if self.advanced_cl_engine else {}
                 }
             },
             "interference": {
@@ -1406,7 +1494,8 @@ def create_continual_learning_engine(
     ewc_lambda: float = 1000.0,
     replay_buffer_size: int = 10000,
     use_progressive_nets: bool = False,
-    use_adapters: bool = True
+    use_adapters: bool = True,
+    use_advanced_cl: bool = True
 ) -> ContinualLearningEngine:
     """
     Factory function to create a configured Continual Learning Engine.
@@ -1428,7 +1517,8 @@ def create_continual_learning_engine(
         "replay": ForgettingPreventionStrategy.EXPERIENCE_REPLAY,
         "progressive": ForgettingPreventionStrategy.PROGRESSIVE_NETS,
         "adapters": ForgettingPreventionStrategy.ADAPTERS,
-        "combined": ForgettingPreventionStrategy.COMBINED
+        "combined": ForgettingPreventionStrategy.COMBINED,
+        "advanced": ForgettingPreventionStrategy.ADVANCED
     }
     
     strategy_enum = strategy_map.get(strategy, ForgettingPreventionStrategy.COMBINED)
@@ -1438,7 +1528,8 @@ def create_continual_learning_engine(
         ewc_lambda=ewc_lambda,
         replay_buffer_size=replay_buffer_size,
         use_progressive_nets=use_progressive_nets,
-        use_adapters=use_adapters
+        use_adapters=use_adapters,
+        use_advanced_cl=use_advanced_cl
     )
     
     logging.info(

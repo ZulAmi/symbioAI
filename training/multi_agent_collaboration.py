@@ -135,6 +135,81 @@ class AgentPerformance:
     def average_peer_rating(self) -> float:
         """Average rating from peers."""
         return np.mean(self.peer_ratings) if self.peer_ratings else 0.5
+    
+    def update_performance(self, success: bool, reward: float = 0.0, task_type: str = "general") -> None:
+        """
+        Update agent performance metrics based on task completion.
+        
+        Args:
+            success: Whether the task was completed successfully
+            reward: Reward/score received for the task
+            task_type: Type of task for specialization tracking
+        """
+        # Update basic metrics
+        if success:
+            self.tasks_completed += 1
+        else:
+            self.tasks_failed += 1
+        
+        # Update collaboration score (exponential moving average)
+        alpha = 0.1  # Learning rate for moving average
+        if reward > 0:
+            self.collaboration_score = (1 - alpha) * self.collaboration_score + alpha * reward
+        
+        # Update specialization scores
+        if task_type not in self.specialization_scores:
+            self.specialization_scores[task_type] = 0.5  # Initial neutral score
+        
+        # Update specialization score for this task type
+        task_reward = reward if success else max(0.0, reward - 0.2)  # Penalty for failure
+        self.specialization_scores[task_type] = (
+            (1 - alpha) * self.specialization_scores[task_type] + alpha * task_reward
+        )
+        
+        # Update communication efficiency based on success and collaboration patterns
+        if hasattr(self, '_recent_communications'):
+            comm_efficiency = min(1.0, reward * (1.0 + len(self._recent_communications) * 0.1))
+            self.communication_efficiency = (
+                (1 - alpha) * self.communication_efficiency + alpha * comm_efficiency
+            )
+        else:
+            # Default communication efficiency update
+            self.communication_efficiency = (
+                (1 - alpha) * self.communication_efficiency + alpha * (0.8 if success else 0.3)
+            )
+    
+    def add_peer_rating(self, rating: float) -> None:
+        """Add a peer rating and maintain sliding window."""
+        self.peer_ratings.append(rating)
+        # Keep only last 10 ratings
+        if len(self.peer_ratings) > 10:
+            self.peer_ratings = self.peer_ratings[-10:]
+    
+    def get_performance_summary(self) -> Dict[str, Any]:
+        """Get comprehensive performance summary."""
+        return {
+            'agent_id': self.agent_id,
+            'role': self.role.value,
+            'success_rate': self.success_rate,
+            'tasks_completed': self.tasks_completed,
+            'tasks_failed': self.tasks_failed,
+            'collaboration_score': self.collaboration_score,
+            'communication_efficiency': self.communication_efficiency,
+            'specialization_scores': self.specialization_scores.copy(),
+            'average_peer_rating': self.average_peer_rating,
+            'total_peer_ratings': len(self.peer_ratings),
+            'is_specialist': len(self.specialization_scores) > 0 and max(self.specialization_scores.values()) > 0.7,
+            'best_specialization': max(self.specialization_scores.items(), key=lambda x: x[1]) if self.specialization_scores else None
+        }
+    
+    def reset_metrics(self) -> None:
+        """Reset performance metrics for new evaluation period."""
+        self.tasks_completed = 0
+        self.tasks_failed = 0
+        self.collaboration_score = 0.0
+        self.communication_efficiency = 0.0
+        self.specialization_scores.clear()
+        self.peer_ratings.clear()
 
 
 # ============================================================================
@@ -246,17 +321,68 @@ class EmergentCommunicationProtocol(nn.Module):
         if not messages:
             return torch.zeros(1, self.message_dim)
         
-        # Stack messages
-        msg_stack = torch.stack(messages).unsqueeze(0)  # (1, num_msgs, msg_dim)
+        # Ensure all messages have correct shape and stack them
+        processed_messages = []
+        for msg in messages:
+            # Handle different input shapes
+            if msg.dim() == 1:
+                # 1D tensor: add batch dimension
+                msg = msg.unsqueeze(0)  # (1, msg_dim)
+            elif msg.dim() == 2:
+                # 2D tensor: already has batch dimension
+                pass  # (batch_size, msg_dim)
+            elif msg.dim() == 3:
+                # 3D tensor: squeeze first dimension if size 1
+                if msg.size(0) == 1:
+                    msg = msg.squeeze(0)  # (num_msgs, msg_dim)
+                else:
+                    # Flatten to 2D
+                    msg = msg.view(-1, msg.size(-1))  # (batch*seq, msg_dim)
+            elif msg.dim() == 4:
+                # 4D tensor: reshape to 2D
+                msg = msg.view(-1, msg.size(-1))  # (batch*seq*time, msg_dim)
+            
+            # Ensure message has correct feature dimension
+            if msg.size(-1) != self.message_dim:
+                # Project to correct dimension if needed
+                if not hasattr(self, 'msg_projection'):
+                    self.msg_projection = nn.Linear(msg.size(-1), self.message_dim)
+                msg = self.msg_projection(msg)
+            
+            processed_messages.append(msg)
         
-        # Apply attention
+        # Stack messages - each should now be 2D (batch_size, msg_dim)
+        if len(processed_messages) == 1:
+            msg_stack = processed_messages[0].unsqueeze(1)  # (batch, 1, msg_dim)
+        else:
+            # If messages have different batch sizes, pad them
+            max_batch_size = max(msg.size(0) for msg in processed_messages)
+            padded_messages = []
+            for msg in processed_messages:
+                if msg.size(0) < max_batch_size:
+                    # Pad with zeros
+                    padding = torch.zeros(max_batch_size - msg.size(0), msg.size(1))
+                    msg = torch.cat([msg, padding], dim=0)
+                padded_messages.append(msg)
+            
+            # Stack along sequence dimension
+            msg_stack = torch.stack(padded_messages, dim=1)  # (batch, num_msgs, msg_dim)
+        
+        # Apply attention - ensure input is 3D (batch, seq, feature)
+        if msg_stack.dim() == 2:
+            msg_stack = msg_stack.unsqueeze(1)  # Add sequence dimension
+        
         aggregated, _ = self.message_attention(
             msg_stack, msg_stack, msg_stack,
             attn_mask=attention_mask
         )
         
-        # Return mean pooling
-        return aggregated.mean(dim=1)
+        # Return mean pooling - ensure output is 2D
+        result = aggregated.mean(dim=1)  # (batch, msg_dim)
+        if result.dim() == 1:
+            result = result.unsqueeze(0)  # Ensure batch dimension
+        
+        return result
     
     def update_protocol(
         self,
