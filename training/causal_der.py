@@ -14,7 +14,7 @@ Algorithm:
 2. For each sample: Compute causal importance using counterfactual analysis
 3. Store in buffer: Prioritize causally critical samples
 4. Replay: Sample proportional to causal importance
-5. Loss: Same as DER++ (CE + alpha * MSE on logits)
+5. Loss: Match DER++ (CE(current) + alpha * MSE(replay logits) + beta * CE(buffer labels))
 
 Expected Performance:
 - Baseline (DER++): 72% avg accuracy, 12% forgetting
@@ -74,7 +74,8 @@ class CausalReplayBuffer:
     Key Innovation: Stores and samples based on causal importance.
     """
     
-    def __init__(self, capacity: int = 2000, causal_weight: float = 0.7):
+    def __init__(self, capacity: int = 2000, causal_weight: float = 0.7,
+                 per_class_cap: Optional[int] = None):
         """
         Args:
             capacity: Buffer size (same as DER++)
@@ -82,10 +83,13 @@ class CausalReplayBuffer:
         """
         self.capacity = capacity
         self.causal_weight = causal_weight
-        self.buffer: List[CausalDERSample] = []
+        self.buffer = []
         self.total_seen = 0
         self.task_counts = defaultdict(int)
         self.importance_history = []
+        # Optional cap per class index to avoid buffer domination
+        self.per_class_cap = per_class_cap
+        self.class_counts = defaultdict(int)
     
     def add(self, sample: CausalDERSample):
         """
@@ -93,11 +97,44 @@ class CausalReplayBuffer:
         
         Innovation: Instead of pure random replacement, consider causal importance.
         """
+        # Enforce per-class cap if configured
+        if self.per_class_cap is not None:
+            # Try to infer class id from target tensor
+            try:
+                class_id = int(sample.target.item()) if isinstance(sample.target, torch.Tensor) else int(sample.target)
+            except Exception:
+                class_id = None
+            if class_id is not None and self.class_counts[class_id] >= self.per_class_cap:
+                # Find a replacement candidate within same class with lowest importance
+                same_class_indices = [i for i, s in enumerate(self.buffer)
+                                      if isinstance(s.target, torch.Tensor) and int(s.target.item()) == class_id]
+                if same_class_indices:
+                    # Replace the lowest-importance sample of that class if new is more important
+                    min_idx_local = min(same_class_indices, key=lambda i: self.buffer[i].causal_importance)
+                    if self.buffer[min_idx_local].causal_importance < sample.causal_importance:
+                        old_sample = self.buffer[min_idx_local]
+                        # update counts
+                        self.task_counts[old_sample.task_id] -= 1
+                        # class count unchanged (replace same class)
+                        self.buffer[min_idx_local] = sample
+                        self.task_counts[sample.task_id] += 1
+                        self.importance_history.append(sample.causal_importance)
+                        return
+                    else:
+                        # Drop sample silently (cap reached and not better)
+                        return
+
         if len(self.buffer) < self.capacity:
             # Buffer not full - just add
             self.buffer.append(sample)
             self.task_counts[sample.task_id] += 1
             self.importance_history.append(sample.causal_importance)
+            # update class count if available
+            try:
+                cid = int(sample.target.item()) if isinstance(sample.target, torch.Tensor) else int(sample.target)
+                self.class_counts[cid] += 1
+            except Exception:
+                pass
         else:
             # Buffer full - decide whether to replace
             self.total_seen += 1
@@ -112,10 +149,20 @@ class CausalReplayBuffer:
                 if min_idx is not None:
                     old_sample = self.buffer[min_idx]
                     self.task_counts[old_sample.task_id] -= 1
-                    
+                    # update class count
+                    try:
+                        old_cid = int(old_sample.target.item()) if isinstance(old_sample.target, torch.Tensor) else int(old_sample.target)
+                        self.class_counts[old_cid] -= 1
+                    except Exception:
+                        pass
                     self.buffer[min_idx] = sample
                     self.task_counts[sample.task_id] += 1
                     self.importance_history.append(sample.causal_importance)
+                    try:
+                        new_cid = int(sample.target.item()) if isinstance(sample.target, torch.Tensor) else int(sample.target)
+                        self.class_counts[new_cid] += 1
+                    except Exception:
+                        pass
     
     def _find_replacement_candidate(self, new_sample: CausalDERSample) -> Optional[int]:
         """
@@ -145,43 +192,66 @@ class CausalReplayBuffer:
         return random.choice(candidates)
     
     def sample(self, batch_size: int, device: torch.device, 
-               use_causal_sampling: bool = True) -> Optional[Tuple]:
+               use_causal_sampling: bool = True,
+               model: Optional[nn.Module] = None,
+               use_mir_sampling: bool = False,
+               mir_candidate_factor: int = 3) -> Optional[Tuple]:
         """
         Sample batch with causal importance weighting.
         
         Innovation: DER++ uses uniform sampling, we use importance weighting.
+        Plus optional MIR-lite: choose high-entropy samples from a candidate set
+        proportional to causal importance.
         """
         if not self.buffer:
             return None
         
         n_samples = min(batch_size, len(self.buffer))
         
+        # Step 1: draw candidate set
         if use_causal_sampling:
-            # Causal-weighted sampling
-            importances = np.array([s.causal_importance for s in self.buffer])
-            
-            # Mix causal (70%) + random (30%) for robustness
-            causal_probs = importances / importances.sum()
-            random_probs = np.ones(len(self.buffer)) / len(self.buffer)
-            
-            probs = (self.causal_weight * causal_probs + 
-                    (1 - self.causal_weight) * random_probs)
-            probs = probs / probs.sum()  # Normalize
-            
-            indices = np.random.choice(len(self.buffer), size=n_samples, 
-                                      p=probs, replace=False)
+            importances = np.array([s.causal_importance for s in self.buffer], dtype=np.float64)
+            total_imp = importances.sum()
+            if total_imp <= 0:
+                importances = np.ones_like(importances)
+                total_imp = importances.sum()
+            causal_probs = importances / (total_imp + 1e-12)
+            random_probs = np.ones(len(self.buffer), dtype=np.float64) / len(self.buffer)
+            probs = self.causal_weight * causal_probs + (1 - self.causal_weight) * random_probs
+            probs = probs / probs.sum()
+            cand_size = min(n_samples * max(1, mir_candidate_factor), len(self.buffer))
+            candidate_indices = np.random.choice(len(self.buffer), size=cand_size, p=probs, replace=False)
         else:
-            # Fallback: uniform random (like DER++)
-            indices = random.sample(range(len(self.buffer)), n_samples)
+            cand_size = min(n_samples * max(1, mir_candidate_factor), len(self.buffer))
+            candidate_indices = np.array(random.sample(range(len(self.buffer)), cand_size))
+        
+        # Step 2: MIR-lite filter using entropy * causal_importance
+        if use_mir_sampling and model is not None and cand_size > n_samples:
+            candidates = [self.buffer[i] for i in candidate_indices]
+            cand_data = torch.stack([s.data for s in candidates]).to(device, dtype=torch.float32, non_blocking=True)
+            with torch.inference_mode():
+                outputs = model(cand_data)
+                probs = outputs.softmax(dim=-1)
+                entropy = -(probs * (probs.clamp_min(1e-12).log())).sum(dim=-1)
+            imp = torch.tensor([s.causal_importance for s in candidates], device=device, dtype=torch.float32)
+            scores = entropy * imp
+            topk = torch.topk(scores, k=n_samples, largest=True).indices.detach().cpu().numpy().tolist()
+            indices = [candidate_indices[i] for i in topk]
+        else:
+            if cand_size > n_samples:
+                indices = candidate_indices[:n_samples].tolist()
+            else:
+                indices = candidate_indices.tolist()
         
         samples = [self.buffer[i] for i in indices]
         
-        data = torch.stack([s.data for s in samples]).to(device)
-        targets = torch.stack([s.target for s in samples]).to(device)
-        logits = torch.stack([s.logits for s in samples]).to(device)
+        data = torch.stack([s.data for s in samples]).to(device, dtype=torch.float32, non_blocking=True)
+        targets = torch.stack([s.target for s in samples]).to(device, non_blocking=True)
+        logits = torch.stack([s.logits for s in samples]).to(device, dtype=torch.float32, non_blocking=True)
         task_ids = [s.task_id for s in samples]
+        importances_t = torch.tensor([s.causal_importance for s in samples], dtype=torch.float32, device=device)
         
-        return data, targets, logits, task_ids
+        return data, targets, logits, task_ids, importances_t
     
     def get_statistics(self) -> Dict[str, Any]:
         """Get buffer statistics including causal metrics."""
@@ -195,6 +265,8 @@ class CausalReplayBuffer:
             'capacity': self.capacity,
             'utilization': len(self.buffer) / self.capacity,
             'samples_per_task': dict(self.task_counts),
+            'per_class_cap': self.per_class_cap,
+            'samples_per_class': dict(self.class_counts),
             'avg_causal_importance': np.mean(importances),
             'min_causal_importance': np.min(importances),
             'max_causal_importance': np.max(importances),
@@ -317,22 +389,39 @@ class CausalDEREngine:
     Same training procedure as DER++, but with causal buffer management.
     """
     
-    def __init__(self, alpha: float = 0.5, buffer_size: int = 2000,
-                 causal_weight: float = 0.7, use_causal_sampling: bool = True):
+    def __init__(self, alpha: float = 0.5, beta: float = 0.5, buffer_size: int = 2000,
+                 causal_weight: float = 0.7, use_causal_sampling: bool = True,
+                 temperature: float = 2.0,
+                 mixed_precision: bool = True,
+                 importance_weight_replay: bool = True,
+                 store_dtype: torch.dtype = torch.float16,
+                 pin_memory: bool = True,
+                 use_mir_sampling: bool = True,
+                 mir_candidate_factor: int = 3):
         """
         Args:
-            alpha: Distillation weight (same as DER++)
+            alpha: Distillation weight on MSE logits (same as DER++)
+            beta: Supervised weight on buffer labels (DER++)
             buffer_size: Buffer capacity (same as DER++)
             causal_weight: Weight for causal sampling (0.7 = 70% causal, 30% random)
             use_causal_sampling: Whether to use causal sampling (ablation control)
         """
         self.alpha = alpha
+        self.beta = beta
         self.buffer = CausalReplayBuffer(capacity=buffer_size, 
                                         causal_weight=causal_weight)
         self.importance_estimator = CausalImportanceEstimator(
             use_full_causal_analysis=False  # Use fast version
         )
         self.use_causal_sampling = use_causal_sampling
+        # Performance/robustness knobs
+        self.temperature = temperature
+        self.mixed_precision = mixed_precision
+        self.importance_weight_replay = importance_weight_replay
+        self.store_dtype = store_dtype
+        self.pin_memory = pin_memory
+        self.use_mir_sampling = use_mir_sampling
+        self.mir_candidate_factor = mir_candidate_factor
         
         # Statistics
         self.stats = {
@@ -345,9 +434,10 @@ class CausalDEREngine:
                     target: torch.Tensor, output: torch.Tensor,
                     task_id: int) -> Tuple[torch.Tensor, dict]:
         """
-        Compute loss (SAME as DER++).
+        Compute loss matching DER++ objective with improvements.
         
-        Loss = CE(current) + alpha * MSE(replay_logits, current_logits)
+        Loss = CE(current) + alpha * KD_T(replay) + beta * CE(buffer)
+        where KD_T is temperature-scaled KL between current outputs and stored logits.
         """
         device = data.device
         
@@ -355,9 +445,11 @@ class CausalDEREngine:
         current_loss = F.cross_entropy(output, target)
         
         info = {
-            'current_loss': current_loss.item(),
-            'replay_loss': 0.0,
-            'total_loss': current_loss.item()
+            'current_loss': float(current_loss.detach().cpu()),
+            'replay_mse': 0.0,
+            'replay_kld': 0.0,
+            'replay_ce': 0.0,
+            'total_loss': float(current_loss.detach().cpu())
         }
         
         # Replay loss
@@ -366,25 +458,47 @@ class CausalDEREngine:
         
         # Sample from buffer (INNOVATION: causal sampling)
         replay_batch_size = min(data.size(0), len(self.buffer.buffer))
-        replay_data = self.buffer.sample(replay_batch_size, device, 
-                                        use_causal_sampling=self.use_causal_sampling)
+        replay_data = self.buffer.sample(
+            replay_batch_size,
+            device,
+            use_causal_sampling=self.use_causal_sampling,
+            model=model if self.use_mir_sampling else None,
+            use_mir_sampling=self.use_mir_sampling,
+            mir_candidate_factor=self.mir_candidate_factor,
+        )
         
         if replay_data is None:
             return current_loss, info
         
-        buf_data, buf_targets, buf_logits, buf_task_ids = replay_data
+        buf_data, buf_targets, buf_logits, buf_task_ids, buf_importances = replay_data
         
-        # Forward on replay data
-        buf_outputs = model(buf_data)
+        # Forward on replay data with AMP if available
+        use_amp = self.mixed_precision and (buf_data.is_cuda or buf_data.device.type == 'cuda')
+        with torch.amp.autocast(device_type=('cuda' if buf_data.is_cuda else 'cpu'), enabled=use_amp):
+            buf_outputs = model(buf_data)
+            # Temperature-scaled KL distillation (teacher = stored logits)
+            T = self.temperature
+            student_log_probs = F.log_softmax(buf_outputs / T, dim=-1)
+            teacher_probs = F.softmax(buf_logits / T, dim=-1)
+            kl_per_sample = F.kl_div(student_log_probs, teacher_probs, reduction='none').sum(dim=1) * (T * T)
+            ce_per_sample = F.cross_entropy(buf_outputs, buf_targets, reduction='none')
+
+        # Importance-weight replay losses
+        if self.importance_weight_replay:
+            w = buf_importances / (buf_importances.mean() + 1e-8)
+            w = torch.clamp(w, 0.25, 4.0).detach()
+            replay_kd = (w * kl_per_sample).mean()
+            replay_ce = (w * ce_per_sample).mean()
+        else:
+            replay_kd = kl_per_sample.mean()
+            replay_ce = ce_per_sample.mean()
         
-        # DER++ replay loss: MSE between old and new logits
-        replay_loss = F.mse_loss(buf_outputs, buf_logits)
+        # Total loss
+        total_loss = current_loss + self.alpha * replay_kd + self.beta * replay_ce
         
-        # Total loss (same as DER++)
-        total_loss = current_loss + self.alpha * replay_loss
-        
-        info['replay_loss'] = replay_loss.item()
-        info['total_loss'] = total_loss.item()
+        info['replay_kld'] = float(replay_kd.detach().cpu())
+        info['replay_ce'] = float(replay_ce.detach().cpu())
+        info['total_loss'] = float(total_loss.detach().cpu())
         
         return total_loss, info
     
@@ -392,6 +506,7 @@ class CausalDEREngine:
              logits: torch.Tensor, task_id: int, model: nn.Module = None):
         """
         Store samples in buffer (INNOVATION: with causal importance).
+        Uses compact CPU storage (fp16 by default) with optional pinned memory for faster H2D.
         """
         batch_size = data.size(0)
         num_to_store = max(1, batch_size // 10)  # Store 10% like DER++
@@ -399,17 +514,29 @@ class CausalDEREngine:
         
         for idx in indices:
             # Compute causal importance (INNOVATION)
-            importance = self.importance_estimator.compute_importance(
-                data[idx], target[idx], logits[idx], task_id, model
-            )
+            with torch.inference_mode():
+                importance = self.importance_estimator.compute_importance(
+                    data[idx], target[idx], logits[idx], task_id, model
+                )
             
-            # Create causal sample
+            # Create causal sample with compact storage
+            d = data[idx].detach().cpu().to(dtype=self.store_dtype, copy=True)
+            z = logits[idx].detach().cpu().to(dtype=self.store_dtype, copy=True)
+            y = target[idx].detach().cpu()
+            if self.pin_memory:
+                try:
+                    d = d.pin_memory()
+                    z = z.pin_memory()
+                    y = y.pin_memory()
+                except RuntimeError:
+                    pass
+
             sample = CausalDERSample(
-                data=data[idx].detach().cpu(),
-                target=target[idx].detach().cpu(),
-                logits=logits[idx].detach().cpu(),
+                data=d,
+                target=y,
+                logits=z,
                 task_id=task_id,
-                causal_importance=importance
+                causal_importance=float(importance)
             )
             
             # Add to buffer
@@ -417,7 +544,7 @@ class CausalDEREngine:
             
             # Update stats
             self.stats['total_samples_stored'] += 1
-            self.stats['avg_importance_stored'].append(importance)
+            self.stats['avg_importance_stored'].append(float(importance))
     
     def get_statistics(self) -> dict:
         """Get comprehensive statistics."""
@@ -431,18 +558,26 @@ class CausalDEREngine:
                                  if self.stats['avg_importance_stored'] else 0.0,
                 'causal_sampling_enabled': self.stats['causal_sampling_enabled']
             },
-            'alpha': self.alpha
+            'alpha': self.alpha,
+            'beta': self.beta,
+            'temperature': self.temperature,
+            'mixed_precision': self.mixed_precision,
+            'importance_weight_replay': self.importance_weight_replay,
+            'use_mir_sampling': self.use_mir_sampling,
+            'mir_candidate_factor': self.mir_candidate_factor
         }
 
 
-def create_causal_der_engine(alpha: float = 0.5, buffer_size: int = 2000,
+def create_causal_der_engine(alpha: float = 0.5, beta: float = 0.5, buffer_size: int = 2000,
                             causal_weight: float = 0.7,
-                            use_causal_sampling: bool = True) -> CausalDEREngine:
+                            use_causal_sampling: bool = True,
+                            **kwargs) -> CausalDEREngine:
     """
     Factory function for Causal-DER engine.
     
     Args:
         alpha: Distillation weight (0.5 from DER++)
+        beta: Supervised CE weight (0.5 from DER++)
         buffer_size: Buffer capacity (2000 from DER++)
         causal_weight: How much to weight causal vs random (0.7 = 70% causal)
         use_causal_sampling: Enable causal sampling (False for ablation)
@@ -452,9 +587,11 @@ def create_causal_der_engine(alpha: float = 0.5, buffer_size: int = 2000,
     """
     return CausalDEREngine(
         alpha=alpha,
+        beta=beta,
         buffer_size=buffer_size,
         causal_weight=causal_weight,
-        use_causal_sampling=use_causal_sampling
+        use_causal_sampling=use_causal_sampling,
+        **kwargs
     )
 
 

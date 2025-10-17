@@ -35,7 +35,7 @@ class SimpleResNet18(nn.Module):
         return self.backbone(x)
 
 
-def create_split_cifar100(num_tasks=5, data_root='../../data'):
+def create_split_cifar100(num_tasks=10, data_root='../../data'):
     """Create Split CIFAR-100 dataset."""
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -62,16 +62,20 @@ def create_split_cifar100(num_tasks=5, data_root='../../data'):
     tasks_train = []
     tasks_test = []
     
+    # Use label lists directly to avoid iterating through transformed samples
+    train_targets = train_dataset.targets if hasattr(train_dataset, 'targets') else [y for _, y in train_dataset]
+    test_targets = test_dataset.targets if hasattr(test_dataset, 'targets') else [y for _, y in test_dataset]
+
     for task_id in range(num_tasks):
         start_class = task_id * classes_per_task
         end_class = start_class + classes_per_task
-        
-        task_indices = [i for i, (_, label) in enumerate(train_dataset) 
-                       if start_class <= label < end_class]
+
+        task_indices = [i for i, label in enumerate(train_targets)
+                        if start_class <= label < end_class]
         tasks_train.append(Subset(train_dataset, task_indices))
-        
-        task_indices = [i for i, (_, label) in enumerate(test_dataset)
-                       if start_class <= label < end_class]
+
+        task_indices = [i for i, label in enumerate(test_targets)
+                        if start_class <= label < end_class]
         tasks_test.append(Subset(test_dataset, task_indices))
     
     return tasks_train, tasks_test
@@ -95,7 +99,7 @@ def compute_accuracy(model, dataloader, device):
     return correct / total if total > 0 else 0.0
 
 
-def run_causal_der_benchmark(seed=42, data_root='../../data'):
+def run_causal_der_benchmark(seed=42, data_root='../../data', num_tasks=10, epochs_per_task=50):
     """
     Run Causal-DER benchmark.
     
@@ -125,8 +129,8 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
     # Create model
     model = SimpleResNet18(num_classes=100).to(device)
     
-    # Causal-DER engine (same alpha and buffer as DER++)
-    causal_der_engine = CausalDEREngine(alpha=0.5, buffer_size=2000)
+    # Causal-DER engine (same alpha/beta and buffer as DER++)
+    causal_der_engine = CausalDEREngine(alpha=0.5, beta=0.5, buffer_size=2000)
     
     # Optimizer (same as DER++)
     optimizer = optim.SGD(
@@ -138,16 +142,18 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
     
     # Data
     print("Loading CIFAR-100...")
-    tasks_train, tasks_test = create_split_cifar100(num_tasks=5, data_root=data_root)
-    print(f"Created 5 tasks with {len(tasks_train[0])} training samples each")
+    tasks_train, tasks_test = create_split_cifar100(num_tasks=num_tasks, data_root=data_root)
+    classes_per_task = 100 // num_tasks
+    print(f"Created {num_tasks} tasks with {classes_per_task} classes/task")
     
     # Training
     all_task_accuracies = []
     task_times = []
+    accmean_per_task = []
     
-    for task_id in range(5):
+    for task_id in range(num_tasks):
         print(f"\n{'='*60}")
-        print(f"Task {task_id + 1}/5 (Classes {task_id*20}-{(task_id+1)*20-1})")
+        print(f"Task {task_id + 1}/{num_tasks} (Classes {task_id*classes_per_task}-{(task_id+1)*classes_per_task-1})")
         print(f"{'='*60}")
         
         task_start = time.time()
@@ -158,11 +164,12 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
                                  shuffle=True,
                                  num_workers=0)
         
-        # Train for 50 epochs
-        for epoch in range(50):
+        # Train for epochs_per_task epochs
+        for epoch in range(epochs_per_task):
             epoch_loss = 0.0
             epoch_current = 0.0
-            epoch_replay = 0.0
+            epoch_replay_mse = 0.0
+            epoch_replay_ce = 0.0
             
             for batch_idx, (data, target) in enumerate(train_loader):
                 data, target = data.to(device), target.to(device)
@@ -188,14 +195,16 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
                 
                 epoch_loss += loss.item()
                 epoch_current += info['current_loss']
-                epoch_replay += info['replay_loss']
+                epoch_replay_mse += info.get('replay_mse', 0.0)
+                epoch_replay_ce += info.get('replay_ce', 0.0)
             
-            if (epoch + 1) % 10 == 0:
+            if (epoch + 1) % 10 == 0 or (epoch + 1) == epochs_per_task:
                 avg_loss = epoch_loss / len(train_loader)
                 avg_current = epoch_current / len(train_loader)
-                avg_replay = epoch_replay / len(train_loader)
-                print(f"  Epoch {epoch+1:2d}/50 - Loss: {avg_loss:.4f} "
-                      f"(Current: {avg_current:.4f}, Replay: {avg_replay:.4f})")
+                avg_replay_mse = epoch_replay_mse / len(train_loader)
+                avg_replay_ce = epoch_replay_ce / len(train_loader)
+                print(f"  Epoch {epoch+1:2d}/{epochs_per_task} - Loss: {avg_loss:.4f} "
+                      f"(Current: {avg_current:.4f}, ReplayMSE: {avg_replay_mse:.4f}, ReplayCE: {avg_replay_ce:.4f})")
         
         task_time = time.time() - task_start
         task_times.append(task_time)
@@ -217,11 +226,15 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
         
         # Show buffer stats (including causal importance info)
         stats = causal_der_engine.get_statistics()
-        print(f"  Buffer: {stats['buffer_size']}/{stats['buffer_capacity']} samples")
-        print(f"  Avg Causal Importance: {stats.get('avg_importance', 0):.4f}")
+        buf = stats.get('buffer', {})
+        print(f"  Buffer: {buf.get('size', 0)}/{buf.get('capacity', 0)} samples")
+        print(f"  Avg Causal Importance: {buf.get('avg_causal_importance', 0.0):.4f}")
+        # AccMean up to this task (class-IL mean over seen tasks)
+        accmean = float(np.mean(task_accs)) if task_accs else 0.0
+        accmean_per_task.append(accmean)
+        print(f"  AccMean@Task{task_id+1}: {accmean*100:.2f}%")
     
     # Compute standard metrics
-    num_tasks = 5
     
     # Average Accuracy
     avg_accuracy = np.mean([
@@ -257,7 +270,12 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
         'task_accuracies': [[float(x) for x in row] for row in all_task_accuracies],
         'task_times': [float(x) for x in task_times],
         'total_time': float(sum(task_times)),
-        'buffer_stats': causal_der_engine.get_statistics()
+        'buffer_stats': causal_der_engine.get_statistics(),
+        'alpha': 0.5,
+        'beta': 0.5,
+        'num_tasks': num_tasks,
+        'epochs_per_task': epochs_per_task,
+        'accmean_per_task': accmean_per_task
     }
     
     print(f"\n{'='*60}")
@@ -270,7 +288,8 @@ def run_causal_der_benchmark(seed=42, data_root='../../data'):
     print(f"Total Time:       {sum(task_times):.2f}s")
     
     # Save results
-    results_dir = Path(__file__).parent / 'validation' / 'results'
+    # Save next to validation/results folder at repo root for consistency
+    results_dir = Path(__file__).parent / 'results'
     results_dir.mkdir(exist_ok=True, parents=True)
     
     results_file = results_dir / f'causal_der_seed{seed}.json'
@@ -288,6 +307,8 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     parser.add_argument('--num_runs', type=int, default=1, help='Number of runs')
     parser.add_argument('--data_root', type=str, default='../../data', help='Data directory')
+    parser.add_argument('--num_tasks', type=int, default=10, help='Number of tasks (CIFAR-100 uses 10 for class-IL)')
+    parser.add_argument('--epochs', type=int, default=50, help='Epochs per task')
     args = parser.parse_args()
     
     all_results = []
@@ -296,7 +317,7 @@ if __name__ == "__main__":
         print(f"\n\n{'#'*60}")
         print(f"RUN {run+1}/{args.num_runs} - Seed {seed}")
         print(f"{'#'*60}\n")
-        results = run_causal_der_benchmark(seed=seed, data_root=args.data_root)
+        results = run_causal_der_benchmark(seed=seed, data_root=args.data_root, num_tasks=args.num_tasks, epochs_per_task=args.epochs)
         all_results.append(results)
     
     if len(all_results) > 1:
