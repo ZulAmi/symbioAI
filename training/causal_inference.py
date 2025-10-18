@@ -102,10 +102,32 @@ class StructuralCausalModel:
         with torch.no_grad():
             # Extract feature distributions per task
             for task_id, data in task_data.items():
-                features = model.net(data) if hasattr(model, 'net') else model(data)
-                if features.dim() > 2:
-                    features = features.mean(dim=[-1, -2])  # Global pool if needed
-                
+                # If 'data' are already features (2D [N, D]), use them directly
+                if isinstance(data, torch.Tensor) and data.dim() == 2:
+                    features = data
+                else:
+                    # Otherwise, forward through the model to get features
+                    if hasattr(model, 'net'):
+                        feats_or_logits = model.net(data)
+                    else:
+                        # Many Mammoth backbones accept returnt='features'
+                        try:
+                            feats_or_logits = model(data, returnt='features')  # type: ignore[arg-type]
+                        except Exception:
+                            feats_or_logits = model(data)
+
+                    # If still spatial, globally average pool
+                    if isinstance(feats_or_logits, torch.Tensor) and feats_or_logits.dim() > 2:
+                        features = feats_or_logits.mean(dim=[-1, -2])
+                    else:
+                        features = feats_or_logits
+
+                    # If the model returned logits, accept them as features as last resort
+                    if not isinstance(features, torch.Tensor) or features.dim() != 2:
+                        features = torch.as_tensor(features)
+                        if features.dim() == 1:
+                            features = features.unsqueeze(0)
+
                 # Estimate feature distribution
                 mean = features.mean(dim=0)
                 cov = torch.cov(features.T)
@@ -223,10 +245,18 @@ class StructuralCausalModel:
         with torch.no_grad():
             # Step 1: Abduction - extract noise from observed
             obs_mean, obs_cov = self.feature_mechanisms[observed_task]
-            obs_features = model.net(observed_x.unsqueeze(0)) if hasattr(model, 'net') else model(observed_x.unsqueeze(0))
-            if obs_features.dim() > 2:
-                obs_features = obs_features.mean(dim=[-1, -2])
-            obs_features = obs_features.squeeze(0)
+            if hasattr(model, 'net'):
+                feats_or_logits = model.net(observed_x.unsqueeze(0))
+            else:
+                try:
+                    feats_or_logits = model(observed_x.unsqueeze(0), returnt='features')  # type: ignore[arg-type]
+                except Exception:
+                    feats_or_logits = model(observed_x.unsqueeze(0))
+
+            if isinstance(feats_or_logits, torch.Tensor) and feats_or_logits.dim() > 2:
+                obs_features = feats_or_logits.mean(dim=[-1, -2]).squeeze(0)
+            else:
+                obs_features = feats_or_logits.squeeze(0)
             
             # Noise = observed - expected (under task_obs distribution)
             noise = obs_features - obs_mean

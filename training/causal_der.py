@@ -90,6 +90,7 @@ class CausalDERSample:
     causal_importance: float = 1.0  # NEW: Causal score
     forgetting_risk: float = 0.0  # NEW: Risk of being forgotten
     sample_id: str = ""
+    features: Optional[torch.Tensor] = None  # Optional stored features for feature KD
     
     @classmethod
     def from_der_sample(cls, der_sample, causal_importance: float = 1.0):
@@ -114,7 +115,8 @@ class CausalReplayBuffer:
     """
     
     def __init__(self, capacity: int = 2000, causal_weight: float = 0.7,
-                 per_class_cap: Optional[int] = None):
+                 per_class_cap: Optional[int] = None,
+                 per_task_cap: Optional[int] = None):
         """
         Args:
             capacity: Buffer size (same as DER++)
@@ -129,6 +131,8 @@ class CausalReplayBuffer:
         # Optional cap per class index to avoid buffer domination
         self.per_class_cap = per_class_cap
         self.class_counts = defaultdict(int)
+        # Optional cap per task to avoid task domination
+        self.per_task_cap = per_task_cap
     
     def add(self, sample: CausalDERSample):
         """
@@ -136,6 +140,32 @@ class CausalReplayBuffer:
         
         Innovation: Instead of pure random replacement, consider causal importance.
         """
+        # Enforce per-task cap if configured
+        if self.per_task_cap is not None:
+            if self.task_counts[sample.task_id] >= self.per_task_cap:
+                same_task_indices = [i for i, s in enumerate(self.buffer) if s.task_id == sample.task_id]
+                if same_task_indices:
+                    min_idx_local = min(same_task_indices, key=lambda i: self.buffer[i].causal_importance)
+                    if self.buffer[min_idx_local].causal_importance < sample.causal_importance:
+                        old_sample = self.buffer[min_idx_local]
+                        # class counts update when replacing
+                        try:
+                            old_cid = int(old_sample.target.item()) if isinstance(old_sample.target, torch.Tensor) else int(old_sample.target)
+                            self.class_counts[old_cid] -= 1
+                        except Exception:
+                            pass
+                        self.buffer[min_idx_local] = sample
+                        # task count unchanged (replace within same task)
+                        self.importance_history.append(sample.causal_importance)
+                        try:
+                            new_cid = int(sample.target.item()) if isinstance(sample.target, torch.Tensor) else int(sample.target)
+                            self.class_counts[new_cid] += 1
+                        except Exception:
+                            pass
+                        return
+                    else:
+                        # Drop sample (cap reached and not better)
+                        return
         # Enforce per-class cap if configured
         if self.per_class_cap is not None:
             # Try to infer class id from target tensor
@@ -234,7 +264,9 @@ class CausalReplayBuffer:
                use_causal_sampling: bool = True,
                model: Optional[nn.Module] = None,
                use_mir_sampling: bool = False,
-               mir_candidate_factor: int = 3) -> Optional[Tuple]:
+               mir_candidate_factor: int = 3,
+               task_bias: Optional[Dict[int, float]] = None,
+               include_features: bool = False) -> Optional[Tuple]:
         """
         Sample batch with causal importance weighting.
         
@@ -253,6 +285,11 @@ class CausalReplayBuffer:
             total_imp = importances.sum()
             if total_imp <= 0:
                 importances = np.ones_like(importances)
+                total_imp = importances.sum()
+            # Apply task bias if provided
+            if task_bias is not None:
+                task_weights = np.array([task_bias.get(s.task_id, 1.0) for s in self.buffer], dtype=np.float64)
+                importances = importances * np.clip(task_weights, 1e-6, 1e6)
                 total_imp = importances.sum()
             causal_probs = importances / (total_imp + 1e-12)
             random_probs = np.ones(len(self.buffer), dtype=np.float64) / len(self.buffer)
@@ -289,7 +326,25 @@ class CausalReplayBuffer:
         logits = torch.stack([s.logits for s in samples]).to(device, dtype=torch.float32, non_blocking=True)
         task_ids = [s.task_id for s in samples]
         importances_t = torch.tensor([s.causal_importance for s in samples], dtype=torch.float32, device=device)
-        
+        if include_features:
+            # Some samples may not have features; fill zeros if missing, infer dim from first available
+            feat_dim = None
+            for s in samples:
+                if s.features is not None:
+                    feat_dim = int(s.features.numel()) if s.features.dim() == 1 else int(s.features.shape[-1])
+                    break
+            if feat_dim is None:
+                feat_dim = 1
+            feat_list = []
+            for s in samples:
+                if s.features is None:
+                    feat_list.append(torch.zeros(feat_dim, dtype=torch.float32))
+                else:
+                    f = s.features
+                    f = f.view(-1) if f.dim() != 1 else f
+                    feat_list.append(f.to(dtype=torch.float32))
+            features = torch.stack(feat_list).to(device, dtype=torch.float32, non_blocking=True)
+            return data, targets, logits, task_ids, importances_t, features
         return data, targets, logits, task_ids, importances_t
     
     def get_statistics(self) -> Dict[str, Any]:
@@ -612,7 +667,14 @@ class CausalDEREngine:
                  num_tasks: int = 10,
                  feature_dim: int = 512,
                  enable_causal_forgetting_detector: bool = True,
-                 enable_causal_graph_learning: bool = True):
+                 enable_causal_graph_learning: bool = True,
+                 per_task_cap: Optional[int] = None,
+                 feature_kd_weight: float = 0.0,
+                 store_features: bool = False,
+                 task_bias_strength: float = 1.0,
+                 kd_warmup_steps: int = 0,
+                 replay_warmup_tasks: int = 0,
+                 kd_conf_threshold: float = 0.0):
         """
         Args:
             alpha: Distillation weight on KL divergence (same as DER++)
@@ -628,8 +690,11 @@ class CausalDEREngine:
         """
         self.alpha = alpha
         self.beta = beta
-        self.buffer = CausalReplayBuffer(capacity=buffer_size, 
-                                        causal_weight=causal_weight)
+        self.buffer = CausalReplayBuffer(
+            capacity=buffer_size,
+            causal_weight=causal_weight,
+            per_task_cap=per_task_cap
+        )
         
         # TRUE CAUSAL IMPORTANCE ESTIMATOR (uses SCM)
         self.importance_estimator = CausalImportanceEstimator(
@@ -657,6 +722,14 @@ class CausalDEREngine:
         self.pin_memory = pin_memory
         self.use_mir_sampling = use_mir_sampling
         self.mir_candidate_factor = mir_candidate_factor
+        self.feature_kd_weight = feature_kd_weight
+        self.store_features = store_features
+        self.task_bias_strength = task_bias_strength
+        # Warmup and gating controls
+        self.kd_warmup_steps = int(kd_warmup_steps)
+        self.replay_warmup_tasks = int(replay_warmup_tasks)
+        self.kd_conf_threshold = float(kd_conf_threshold)
+        self.global_step = 0
         
         # Statistics
         self.stats = {
@@ -695,9 +768,21 @@ class CausalDEREngine:
         }
         
         # Replay loss
-        if len(self.buffer.buffer) == 0:
+        # Gate replay by task warmup: skip any replay for the first replay_warmup_tasks tasks
+        if (self.replay_warmup_tasks > 0 and task_id < self.replay_warmup_tasks) or len(self.buffer.buffer) == 0:
+            # Increment global step counter and return current loss only
+            self.global_step += 1
             return current_loss, info
         
+        # Build task bias from causal graph if available
+        task_bias = None
+        if self.causal_graph is not None and 0 <= task_id < self.causal_graph.shape[0]:
+            # Symmetrize edges related to current task and exponentiate by strength
+            row = self.causal_graph[task_id].abs().detach().cpu().numpy()
+            col = self.causal_graph[:, task_id].abs().detach().cpu().numpy()
+            combined = np.maximum(row, col) if 'np' in globals() else row
+            task_bias = {i: float(1.0 + self.task_bias_strength * combined[i]) for i in range(len(combined))}
+
         # Sample from buffer (INNOVATION: causal sampling)
         replay_batch_size = min(data.size(0), len(self.buffer.buffer))
         replay_data = self.buffer.sample(
@@ -707,12 +792,17 @@ class CausalDEREngine:
             model=model if self.use_mir_sampling else None,
             use_mir_sampling=self.use_mir_sampling,
             mir_candidate_factor=self.mir_candidate_factor,
+            task_bias=task_bias,
+            include_features=self.store_features or self.feature_kd_weight > 0.0,
         )
         
         if replay_data is None:
             return current_loss, info
         
-        buf_data, buf_targets, buf_logits, buf_task_ids, buf_importances = replay_data
+        if self.store_features or self.feature_kd_weight > 0.0:
+            buf_data, buf_targets, buf_logits, buf_task_ids, buf_importances, buf_features_stored = replay_data
+        else:
+            buf_data, buf_targets, buf_logits, buf_task_ids, buf_importances = replay_data
         
         # Forward on replay data with AMP if available
         use_amp = self.mixed_precision and (buf_data.is_cuda or buf_data.device.type == 'cuda')
@@ -726,6 +816,58 @@ class CausalDEREngine:
             teacher_probs = torch.clamp(teacher_probs, min=1e-7, max=1.0)
             kl_per_sample = F.kl_div(student_log_probs, teacher_probs, reduction='none').sum(dim=1) * (T * T)
             ce_per_sample = F.cross_entropy(buf_outputs, buf_targets, reduction='none')
+            # Optional: teacher-confidence gating for KD term
+            if self.kd_conf_threshold > 0.0:
+                with torch.no_grad():
+                    teacher_conf = teacher_probs.max(dim=1).values
+                kd_mask = (teacher_conf >= self.kd_conf_threshold).to(kl_per_sample.dtype)
+                # Avoid masking out all elements: if all below threshold, keep the top 25% by confidence
+                if kd_mask.sum() == 0:
+                    topk = max(1, int(0.25 * kd_mask.numel()))
+                    top_idx = torch.topk(teacher_conf, k=topk, largest=True).indices
+                    kd_mask = torch.zeros_like(kd_mask)
+                    kd_mask[top_idx] = 1.0
+                kl_per_sample = kl_per_sample * kd_mask
+            # Feature-level KD (optional)
+            if self.feature_kd_weight > 0.0:
+                try:
+                    if hasattr(model, 'net'):
+                        curr_feats = model.net(buf_data, returnt='features')
+                    else:
+                        curr_feats = model(buf_data, returnt='features')  # type: ignore
+                except Exception:
+                    # Fallback: try to pool from penultimate by 'both' API
+                    try:
+                        out, curr_feats = model.net(buf_data, returnt='both')  # type: ignore
+                        if isinstance(out, tuple):
+                            curr_feats = out[1]
+                    except Exception:
+                        curr_feats = None
+                if curr_feats is not None:
+                    # Align dims if needed
+                    if curr_feats.dim() > 2:
+                        curr_feats = curr_feats.mean(dim=[-1, -2])
+                    # Ensure stored features present and shape-compatible
+                    if buf_features_stored is None:
+                        feat_per_sample = torch.zeros_like(ce_per_sample)
+                    else:
+                        f_stored = buf_features_stored.to(curr_feats.dtype)
+                        # Fix shape mismatch if any
+                        if f_stored.dim() == 1:
+                            f_stored = f_stored.unsqueeze(0).expand_as(curr_feats)
+                        if curr_feats.shape != f_stored.shape:
+                            min_dim = min(curr_feats.shape[-1], f_stored.shape[-1])
+                            curr_feats = curr_feats[..., :min_dim]
+                            f_stored = f_stored[..., :min_dim]
+                        feat_per_sample = (curr_feats - f_stored).pow(2).sum(dim=1)
+                else:
+                    feat_per_sample = torch.zeros_like(ce_per_sample)
+
+        # Guard against NaNs/Infs in per-sample losses
+        kl_per_sample = torch.nan_to_num(kl_per_sample, nan=0.0, posinf=1e6, neginf=0.0)
+        ce_per_sample = torch.nan_to_num(ce_per_sample, nan=0.0, posinf=1e6, neginf=0.0)
+        if self.feature_kd_weight > 0.0:
+            feat_per_sample = torch.nan_to_num(feat_per_sample, nan=0.0, posinf=1e6, neginf=0.0)
 
         # Importance-weight replay losses
         if self.importance_weight_replay:
@@ -735,22 +877,35 @@ class CausalDEREngine:
             w = torch.clamp(w, 0.25, 4.0).detach()
             replay_kd = (w * kl_per_sample).mean()
             replay_ce = (w * ce_per_sample).mean()
+            if self.feature_kd_weight > 0.0:
+                replay_feat = (w * feat_per_sample).mean()
         else:
             replay_kd = kl_per_sample.mean()
             replay_ce = ce_per_sample.mean()
+            if self.feature_kd_weight > 0.0:
+                replay_feat = feat_per_sample.mean()
         
         # Check for NaN in losses
-        if torch.isnan(current_loss) or torch.isnan(replay_kd) or torch.isnan(replay_ce):
+        if torch.isnan(current_loss) or torch.isnan(replay_kd) or torch.isnan(replay_ce) or (self.feature_kd_weight > 0.0 and torch.isnan(replay_feat)):
             # Fallback to just current loss if replay losses are unstable
             total_loss = current_loss
         else:
             # Total loss
-            total_loss = current_loss + self.alpha * replay_kd + self.beta * replay_ce
+            # Apply KD warmup: suppress KD contribution for initial global steps
+            effective_alpha = (0.0 if (self.kd_warmup_steps > 0 and self.global_step < self.kd_warmup_steps) else self.alpha)
+            total_loss = current_loss + effective_alpha * replay_kd + self.beta * replay_ce
+            if self.feature_kd_weight > 0.0:
+                # Clip feature loss contribution to avoid explosions
+                total_loss = total_loss + self.feature_kd_weight * torch.clamp(replay_feat, max=1e3)
         
         info['replay_kld'] = float(replay_kd.detach().cpu())
         info['replay_ce'] = float(replay_ce.detach().cpu())
         info['total_loss'] = float(total_loss.detach().cpu())
+        if self.feature_kd_weight > 0.0:
+            info['replay_feat'] = float(replay_feat.detach().cpu())
         
+        # Increment global step counter once per batch
+        self.global_step += 1
         return total_loss, info
     
     def store(self, data: torch.Tensor, target: torch.Tensor,
@@ -782,12 +937,32 @@ class CausalDEREngine:
                 except RuntimeError:
                     pass
 
+            # Optionally compute and store features for feature KD
+            feat_tensor: Optional[torch.Tensor] = None
+            if self.store_features and model is not None:
+                try:
+                    if hasattr(model, 'net'):
+                        f = model.net(data[idx].unsqueeze(0), returnt='features')
+                    else:
+                        f = model(data[idx].unsqueeze(0), returnt='features')  # type: ignore
+                    if isinstance(f, torch.Tensor) and f.dim() > 2:
+                        f = f.mean(dim=[-1, -2])
+                    feat_tensor = f.squeeze(0).detach().cpu().to(dtype=self.store_dtype, copy=True)
+                    if self.pin_memory:
+                        try:
+                            feat_tensor = feat_tensor.pin_memory()
+                        except RuntimeError:
+                            pass
+                except Exception:
+                    feat_tensor = None
+
             sample = CausalDERSample(
                 data=d,
                 target=y,
                 logits=z,
                 task_id=task_id,
-                causal_importance=float(importance)
+                causal_importance=float(importance),
+                features=feat_tensor
             )
             
             # Add to buffer
