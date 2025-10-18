@@ -427,6 +427,38 @@ python3 main.py --model derpp --dataset seq-cifar100 \
   --batch_size 32 --alpha 0.5 --seed 42
 ```
 
+### Causal‑DER in Mammoth (recommended)
+
+Run the upgraded Causal‑DER model integrated into Mammoth with causal sampling and stability knobs.
+
+Key args (safe defaults shown):
+
+- --model causal-der --backbone resnet18
+- --buffer_size 500 --batch_size 128 --alpha 0.5 --beta 0.5 --temperature 2.0
+- --use_causal_sampling 1 --use_mir_sampling 1 --mir_candidate_factor 3 --task_bias_strength 1.0
+- --importance_weight_replay 1 --mixed_precision 1 --buffer_dtype float16 --pin_memory 1
+- --per_task_cap 50 [optional: --per_class_cap N]
+- --feature_kd_weight 0.0 --store_features 0
+- --kd_warmup_steps 0 --replay_warmup_tasks 0 --kd_conf_threshold 0.0
+
+Quick sanity (seq‑cifar10):
+
+- dataset: seq-cifar10, n_epochs: 1 by default
+- expect healthy learning in a few minutes on CPU/MPS
+
+Fast CIFAR‑100 smoke (3 tasks, 1 epoch):
+
+- --dataset seq-cifar100 --lr 0.02 --n_epochs 1 --stop_after 3
+- --use_causal_sampling 1 --use_mir_sampling 0 --importance_weight_replay 0
+- --per_task_cap 50 --task_bias_strength 0.5
+- --kd_warmup_steps 200 --replay_warmup_tasks 1 --kd_conf_threshold 0.6
+
+Notes:
+
+- Increase buffer_size (e.g., 2000) for stronger performance; then consider enabling importance_weight_replay and MIR‑lite.
+- Feature‑level KD is optional: --store_features 1 --feature_kd_weight 0.05 (slightly higher compute/memory).
+- Mammoth auto-selects device; Apple Silicon MPS is supported.
+
 ### Available Datasets
 
 - **MNIST**: 10 classes, grayscale digits (baseline)
