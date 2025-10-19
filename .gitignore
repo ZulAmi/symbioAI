@@ -437,3 +437,5 @@ __pycache__/
 *.pyc
 *_generated.py
 *_temp.py
+
+mammoth/
