@@ -1,0 +1,1401 @@
+================================================================
+Testing Causal-DER in PURE DER++ MODE
+All causal features disabled - should match DER++ baseline
+================================================================
+[INFO] 20-Oct-25 11:14:04 - Running Mammoth! on Zulhilmis-MacBook-Pro.local. 
+[WARNING] 20-Oct-25 11:14:04 - Warning: python-dotenv not installed. Ignoring .env file.
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+[WARNING] 20-Oct-25 11:14:06 - Error in model first-stage-starprompt
+[WARNING] 20-Oct-25 11:14:06 - Please install the CLIP package by running: pip install git+https://github.com/openai/CLIP.git (requires also `huggingface-hub`)
+[WARNING] 20-Oct-25 11:14:06 - Error in model xder-rpc-casper
+[WARNING] 20-Oct-25 11:14:06 - No module named 'xitorch'
+[WARNING] 20-Oct-25 11:14:06 - Error in model lws
+[WARNING] 20-Oct-25 11:14:06 - kmeans_pytorch not installed. Please run `pip install kmeans-pytorch`.
+[WARNING] 20-Oct-25 11:14:06 - Error in model icarl-casper
+[WARNING] 20-Oct-25 11:14:06 - Error in model llava
+[WARNING] 20-Oct-25 11:14:06 - Please install the HuggingFace Transformers package by running: pip install transformers
+[WARNING] 20-Oct-25 11:14:06 - Error in model starprompt
+[WARNING] 20-Oct-25 11:14:07 - Error in model cgil
+[WARNING] 20-Oct-25 11:14:07 - Please install the CLIP package by running: pip install git+https://github.com/openai/CLIP.git
+[WARNING] 20-Oct-25 11:14:07 - Error in model second-stage-starprompt
+[WARNING] 20-Oct-25 11:14:07 - Error in model er-ace-casper
+[WARNING] 20-Oct-25 11:14:07 - Error in model derpp-casper
+[WARNING] 20-Oct-25 11:14:07 - Error in model clip
+[WARNING] 20-Oct-25 11:14:07 - No backbone specified. Using default backbone (set by the dataset).
+[INFO] 20-Oct-25 11:14:07 - Trying to load default configuration for model causal-der but no configuration file found in None.
+[WARNING] 20-Oct-25 11:14:07 - Default configuration file not found for dataset seq-cifar100. Using the defaults specified in the dataset class (if available).
+[INFO] 20-Oct-25 11:14:07 - `lr_scheduler` set to multisteplr, overrides default from dataset.
+[ERROR] 20-Oct-25 11:14:07 - Could not retrieve git hash.
+[INFO] 20-Oct-25 11:14:07 - 
+╔═══════════════════════ CONFIGURATION ═══════════════════════╗
+║ optional arguments:
+║   • backbone: resnet18
+║   • dataset: seq-cifar100
+║   • load_best_args: False
+║   • model: causal-der
+║
+║ Configuration arguments:
+║   • model_config: default
+║
+║ Model-specific arguments:
+║   • adaptive_replay_weights: 1
+║   • alpha: 0.300000
+║   • beta: 0.500000
+║   • buffer_dtype: float32
+║   • causal_weight: 0.700000
+║   • clip_grad: 1.000000
+║   • controller_mode: fixed
+║   • controller_update_every: 0
+║   • counterfactual_ratio: 0.200000
+║   • enable_causal_graph_learning: 0
+║   • feature_kd_weight: 0.000000
+║   • graph_acyclic_weight: 0.000000
+║   • graph_mode: offline
+║   • graph_sparsity: 0.001000
+║   • importance_weight_replay: 0
+║   • invariance_method: none
+║   • invariance_weight: 0.000000
+║   • irm_num_envs: 3
+║   • kd_conf_threshold: 0.000000
+║   • kd_warmup_steps: 0
+║   • mir_candidate_factor: 3
+║   • mixed_precision: 0
+║   • per_task_cap: 50
+║   • pin_memory: 1
+║   • prune_budget: 200
+║   • prune_fraction: 0.000000
+║   • prune_interval_steps: 0
+║   • replay_warmup_tasks: 0
+║   • shift_detection_threshold: 0.100000
+║   • store_features: 0
+║   • store_logits_as: logits32
+║   • task_bias_cap: 0.000000
+║   • task_bias_strength: 1.000000
+║   • task_bias_temp: 1.000000
+║   • temperature: 2.000000
+║   • use_adaptive_controller: 0
+║   • use_ate_pruning: 0
+║   • use_causal_sampling: 0
+║   • use_counterfactual_replay: 0
+║   • use_enhanced_irm: 0
+║   • use_lr_decay: 1
+║   • use_mir_sampling: 0
+║   • use_neural_causal_discovery: 0
+║   • use_task_free_streaming: 0
+║   • vae_latent_dim: 128
+║
+║ Backbone arguments:
+║   • num_filters: 64
+║
+║ Management arguments:
+║   • base_path: ./data/
+║   • checkpoint_path: ./checkpoints/
+║   • code_optimization: 0
+║   • debug_mode: False
+║   • disable_log: False
+║   • distributed: no
+║   • enable_other_metrics: False
+║   • inference_only: False
+║   • non_verbose: False
+║   • permute_classes: False
+║   • results_path: results/
+║   • save_after_interrupt: True
+║   • save_checkpoint_mode: safe
+║   • seed: 1
+║
+║ Wandb arguments:
+║
+║ Experiment arguments:
+║   • batch_size: 128
+║   • eval_future: False
+║   • joint: 0
+║   • label_perc: 1.000000
+║   • label_perc_by_class: 1.000000
+║   • lr: 0.030000
+║
+║ Validation and fitting arguments:
+║   • early_stopping_epsilon: 0.000001
+║   • early_stopping_freq: 1
+║   • early_stopping_metric: loss
+║   • early_stopping_patience: 5
+║   • fitting_mode: epochs
+║   • n_epochs: 1
+║   • validation_mode: current
+║
+║ Optimizer and learning rate scheduler arguments:
+║   • drop_last: False
+║   • lr_milestones: [35, 45]
+║   • lr_scheduler: multisteplr
+║   • optim_mom: 0.900000
+║   • optim_nesterov: False
+║   • optim_wd: 0.000000
+║   • optimizer: sgd
+║   • sched_multistep_lr_gamma: 0.100000
+║   • scheduler_mode: epoch
+║
+║ Noise arguments:
+║   • cache_path_noisy_labels: noisy_labels
+║   • disable_noisy_labels_cache: False
+║   • noise_rate: 0.000000
+║   • noise_type: symmetric
+║
+╚════════════════════════════════════════════════════════════╝
+[WARNING] 20-Oct-25 11:14:07 - MSP support is still experimental. Use at your own risk!
+[INFO] 20-Oct-25 11:14:07 - Using device mps
+[INFO] 20-Oct-25 11:14:07 - `wandb_entity` and `wandb_project` not set. Disabling wandb.
+[INFO] 20-Oct-25 11:14:07 - Using backbone: resnet18
+[INFO] 20-Oct-25 11:14:07 - Using ResNet as backbone
+[INFO] 20-Oct-25 11:14:07 - 
+============================================================
+[INFO] 20-Oct-25 11:14:07 - PURE CAUSAL-DER Engine (Stable Configuration)
+[INFO] 20-Oct-25 11:14:07 - ============================================================
+[INFO] 20-Oct-25 11:14:07 - ENABLED Core Causal Features:
+[INFO] 20-Oct-25 11:14:07 -   ✅ Causal graph learning: False
+[INFO] 20-Oct-25 11:14:07 -   ✅ Causal forgetting detection: True
+[INFO] 20-Oct-25 11:14:07 -   ✅ SCM-based importance: True
+[INFO] 20-Oct-25 11:14:07 -   ✅ Intervention-based sampling: False
+[INFO] 20-Oct-25 11:14:07 -   ✅ Enhanced IRM: False
+[INFO] 20-Oct-25 11:14:07 -   ✅ ATE pruning: False
+[INFO] 20-Oct-25 11:14:07 - 
+DISABLED Experimental Features:
+[INFO] 20-Oct-25 11:14:07 -   ❌ Neural causal discovery: False
+[INFO] 20-Oct-25 11:14:07 -   ❌ Counterfactual replay: False
+[INFO] 20-Oct-25 11:14:07 -   ❌ Task-free streaming: False
+[INFO] 20-Oct-25 11:14:07 -   ❌ Adaptive controller: False
+[INFO] 20-Oct-25 11:14:07 - ============================================================
+
+[INFO] 20-Oct-25 11:14:07 - Current working directory: /Users/zulhilmirahmat/Development/programming/Symbio AI/mammoth.
+[INFO] 20-Oct-25 11:14:07 - Main process PID: 76034
+[INFO] 20-Oct-25 11:14:08 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:14:08 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 1 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 1 - Epoch 1:   2%|▎         | 1/40 [00:15<10:10, 15.66s/it, loss=4.58, lr=0.03]Task 1 - Epoch 1:   5%|▌         | 2/40 [00:16<04:26,  7.01s/it, loss=5.84, lr=0.03]Task 1 - Epoch 1:   8%|▊         | 3/40 [00:17<02:33,  4.16s/it, loss=6.72, lr=0.03]Task 1 - Epoch 1:  10%|█         | 4/40 [00:18<01:41,  2.83s/it, loss=inf, lr=0.03] Task 1 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:13,  2.09s/it, loss=5.46, lr=0.03]Task 1 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:55,  1.64s/it, loss=inf, lr=0.03] Task 1 - Epoch 1:  18%|█▊        | 7/40 [00:20<00:44,  1.36s/it, loss=4.48, lr=0.03]Task 1 - Epoch 1:  20%|██        | 8/40 [00:21<00:37,  1.17s/it, loss=inf, lr=0.03] Task 1 - Epoch 1:  22%|██▎       | 9/40 [00:22<00:32,  1.05s/it, loss=4.24, lr=0.03]Task 1 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=4.2, lr=0.03]Task 1 - Epoch 1:  28%|██▊       | 11/40 [00:23<00:26,  1.10it/s, loss=4.22, lr=0.03]Task 1 - Epoch 1:  30%|███       | 12/40 [00:24<00:24,  1.15it/s, loss=3.84, lr=0.03]Task 1 - Epoch 1:  32%|███▎      | 13/40 [00:25<00:22,  1.19it/s, loss=3.74, lr=0.03]Task 1 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.21it/s, loss=3.63, lr=0.03]Task 1 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.23it/s, loss=3.41, lr=0.03]Task 1 - Epoch 1:  40%|████      | 16/40 [00:27<00:19,  1.25it/s, loss=3.84, lr=0.03]Task 1 - Epoch 1:  42%|████▎     | 17/40 [00:28<00:18,  1.26it/s, loss=inf, lr=0.03] Task 1 - Epoch 1:  45%|████▌     | 18/40 [00:29<00:17,  1.26it/s, loss=3.75, lr=0.03]Task 1 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=3.53, lr=0.03]Task 1 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.27it/s, loss=3.48, lr=0.03]Task 1 - Epoch 1:  52%|█████▎    | 21/40 [00:31<00:14,  1.28it/s, loss=inf, lr=0.03] Task 1 - Epoch 1:  55%|█████▌    | 22/40 [00:32<00:14,  1.28it/s, loss=3.78, lr=0.03]Task 1 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.28it/s, loss=3.7, lr=0.03] Task 1 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.28it/s, loss=9.81e+31, lr=0.03]Task 1 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.28it/s, loss=3.4, lr=0.03]     Task 1 - Epoch 1:  65%|██████▌   | 26/40 [00:35<00:10,  1.29it/s, loss=3.19, lr=0.03]Task 1 - Epoch 1:  68%|██████▊   | 27/40 [00:36<00:10,  1.29it/s, loss=3.33, lr=0.03]Task 1 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.29it/s, loss=2.97, lr=0.03]Task 1 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.28it/s, loss=3.41, lr=0.03]Task 1 - Epoch 1:  75%|███████▌  | 30/40 [00:38<00:07,  1.28it/s, loss=3.25, lr=0.03]Task 1 - Epoch 1:  78%|███████▊  | 31/40 [00:39<00:07,  1.28it/s, loss=3.31, lr=0.03]Task 1 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.28it/s, loss=3.24, lr=0.03]Task 1 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.28it/s, loss=3.06, lr=0.03]Task 1 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.28it/s, loss=3, lr=0.03]   Task 1 - Epoch 1:  88%|████████▊ | 35/40 [00:42<00:03,  1.30it/s, loss=2.95, lr=0.03]Task 1 - Epoch 1:  90%|█████████ | 36/40 [00:43<00:03,  1.29it/s, loss=inf, lr=0.03] Task 1 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.29it/s, loss=2.89, lr=0.03]Task 1 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.29it/s, loss=2.88, lr=0.03]Task 1 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.29it/s, loss=3.06, lr=0.03]Task 1 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.52it/s, loss=2.78, lr=0.03]Task 1 - Epoch 1: 100%|██████████| 40/40 [00:46<00:00,  1.16s/it, loss=2.78, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 0 → LR: 0.029266 (multiplier: 0.976)
+[INFO] 20-Oct-25 11:14:55 - 
+============================================================
+[INFO] 20-Oct-25 11:14:55 - END OF TASK 0 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:14:55 - ============================================================
+[INFO] 20-Oct-25 11:14:55 - Buffer size: 50/500
+
+[Causal-DER] End of Task 0
+  Buffer size: 50/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50}
+Evaluating:   0%|          | 0/8 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:  12%|█▎        | 1/8 [00:07<00:51,  7.36s/it, acc_task_1=16.4]Evaluating Task 1:  25%|██▌       | 2/8 [00:07<00:18,  3.10s/it, acc_task_1=15.2]Evaluating Task 1:  50%|█████     | 4/8 [00:07<00:04,  1.22s/it, acc_task_1=13.5]Evaluating Task 1:  75%|███████▌  | 6/8 [00:07<00:01,  1.45it/s, acc_task_1=13.4]Evaluating Task 1: 100%|██████████| 8/8 [00:08<00:00,  2.20it/s, acc_task_1=13.4]Evaluating Task 1: 100%|██████████| 8/8 [00:08<00:00,  1.07s/it, acc_task_1=13.4]
+Accuracy for 1 task(s): 	 [Class-IL]: 13.4 % 	 [Task-IL]: 13.4 %
+[INFO] 20-Oct-25 11:15:03 - Accuracy for 1 task(s): 	 [Class-IL]: 13.4 % 	 [Task-IL]: 13.4 %
+	Raw accuracy values: Class-IL [13.4] | Task-IL [13.4]
+[INFO] 20-Oct-25 11:15:03 - 	Raw accuracy values: Class-IL [13.4] | Task-IL [13.4]
+
+
+[INFO] 20-Oct-25 11:15:05 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:15:05 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 2 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 2 - Epoch 1:   2%|▎         | 1/40 [00:15<09:58, 15.35s/it, loss=7.17, lr=0.03]Task 2 - Epoch 1:   5%|▌         | 2/40 [00:16<04:17,  6.77s/it, loss=7.03, lr=0.03]Task 2 - Epoch 1:   8%|▊         | 3/40 [00:16<02:29,  4.03s/it, loss=6.53, lr=0.03]Task 2 - Epoch 1:  10%|█         | 4/40 [00:17<01:39,  2.75s/it, loss=inf, lr=0.03] Task 2 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:11,  2.04s/it, loss=5.57, lr=0.03]Task 2 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:54,  1.61s/it, loss=4.79, lr=0.03]Task 2 - Epoch 1:  18%|█▊        | 7/40 [00:20<00:44,  1.34s/it, loss=4.27, lr=0.03]Task 2 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.16s/it, loss=3.87, lr=0.03]Task 2 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.04s/it, loss=4.43, lr=0.03]Task 2 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=4.38, lr=0.03]Task 2 - Epoch 1:  28%|██▊       | 11/40 [00:23<00:26,  1.11it/s, loss=4.01, lr=0.03]Task 2 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.16it/s, loss=4.03, lr=0.03]Task 2 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.19it/s, loss=3.79, lr=0.03]Task 2 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.22it/s, loss=inf, lr=0.03] Task 2 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.24it/s, loss=inf, lr=0.03]Task 2 - Epoch 1:  40%|████      | 16/40 [00:27<00:19,  1.25it/s, loss=3.53, lr=0.03]Task 2 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.26it/s, loss=inf, lr=0.03] Task 2 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.27it/s, loss=inf, lr=0.03]Task 2 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=4.11, lr=0.03]Task 2 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.28it/s, loss=3.89, lr=0.03]Task 2 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:14,  1.28it/s, loss=4.16, lr=0.03]Task 2 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.28it/s, loss=3.69, lr=0.03]Task 2 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.28it/s, loss=3.62, lr=0.03]Task 2 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.29it/s, loss=3.56, lr=0.03]Task 2 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.29it/s, loss=inf, lr=0.03] Task 2 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.29it/s, loss=3.45, lr=0.03]Task 2 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.28it/s, loss=3.73, lr=0.03]Task 2 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.28it/s, loss=3.16, lr=0.03]Task 2 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.29it/s, loss=inf, lr=0.03] Task 2 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.29it/s, loss=3.38, lr=0.03]Task 2 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.28it/s, loss=2.79, lr=0.03]Task 2 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.28it/s, loss=3.21, lr=0.03]Task 2 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.28it/s, loss=2.82, lr=0.03]Task 2 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.28it/s, loss=inf, lr=0.03] Task 2 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.28it/s, loss=2.63, lr=0.03]Task 2 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.28it/s, loss=2.69, lr=0.03]Task 2 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.28it/s, loss=2.48, lr=0.03]Task 2 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.28it/s, loss=2.69, lr=0.03]Task 2 - Epoch 1:  98%|█████████▊| 39/40 [00:44<00:00,  1.28it/s, loss=2.36, lr=0.03]Task 2 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.60it/s, loss=1.19e+32, lr=0.03]Task 2 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.15s/it, loss=1.19e+32, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 1 → LR: 0.027135 (multiplier: 0.905)
+[INFO] 20-Oct-25 11:15:51 - 
+============================================================
+[INFO] 20-Oct-25 11:15:51 - END OF TASK 1 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:15:51 - ============================================================
+[INFO] 20-Oct-25 11:15:51 - Buffer size: 100/500
+
+[Causal-DER] End of Task 1
+  Buffer size: 100/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50}
+Evaluating:   0%|          | 0/16 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   6%|▋         | 1/16 [00:07<01:53,  7.59s/it, acc_task_1=10.9]Evaluating Task 1:  12%|█▎        | 2/16 [00:07<00:44,  3.19s/it, acc_task_1=9.77]Evaluating Task 1:  25%|██▌       | 4/16 [00:07<00:15,  1.25s/it, acc_task_1=9.96]Evaluating Task 1:  38%|███▊      | 6/16 [00:08<00:07,  1.42it/s, acc_task_1=9.64]Evaluating Task 1:  44%|████▍     | 7/16 [00:08<00:04,  1.81it/s, acc_task_1=9.6] /Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  56%|█████▋    | 9/16 [00:15<00:12,  1.83s/it, acc_task_2=0]  Evaluating Task 2:  69%|██████▉   | 11/16 [00:15<00:05,  1.18s/it, acc_task_2=0.781]Evaluating Task 2:  81%|████████▏ | 13/16 [00:15<00:02,  1.24it/s, acc_task_2=1.09] Evaluating Task 2:  88%|████████▊ | 14/16 [00:15<00:01,  1.51it/s, acc_task_2=1.69]Evaluating Task 2:  94%|█████████▍| 15/16 [00:15<00:00,  1.85it/s, acc_task_2=1.9] Evaluating Task 2: 100%|██████████| 16/16 [00:16<00:00,  1.04s/it, acc_task_2=2]  
+Accuracy for 2 task(s): 	 [Class-IL]: 5.65 % 	 [Task-IL]: 13.75 %
+[INFO] 20-Oct-25 11:16:07 - Accuracy for 2 task(s): 	 [Class-IL]: 5.65 % 	 [Task-IL]: 13.75 %
+	Raw accuracy values: Class-IL [9.3, 2.0] | Task-IL [10.0, 17.5]
+[INFO] 20-Oct-25 11:16:07 - 	Raw accuracy values: Class-IL [9.3, 2.0] | Task-IL [10.0, 17.5]
+
+
+[INFO] 20-Oct-25 11:16:08 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:16:08 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 3 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 3 - Epoch 1:   2%|▎         | 1/40 [00:15<09:59, 15.37s/it, loss=7, lr=0.03]Task 3 - Epoch 1:   5%|▌         | 2/40 [00:16<04:18,  6.79s/it, loss=6.89, lr=0.03]Task 3 - Epoch 1:   8%|▊         | 3/40 [00:16<02:29,  4.05s/it, loss=6.17, lr=0.03]Task 3 - Epoch 1:  10%|█         | 4/40 [00:17<01:39,  2.76s/it, loss=5.67, lr=0.03]Task 3 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:11,  2.05s/it, loss=5, lr=0.03]   Task 3 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:55,  1.63s/it, loss=4.53, lr=0.03]Task 3 - Epoch 1:  18%|█▊        | 7/40 [00:20<00:45,  1.38s/it, loss=3.81, lr=0.03]Task 3 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.18s/it, loss=inf, lr=0.03] Task 3 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.05s/it, loss=3.2, lr=0.03]Task 3 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=3.02, lr=0.03]Task 3 - Epoch 1:  28%|██▊       | 11/40 [00:23<00:26,  1.11it/s, loss=2.92, lr=0.03]Task 3 - Epoch 1:  30%|███       | 12/40 [00:23<00:23,  1.17it/s, loss=2.78, lr=0.03]Task 3 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.21it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.24it/s, loss=3.12, lr=0.03]Task 3 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:19,  1.26it/s, loss=3.16, lr=0.03]Task 3 - Epoch 1:  40%|████      | 16/40 [00:27<00:19,  1.26it/s, loss=1.12e+32, lr=0.03]Task 3 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.26it/s, loss=2.74, lr=0.03]    Task 3 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.26it/s, loss=2.82, lr=0.03]Task 3 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=3.23, lr=0.03]Task 3 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.27it/s, loss=2.79, lr=0.03]Task 3 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:14,  1.28it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.28it/s, loss=3.11, lr=0.03]Task 3 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.28it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.28it/s, loss=2.53, lr=0.03]Task 3 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.28it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.28it/s, loss=inf, lr=0.03]Task 3 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.28it/s, loss=2.35, lr=0.03]Task 3 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.28it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.28it/s, loss=inf, lr=0.03]Task 3 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.28it/s, loss=2.5, lr=0.03]Task 3 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.28it/s, loss=2.31, lr=0.03]Task 3 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.29it/s, loss=2.57, lr=0.03]Task 3 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.28it/s, loss=2.44, lr=0.03]Task 3 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.28it/s, loss=inf, lr=0.03] Task 3 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.28it/s, loss=inf, lr=0.03]Task 3 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.27it/s, loss=inf, lr=0.03]Task 3 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.28it/s, loss=inf, lr=0.03]Task 3 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.28it/s, loss=2.17, lr=0.03]Task 3 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.28it/s, loss=2.2, lr=0.03] Task 3 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.60it/s, loss=2.61, lr=0.03]Task 3 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.15s/it, loss=2.61, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 2 → LR: 0.023817 (multiplier: 0.794)
+[INFO] 20-Oct-25 11:16:54 - 
+============================================================
+[INFO] 20-Oct-25 11:16:54 - END OF TASK 2 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:16:54 - ============================================================
+[INFO] 20-Oct-25 11:16:54 - Buffer size: 150/500
+
+[Causal-DER] End of Task 2
+  Buffer size: 150/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50}
+Evaluating:   0%|          | 0/24 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   4%|▍         | 1/24 [00:07<02:56,  7.67s/it, acc_task_1=11.7]Evaluating Task 1:  12%|█▎        | 3/24 [00:07<00:43,  2.06s/it, acc_task_1=10.2]Evaluating Task 1:  21%|██        | 5/24 [00:08<00:20,  1.05s/it, acc_task_1=10.9]Evaluating Task 1:  25%|██▌       | 6/24 [00:08<00:14,  1.25it/s, acc_task_1=10.3]Evaluating Task 1:  33%|███▎      | 8/24 [00:08<00:07,  2.04it/s, acc_task_1=10]  /Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  38%|███▊      | 9/24 [00:15<00:31,  2.09s/it, acc_task_2=0] Evaluating Task 2:  42%|████▏     | 10/24 [00:15<00:22,  1.59s/it, acc_task_2=0]Evaluating Task 2:  46%|████▌     | 11/24 [00:15<00:15,  1.21s/it, acc_task_2=0]Evaluating Task 2:  50%|█████     | 12/24 [00:15<00:10,  1.11it/s, acc_task_2=0]Evaluating Task 2:  58%|█████▊    | 14/24 [00:16<00:05,  1.82it/s, acc_task_2=0]Evaluating Task 2:  62%|██████▎   | 15/24 [00:16<00:03,  2.26it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  71%|███████   | 17/24 [00:23<00:12,  1.76s/it, acc_task_3=0]Evaluating Task 3:  79%|███████▉  | 19/24 [00:23<00:05,  1.15s/it, acc_task_3=0]Evaluating Task 3:  88%|████████▊ | 21/24 [00:24<00:02,  1.27it/s, acc_task_3=0]Evaluating Task 3:  92%|█████████▏| 22/24 [00:24<00:01,  1.53it/s, acc_task_3=0.13]Evaluating Task 3:  96%|█████████▌| 23/24 [00:24<00:00,  1.88it/s, acc_task_3=0.112]Evaluating Task 3: 100%|██████████| 24/24 [00:24<00:00,  1.04s/it, acc_task_3=0.1]  
+Accuracy for 3 task(s): 	 [Class-IL]: 3.37 % 	 [Task-IL]: 13.97 %
+[INFO] 20-Oct-25 11:17:19 - Accuracy for 3 task(s): 	 [Class-IL]: 3.37 % 	 [Task-IL]: 13.97 %
+	Raw accuracy values: Class-IL [10.0, 0.0, 0.1] | Task-IL [10.0, 11.200000000000001, 20.7]
+[INFO] 20-Oct-25 11:17:19 - 	Raw accuracy values: Class-IL [10.0, 0.0, 0.1] | Task-IL [10.0, 11.200000000000001, 20.7]
+
+
+[INFO] 20-Oct-25 11:17:20 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:17:20 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 4 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 4 - Epoch 1:   2%|▎         | 1/40 [00:15<09:51, 15.16s/it, loss=inf, lr=0.03]Task 4 - Epoch 1:   5%|▌         | 2/40 [00:15<04:14,  6.71s/it, loss=7.87, lr=0.03]Task 4 - Epoch 1:   8%|▊         | 3/40 [00:16<02:28,  4.00s/it, loss=7.39, lr=0.03]Task 4 - Epoch 1:  10%|█         | 4/40 [00:17<01:37,  2.72s/it, loss=7.09, lr=0.03]Task 4 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:10,  2.02s/it, loss=6.3, lr=0.03] Task 4 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:54,  1.60s/it, loss=5.53, lr=0.03]Task 4 - Epoch 1:  18%|█▊        | 7/40 [00:19<00:44,  1.33s/it, loss=inf, lr=0.03] Task 4 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.16s/it, loss=4.33, lr=0.03]Task 4 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.05s/it, loss=4.32, lr=0.03]Task 4 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=3.6, lr=0.03]Task 4 - Epoch 1:  28%|██▊       | 11/40 [00:22<00:26,  1.10it/s, loss=inf, lr=0.03]Task 4 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.14it/s, loss=1.05e+32, lr=0.03]Task 4 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.18it/s, loss=3.16, lr=0.03]    Task 4 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.21it/s, loss=3.1, lr=0.03] Task 4 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.23it/s, loss=2.97, lr=0.03]Task 4 - Epoch 1:  40%|████      | 16/40 [00:26<00:19,  1.24it/s, loss=inf, lr=0.03] Task 4 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.25it/s, loss=inf, lr=0.03]Task 4 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.26it/s, loss=inf, lr=0.03]Task 4 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=2.72, lr=0.03]Task 4 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.27it/s, loss=inf, lr=0.03] Task 4 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:14,  1.27it/s, loss=2.82, lr=0.03]Task 4 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.27it/s, loss=2.86, lr=0.03]Task 4 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.28it/s, loss=3.09, lr=0.03]Task 4 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.28it/s, loss=2.52, lr=0.03]Task 4 - Epoch 1:  62%|██████▎   | 25/40 [00:33<00:11,  1.27it/s, loss=2.59, lr=0.03]Task 4 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.27it/s, loss=2.55, lr=0.03]Task 4 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.28it/s, loss=inf, lr=0.03] Task 4 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.28it/s, loss=3.02, lr=0.03]Task 4 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.28it/s, loss=2.43, lr=0.03]Task 4 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.28it/s, loss=2.31, lr=0.03]Task 4 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.28it/s, loss=2.24, lr=0.03]Task 4 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.28it/s, loss=2.16, lr=0.03]Task 4 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.28it/s, loss=2.23, lr=0.03]Task 4 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.28it/s, loss=inf, lr=0.03] Task 4 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.29it/s, loss=2.11, lr=0.03]Task 4 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.30it/s, loss=inf, lr=0.03] Task 4 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.29it/s, loss=2.32, lr=0.03]Task 4 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.29it/s, loss=2.26, lr=0.03]Task 4 - Epoch 1:  98%|█████████▊| 39/40 [00:44<00:00,  1.28it/s, loss=inf, lr=0.03] Task 4 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.60it/s, loss=2.84, lr=0.03]Task 4 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.14s/it, loss=2.84, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 3 → LR: 0.019635 (multiplier: 0.655)
+[INFO] 20-Oct-25 11:18:06 - 
+============================================================
+[INFO] 20-Oct-25 11:18:06 - END OF TASK 3 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:18:06 - ============================================================
+[INFO] 20-Oct-25 11:18:06 - Buffer size: 200/500
+
+[Causal-DER] End of Task 3
+  Buffer size: 200/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50}
+Evaluating:   0%|          | 0/32 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   3%|▎         | 1/32 [00:07<03:53,  7.54s/it, acc_task_1=11.7]Evaluating Task 1:   6%|▋         | 2/32 [00:07<01:35,  3.17s/it, acc_task_1=10.5]Evaluating Task 1:  12%|█▎        | 4/32 [00:07<00:34,  1.24s/it, acc_task_1=10.7]Evaluating Task 1:  16%|█▌        | 5/32 [00:07<00:24,  1.12it/s, acc_task_1=10.9]Evaluating Task 1:  19%|█▉        | 6/32 [00:08<00:16,  1.54it/s, acc_task_1=10.3]Evaluating Task 1:  22%|██▏       | 7/32 [00:08<00:12,  2.07it/s, acc_task_1=10.3]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  28%|██▊       | 9/32 [00:15<00:46,  2.01s/it, acc_task_2=0]   Evaluating Task 2:  31%|███▏      | 10/32 [00:15<00:33,  1.53s/it, acc_task_2=0]Evaluating Task 2:  38%|███▊      | 12/32 [00:15<00:18,  1.07it/s, acc_task_2=0]Evaluating Task 2:  44%|████▍     | 14/32 [00:16<00:11,  1.60it/s, acc_task_2=0]Evaluating Task 2:  47%|████▋     | 15/32 [00:16<00:08,  1.95it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  53%|█████▎    | 17/32 [00:23<00:25,  1.71s/it, acc_task_3=0]Evaluating Task 3:  56%|█████▋    | 18/32 [00:23<00:19,  1.37s/it, acc_task_3=0]Evaluating Task 3:  62%|██████▎   | 20/32 [00:23<00:10,  1.12it/s, acc_task_3=0]Evaluating Task 3:  66%|██████▌   | 21/32 [00:24<00:07,  1.38it/s, acc_task_3=0]Evaluating Task 3:  72%|███████▏  | 23/32 [00:24<00:04,  2.05it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  78%|███████▊  | 25/32 [00:31<00:11,  1.59s/it, acc_task_4=0]Evaluating Task 4:  84%|████████▍ | 27/32 [00:31<00:05,  1.09s/it, acc_task_4=0]Evaluating Task 4:  91%|█████████ | 29/32 [00:31<00:02,  1.30it/s, acc_task_4=0]Evaluating Task 4:  97%|█████████▋| 31/32 [00:32<00:00,  1.79it/s, acc_task_4=0]Evaluating Task 4: 100%|██████████| 32/32 [00:32<00:00,  1.02s/it, acc_task_4=0]
+Accuracy for 4 task(s): 	 [Class-IL]: 2.5 % 	 [Task-IL]: 14.2 %
+[INFO] 20-Oct-25 11:18:39 - Accuracy for 4 task(s): 	 [Class-IL]: 2.5 % 	 [Task-IL]: 14.2 %
+	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0] | Task-IL [10.0, 11.0, 11.799999999999999, 24.0]
+[INFO] 20-Oct-25 11:18:39 - 	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0] | Task-IL [10.0, 11.0, 11.799999999999999, 24.0]
+
+
+[INFO] 20-Oct-25 11:18:40 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:18:40 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 5 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 5 - Epoch 1:   2%|▎         | 1/40 [00:15<09:55, 15.27s/it, loss=8.14, lr=0.03]Task 5 - Epoch 1:   5%|▌         | 2/40 [00:16<04:16,  6.76s/it, loss=7.61, lr=0.03]Task 5 - Epoch 1:   8%|▊         | 3/40 [00:16<02:28,  4.03s/it, loss=7.26, lr=0.03]Task 5 - Epoch 1:  10%|█         | 4/40 [00:17<01:38,  2.74s/it, loss=6.45, lr=0.03]Task 5 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:11,  2.04s/it, loss=5.64, lr=0.03]Task 5 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:54,  1.61s/it, loss=inf, lr=0.03] Task 5 - Epoch 1:  18%|█▊        | 7/40 [00:20<00:44,  1.35s/it, loss=4.91, lr=0.03]Task 5 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.16s/it, loss=inf, lr=0.03] Task 5 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.05s/it, loss=inf, lr=0.03]Task 5 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:29,  1.03it/s, loss=3.8, lr=0.03]Task 5 - Epoch 1:  28%|██▊       | 11/40 [00:23<00:26,  1.10it/s, loss=3.48, lr=0.03]Task 5 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.14it/s, loss=3.32, lr=0.03]Task 5 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.17it/s, loss=inf, lr=0.03] Task 5 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.19it/s, loss=2.98, lr=0.03]Task 5 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.21it/s, loss=2.82, lr=0.03]Task 5 - Epoch 1:  40%|████      | 16/40 [00:27<00:19,  1.22it/s, loss=2.83, lr=0.03]Task 5 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.23it/s, loss=2.6, lr=0.03] Task 5 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.23it/s, loss=inf, lr=0.03]Task 5 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.25it/s, loss=inf, lr=0.03]Task 5 - Epoch 1:  50%|█████     | 20/40 [00:30<00:16,  1.19it/s, loss=inf, lr=0.03]Task 5 - Epoch 1:  52%|█████▎    | 21/40 [00:31<00:15,  1.20it/s, loss=2.89, lr=0.03]Task 5 - Epoch 1:  55%|█████▌    | 22/40 [00:32<00:14,  1.22it/s, loss=2.51, lr=0.03]Task 5 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.24it/s, loss=2.98, lr=0.03]Task 5 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.25it/s, loss=2.51, lr=0.03]Task 5 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.25it/s, loss=2.89, lr=0.03]Task 5 - Epoch 1:  65%|██████▌   | 26/40 [00:35<00:11,  1.25it/s, loss=2.54, lr=0.03]Task 5 - Epoch 1:  68%|██████▊   | 27/40 [00:36<00:10,  1.25it/s, loss=inf, lr=0.03] Task 5 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.25it/s, loss=2.42, lr=0.03]Task 5 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.27it/s, loss=inf, lr=0.03] Task 5 - Epoch 1:  75%|███████▌  | 30/40 [00:38<00:07,  1.27it/s, loss=2.23, lr=0.03]Task 5 - Epoch 1:  78%|███████▊  | 31/40 [00:39<00:07,  1.27it/s, loss=inf, lr=0.03] Task 5 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.27it/s, loss=inf, lr=0.03]Task 5 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.26it/s, loss=2.34, lr=0.03]Task 5 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.23it/s, loss=2.35, lr=0.03]Task 5 - Epoch 1:  88%|████████▊ | 35/40 [00:42<00:04,  1.24it/s, loss=inf, lr=0.03] Task 5 - Epoch 1:  90%|█████████ | 36/40 [00:43<00:03,  1.25it/s, loss=1.98, lr=0.03]Task 5 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.25it/s, loss=2.33, lr=0.03]Task 5 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.27it/s, loss=1.98, lr=0.03]Task 5 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.27it/s, loss=1.91, lr=0.03]Task 5 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.58it/s, loss=1.89, lr=0.03]Task 5 - Epoch 1: 100%|██████████| 40/40 [00:46<00:00,  1.17s/it, loss=1.89, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 4 → LR: 0.015000 (multiplier: 0.500)
+[INFO] 20-Oct-25 11:19:27 - 
+============================================================
+[INFO] 20-Oct-25 11:19:27 - END OF TASK 4 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:19:27 - ============================================================
+[INFO] 20-Oct-25 11:19:27 - Buffer size: 250/500
+
+[Causal-DER] End of Task 4
+  Buffer size: 250/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50}
+Evaluating:   0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   2%|▎         | 1/40 [00:07<04:50,  7.46s/it, acc_task_1=11.7]Evaluating Task 1:   5%|▌         | 2/40 [00:07<01:59,  3.13s/it, acc_task_1=10.5]Evaluating Task 1:   8%|▊         | 3/40 [00:07<01:04,  1.75s/it, acc_task_1=10.2]Evaluating Task 1:  12%|█▎        | 5/40 [00:07<00:28,  1.23it/s, acc_task_1=10.9]Evaluating Task 1:  18%|█▊        | 7/40 [00:08<00:16,  2.02it/s, acc_task_1=10.3]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  22%|██▎       | 9/40 [00:15<00:54,  1.77s/it, acc_task_2=0]   Evaluating Task 2:  28%|██▊       | 11/40 [00:15<00:33,  1.17s/it, acc_task_2=0]Evaluating Task 2:  32%|███▎      | 13/40 [00:15<00:21,  1.24it/s, acc_task_2=0]Evaluating Task 2:  35%|███▌      | 14/40 [00:16<00:17,  1.49it/s, acc_task_2=0]Evaluating Task 2:  40%|████      | 16/40 [00:16<00:11,  2.16it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  42%|████▎     | 17/40 [00:23<00:41,  1.83s/it, acc_task_3=0]Evaluating Task 3:  45%|████▌     | 18/40 [00:23<00:31,  1.44s/it, acc_task_3=0]Evaluating Task 3:  50%|█████     | 20/40 [00:23<00:18,  1.09it/s, acc_task_3=0]Evaluating Task 3:  55%|█████▌    | 22/40 [00:23<00:11,  1.61it/s, acc_task_3=0]Evaluating Task 3:  57%|█████▊    | 23/40 [00:24<00:08,  1.94it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  62%|██████▎   | 25/40 [00:31<00:24,  1.66s/it, acc_task_4=0]Evaluating Task 4:  68%|██████▊   | 27/40 [00:31<00:14,  1.12s/it, acc_task_4=0]Evaluating Task 4:  72%|███████▎  | 29/40 [00:31<00:08,  1.27it/s, acc_task_4=0]Evaluating Task 4:  78%|███████▊  | 31/40 [00:31<00:05,  1.77it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  82%|████████▎ | 33/40 [00:39<00:10,  1.52s/it, acc_task_5=0]Evaluating Task 5:  88%|████████▊ | 35/40 [00:39<00:05,  1.08s/it, acc_task_5=0]Evaluating Task 5:  92%|█████████▎| 37/40 [00:39<00:02,  1.29it/s, acc_task_5=0]Evaluating Task 5:  95%|█████████▌| 38/40 [00:39<00:01,  1.52it/s, acc_task_5=0]Evaluating Task 5: 100%|██████████| 40/40 [00:39<00:00,  2.15it/s, acc_task_5=0]Evaluating Task 5: 100%|██████████| 40/40 [00:40<00:00,  1.01s/it, acc_task_5=0]
+Accuracy for 5 task(s): 	 [Class-IL]: 2.0 % 	 [Task-IL]: 13.42 %
+[INFO] 20-Oct-25 11:20:07 - Accuracy for 5 task(s): 	 [Class-IL]: 2.0 % 	 [Task-IL]: 13.42 %
+	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0] | Task-IL [10.0, 13.100000000000001, 10.0, 10.7, 23.3]
+[INFO] 20-Oct-25 11:20:07 - 	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0] | Task-IL [10.0, 13.100000000000001, 10.0, 10.7, 23.3]
+
+
+[INFO] 20-Oct-25 11:20:09 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:20:09 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 6 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 6 - Epoch 1:   2%|▎         | 1/40 [00:15<10:00, 15.39s/it, loss=8.67, lr=0.03]Task 6 - Epoch 1:   5%|▌         | 2/40 [00:16<04:18,  6.81s/it, loss=8.35, lr=0.03]Task 6 - Epoch 1:   8%|▊         | 3/40 [00:16<02:29,  4.05s/it, loss=7.79, lr=0.03]Task 6 - Epoch 1:  10%|█         | 4/40 [00:17<01:39,  2.76s/it, loss=7.06, lr=0.03]Task 6 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:11,  2.05s/it, loss=6.33, lr=0.03]Task 6 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:55,  1.62s/it, loss=5.7, lr=0.03] Task 6 - Epoch 1:  18%|█▊        | 7/40 [00:20<00:44,  1.35s/it, loss=4.94, lr=0.03]Task 6 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.16s/it, loss=4, lr=0.03]   Task 6 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.05s/it, loss=3.52, lr=0.03]Task 6 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=3, lr=0.03]  Task 6 - Epoch 1:  28%|██▊       | 11/40 [00:23<00:26,  1.10it/s, loss=2.61, lr=0.03]Task 6 - Epoch 1:  30%|███       | 12/40 [00:24<00:24,  1.15it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.19it/s, loss=2.67, lr=0.03]Task 6 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.22it/s, loss=2.45, lr=0.03]Task 6 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.24it/s, loss=2.64, lr=0.03]Task 6 - Epoch 1:  40%|████      | 16/40 [00:27<00:19,  1.25it/s, loss=2.42, lr=0.03]Task 6 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.26it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.27it/s, loss=inf, lr=0.03]Task 6 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=2.6, lr=0.03]Task 6 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.27it/s, loss=2.53, lr=0.03]Task 6 - Epoch 1:  52%|█████▎    | 21/40 [00:31<00:14,  1.27it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.27it/s, loss=inf, lr=0.03]Task 6 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.27it/s, loss=2.15, lr=0.03]Task 6 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.27it/s, loss=2.27, lr=0.03]Task 6 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.27it/s, loss=2.21, lr=0.03]Task 6 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:11,  1.27it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.27it/s, loss=inf, lr=0.03]Task 6 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.27it/s, loss=2.26, lr=0.03]Task 6 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.27it/s, loss=2.22, lr=0.03]Task 6 - Epoch 1:  75%|███████▌  | 30/40 [00:38<00:07,  1.27it/s, loss=2.14, lr=0.03]Task 6 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.27it/s, loss=2.06, lr=0.03]Task 6 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.28it/s, loss=2.53, lr=0.03]Task 6 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.27it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.27it/s, loss=2.36, lr=0.03]Task 6 - Epoch 1:  88%|████████▊ | 35/40 [00:42<00:03,  1.27it/s, loss=1.94, lr=0.03]Task 6 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.27it/s, loss=inf, lr=0.03] Task 6 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.27it/s, loss=1.84, lr=0.03]Task 6 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.27it/s, loss=1.84, lr=0.03]Task 6 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.27it/s, loss=2, lr=0.03]   Task 6 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.59it/s, loss=2.87, lr=0.03]Task 6 - Epoch 1: 100%|██████████| 40/40 [00:46<00:00,  1.16s/it, loss=2.87, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 5 → LR: 0.010365 (multiplier: 0.345)
+[INFO] 20-Oct-25 11:20:55 - 
+============================================================
+[INFO] 20-Oct-25 11:20:55 - END OF TASK 5 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:20:55 - ============================================================
+[INFO] 20-Oct-25 11:20:55 - Buffer size: 300/500
+
+[Causal-DER] End of Task 5
+  Buffer size: 300/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50}
+Evaluating:   0%|          | 0/48 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   2%|▏         | 1/48 [00:07<05:46,  7.37s/it, acc_task_1=11.7]Evaluating Task 1:   4%|▍         | 2/48 [00:07<02:22,  3.10s/it, acc_task_1=10.5]Evaluating Task 1:   8%|▊         | 4/48 [00:07<00:53,  1.22s/it, acc_task_1=10.7]Evaluating Task 1:  12%|█▎        | 6/48 [00:07<00:28,  1.45it/s, acc_task_1=10.3]Evaluating Task 1:  17%|█▋        | 8/48 [00:08<00:17,  2.23it/s, acc_task_1=10]  /Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  19%|█▉        | 9/48 [00:15<01:20,  2.06s/it, acc_task_2=0] Evaluating Task 2:  21%|██        | 10/48 [00:15<01:00,  1.59s/it, acc_task_2=0]Evaluating Task 2:  25%|██▌       | 12/48 [00:16<00:35,  1.02it/s, acc_task_2=0]Evaluating Task 2:  27%|██▋       | 13/48 [00:16<00:27,  1.28it/s, acc_task_2=0]Evaluating Task 2:  31%|███▏      | 15/48 [00:16<00:16,  1.95it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  35%|███▌      | 17/48 [00:23<00:52,  1.69s/it, acc_task_3=0]Evaluating Task 3:  38%|███▊      | 18/48 [00:23<00:40,  1.37s/it, acc_task_3=0]Evaluating Task 3:  42%|████▏     | 20/48 [00:24<00:25,  1.11it/s, acc_task_3=0]Evaluating Task 3:  46%|████▌     | 22/48 [00:24<00:16,  1.60it/s, acc_task_3=0]Evaluating Task 3:  50%|█████     | 24/48 [00:24<00:10,  2.24it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  52%|█████▏    | 25/48 [00:31<00:39,  1.73s/it, acc_task_4=0]Evaluating Task 4:  54%|█████▍    | 26/48 [00:31<00:30,  1.38s/it, acc_task_4=0]Evaluating Task 4:  58%|█████▊    | 28/48 [00:32<00:17,  1.12it/s, acc_task_4=0]Evaluating Task 4:  60%|██████    | 29/48 [00:32<00:13,  1.38it/s, acc_task_4=0]Evaluating Task 4:  65%|██████▍   | 31/48 [00:32<00:08,  2.05it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  69%|██████▉   | 33/48 [00:39<00:23,  1.57s/it, acc_task_5=0]Evaluating Task 5:  73%|███████▎  | 35/48 [00:39<00:14,  1.08s/it, acc_task_5=0]Evaluating Task 5:  75%|███████▌  | 36/48 [00:39<00:10,  1.12it/s, acc_task_5=0]Evaluating Task 5:  77%|███████▋  | 37/48 [00:39<00:07,  1.39it/s, acc_task_5=0]Evaluating Task 5:  81%|████████▏ | 39/48 [00:40<00:04,  2.07it/s, acc_task_5=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 6:  85%|████████▌ | 41/48 [00:47<00:10,  1.56s/it, acc_task_6=2.34]Evaluating Task 6:  90%|████████▉ | 43/48 [00:47<00:05,  1.07s/it, acc_task_6=1.3] Evaluating Task 6:  94%|█████████▍| 45/48 [00:47<00:02,  1.33it/s, acc_task_6=1.09]Evaluating Task 6:  98%|█████████▊| 47/48 [00:47<00:00,  1.83it/s, acc_task_6=1.12]Evaluating Task 6: 100%|██████████| 48/48 [00:48<00:00,  1.01s/it, acc_task_6=1.1] 
+Accuracy for 6 task(s): 	 [Class-IL]: 1.85 % 	 [Task-IL]: 12.68 %
+[INFO] 20-Oct-25 11:21:43 - Accuracy for 6 task(s): 	 [Class-IL]: 1.85 % 	 [Task-IL]: 12.68 %
+	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0, 1.0999999999999999] | Task-IL [10.0, 10.8, 9.2, 10.7, 10.4, 25.0]
+[INFO] 20-Oct-25 11:21:43 - 	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0, 1.0999999999999999] | Task-IL [10.0, 10.8, 9.2, 10.7, 10.4, 25.0]
+
+
+[INFO] 20-Oct-25 11:21:44 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:21:44 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 7 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 7 - Epoch 1:   2%|▎         | 1/40 [00:14<09:40, 14.87s/it, loss=9.83, lr=0.03]Task 7 - Epoch 1:   5%|▌         | 2/40 [00:15<04:10,  6.59s/it, loss=inf, lr=0.03] Task 7 - Epoch 1:   8%|▊         | 3/40 [00:16<02:25,  3.94s/it, loss=9.07, lr=0.03]Task 7 - Epoch 1:  10%|█         | 4/40 [00:17<01:37,  2.70s/it, loss=inf, lr=0.03] Task 7 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:10,  2.00s/it, loss=inf, lr=0.03]Task 7 - Epoch 1:  15%|█▌        | 6/40 [00:18<00:54,  1.59s/it, loss=7.34, lr=0.03]Task 7 - Epoch 1:  18%|█▊        | 7/40 [00:19<00:43,  1.32s/it, loss=7.08, lr=0.03]Task 7 - Epoch 1:  20%|██        | 8/40 [00:20<00:36,  1.15s/it, loss=6.16, lr=0.03]Task 7 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.04s/it, loss=inf, lr=0.03] Task 7 - Epoch 1:  25%|██▌       | 10/40 [00:21<00:28,  1.04it/s, loss=5.53, lr=0.03]Task 7 - Epoch 1:  28%|██▊       | 11/40 [00:22<00:26,  1.10it/s, loss=inf, lr=0.03] Task 7 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.16it/s, loss=inf, lr=0.03]Task 7 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.19it/s, loss=4.57, lr=0.03]Task 7 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.22it/s, loss=inf, lr=0.03] Task 7 - Epoch 1:  38%|███▊      | 15/40 [00:25<00:20,  1.22it/s, loss=4.05, lr=0.03]Task 7 - Epoch 1:  40%|████      | 16/40 [00:26<00:19,  1.24it/s, loss=3.9, lr=0.03] Task 7 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.24it/s, loss=3.72, lr=0.03]Task 7 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.24it/s, loss=3.45, lr=0.03]Task 7 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.26it/s, loss=3.31, lr=0.03]Task 7 - Epoch 1:  50%|█████     | 20/40 [00:29<00:15,  1.26it/s, loss=inf, lr=0.03] Task 7 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:15,  1.26it/s, loss=inf, lr=0.03]Task 7 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.26it/s, loss=2.74, lr=0.03]Task 7 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.26it/s, loss=2.74, lr=0.03]Task 7 - Epoch 1:  60%|██████    | 24/40 [00:32<00:12,  1.26it/s, loss=2.75, lr=0.03]Task 7 - Epoch 1:  62%|██████▎   | 25/40 [00:33<00:11,  1.26it/s, loss=2.71, lr=0.03]Task 7 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.27it/s, loss=2.55, lr=0.03]Task 7 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.27it/s, loss=2.51, lr=0.03]Task 7 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.28it/s, loss=2.54, lr=0.03]Task 7 - Epoch 1:  72%|███████▎  | 29/40 [00:36<00:08,  1.28it/s, loss=2.29, lr=0.03]Task 7 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.28it/s, loss=inf, lr=0.03] Task 7 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.28it/s, loss=2.43, lr=0.03]Task 7 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.27it/s, loss=2.48, lr=0.03]Task 7 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.28it/s, loss=inf, lr=0.03] Task 7 - Epoch 1:  85%|████████▌ | 34/40 [00:40<00:04,  1.29it/s, loss=2.68, lr=0.03]Task 7 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.29it/s, loss=2.52, lr=0.03]Task 7 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.29it/s, loss=2.34, lr=0.03]Task 7 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.29it/s, loss=2.18, lr=0.03]Task 7 - Epoch 1:  95%|█████████▌| 38/40 [00:43<00:01,  1.29it/s, loss=1.98, lr=0.03]Task 7 - Epoch 1:  98%|█████████▊| 39/40 [00:44<00:00,  1.29it/s, loss=2.24, lr=0.03]Task 7 - Epoch 1: 100%|██████████| 40/40 [00:44<00:00,  1.61it/s, loss=2.44, lr=0.03]Task 7 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.14s/it, loss=2.44, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 6 → LR: 0.006183 (multiplier: 0.206)
+[INFO] 20-Oct-25 11:22:30 - 
+============================================================
+[INFO] 20-Oct-25 11:22:30 - END OF TASK 6 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:22:30 - ============================================================
+[INFO] 20-Oct-25 11:22:30 - Buffer size: 350/500
+
+[Causal-DER] End of Task 6
+  Buffer size: 350/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50, 6: 50}
+Evaluating:   0%|          | 0/56 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   2%|▏         | 1/56 [00:07<06:39,  7.26s/it, acc_task_1=11.7]Evaluating Task 1:   5%|▌         | 3/56 [00:07<01:43,  1.96s/it, acc_task_1=9.64]Evaluating Task 1:   9%|▉         | 5/56 [00:07<00:51,  1.00s/it, acc_task_1=10.5]Evaluating Task 1:  12%|█▎        | 7/56 [00:07<00:30,  1.62it/s, acc_task_1=9.93]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  16%|█▌        | 9/56 [00:14<01:21,  1.73s/it, acc_task_2=0]   Evaluating Task 2:  20%|█▉        | 11/56 [00:15<00:52,  1.16s/it, acc_task_2=0]Evaluating Task 2:  21%|██▏       | 12/56 [00:15<00:41,  1.06it/s, acc_task_2=0]Evaluating Task 2:  25%|██▌       | 14/56 [00:15<00:26,  1.57it/s, acc_task_2=0]Evaluating Task 2:  29%|██▊       | 16/56 [00:15<00:17,  2.23it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  30%|███       | 17/56 [00:22<01:08,  1.76s/it, acc_task_3=0]Evaluating Task 3:  32%|███▏      | 18/56 [00:22<00:52,  1.39s/it, acc_task_3=0]Evaluating Task 3:  34%|███▍      | 19/56 [00:22<00:40,  1.09s/it, acc_task_3=0]Evaluating Task 3:  38%|███▊      | 21/56 [00:23<00:23,  1.46it/s, acc_task_3=0]Evaluating Task 3:  41%|████      | 23/56 [00:23<00:15,  2.13it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  45%|████▍     | 25/56 [00:30<00:47,  1.54s/it, acc_task_4=0]Evaluating Task 4:  48%|████▊     | 27/56 [00:30<00:30,  1.06s/it, acc_task_4=0]Evaluating Task 4:  50%|█████     | 28/56 [00:30<00:24,  1.14it/s, acc_task_4=0]Evaluating Task 4:  52%|█████▏    | 29/56 [00:30<00:19,  1.40it/s, acc_task_4=0]Evaluating Task 4:  55%|█████▌    | 31/56 [00:31<00:11,  2.08it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  59%|█████▉    | 33/56 [00:38<00:35,  1.56s/it, acc_task_5=0]Evaluating Task 5:  61%|██████    | 34/56 [00:38<00:27,  1.27s/it, acc_task_5=0]Evaluating Task 5:  64%|██████▍   | 36/56 [00:38<00:16,  1.19it/s, acc_task_5=0]Evaluating Task 5:  68%|██████▊   | 38/56 [00:38<00:10,  1.70it/s, acc_task_5=0]Evaluating Task 5:  71%|███████▏  | 40/56 [00:38<00:06,  2.36it/s, acc_task_5=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 6:  73%|███████▎  | 41/56 [00:46<00:26,  1.76s/it, acc_task_6=0]Evaluating Task 6:  75%|███████▌  | 42/56 [00:46<00:19,  1.41s/it, acc_task_6=0]Evaluating Task 6:  79%|███████▊  | 44/56 [00:46<00:10,  1.10it/s, acc_task_6=0]Evaluating Task 6:  82%|████████▏ | 46/56 [00:46<00:06,  1.60it/s, acc_task_6=0]Evaluating Task 6:  86%|████████▌ | 48/56 [00:47<00:03,  2.24it/s, acc_task_6=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 7:  88%|████████▊ | 49/56 [00:54<00:12,  1.73s/it, acc_task_7=10.2]Evaluating Task 7:  91%|█████████ | 51/56 [00:54<00:05,  1.15s/it, acc_task_7=11.2]Evaluating Task 7:  93%|█████████▎| 52/56 [00:54<00:03,  1.07it/s, acc_task_7=10.2]Evaluating Task 7:  96%|█████████▋| 54/56 [00:54<00:01,  1.59it/s, acc_task_7=11.2]Evaluating Task 7: 100%|██████████| 56/56 [00:54<00:00,  2.25it/s, acc_task_7=11]  Evaluating Task 7: 100%|██████████| 56/56 [00:55<00:00,  1.01it/s, acc_task_7=11]
+Accuracy for 7 task(s): 	 [Class-IL]: 2.96 % 	 [Task-IL]: 15.97 %
+[INFO] 20-Oct-25 11:23:25 - Accuracy for 7 task(s): 	 [Class-IL]: 2.96 % 	 [Task-IL]: 15.97 %
+	Raw accuracy values: Class-IL [9.700000000000001, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0] | Task-IL [10.0, 16.2, 14.399999999999999, 10.4, 11.5, 17.8, 31.5]
+[INFO] 20-Oct-25 11:23:25 - 	Raw accuracy values: Class-IL [9.700000000000001, 0.0, 0.0, 0.0, 0.0, 0.0, 11.0] | Task-IL [10.0, 16.2, 14.399999999999999, 10.4, 11.5, 17.8, 31.5]
+
+
+[INFO] 20-Oct-25 11:23:27 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:23:27 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 8 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 8 - Epoch 1:   2%|▎         | 1/40 [00:14<09:44, 14.98s/it, loss=inf, lr=0.03]Task 8 - Epoch 1:   5%|▌         | 2/40 [00:15<04:11,  6.63s/it, loss=8.87, lr=0.03]Task 8 - Epoch 1:   8%|▊         | 3/40 [00:16<02:26,  3.95s/it, loss=8.69, lr=0.03]Task 8 - Epoch 1:  10%|█         | 4/40 [00:17<01:37,  2.70s/it, loss=8.19, lr=0.03]Task 8 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:10,  2.01s/it, loss=7.33, lr=0.03]Task 8 - Epoch 1:  15%|█▌        | 6/40 [00:18<00:53,  1.59s/it, loss=6.97, lr=0.03]Task 8 - Epoch 1:  18%|█▊        | 7/40 [00:19<00:43,  1.32s/it, loss=6.08, lr=0.03]Task 8 - Epoch 1:  20%|██        | 8/40 [00:20<00:36,  1.15s/it, loss=5.23, lr=0.03]Task 8 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:31,  1.03s/it, loss=4.6, lr=0.03] Task 8 - Epoch 1:  25%|██▌       | 10/40 [00:21<00:28,  1.05it/s, loss=inf, lr=0.03]Task 8 - Epoch 1:  28%|██▊       | 11/40 [00:22<00:26,  1.11it/s, loss=inf, lr=0.03]Task 8 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.15it/s, loss=3.42, lr=0.03]Task 8 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.19it/s, loss=3.08, lr=0.03]Task 8 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.21it/s, loss=2.83, lr=0.03]Task 8 - Epoch 1:  38%|███▊      | 15/40 [00:25<00:20,  1.23it/s, loss=inf, lr=0.03] Task 8 - Epoch 1:  40%|████      | 16/40 [00:26<00:19,  1.25it/s, loss=2.66, lr=0.03]Task 8 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.27it/s, loss=inf, lr=0.03] Task 8 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.28it/s, loss=inf, lr=0.03]Task 8 - Epoch 1:  48%|████▊     | 19/40 [00:28<00:16,  1.28it/s, loss=2.68, lr=0.03]Task 8 - Epoch 1:  50%|█████     | 20/40 [00:29<00:15,  1.29it/s, loss=2.52, lr=0.03]Task 8 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:14,  1.29it/s, loss=2.49, lr=0.03]Task 8 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:13,  1.29it/s, loss=inf, lr=0.03] Task 8 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.29it/s, loss=inf, lr=0.03]Task 8 - Epoch 1:  60%|██████    | 24/40 [00:32<00:12,  1.29it/s, loss=2.61, lr=0.03]Task 8 - Epoch 1:  62%|██████▎   | 25/40 [00:33<00:11,  1.29it/s, loss=inf, lr=0.03] Task 8 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.29it/s, loss=inf, lr=0.03]Task 8 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.29it/s, loss=2.52, lr=0.03]Task 8 - Epoch 1:  70%|███████   | 28/40 [00:35<00:09,  1.29it/s, loss=2.78, lr=0.03]Task 8 - Epoch 1:  72%|███████▎  | 29/40 [00:36<00:08,  1.30it/s, loss=2.68, lr=0.03]Task 8 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.29it/s, loss=2.45, lr=0.03]Task 8 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:06,  1.29it/s, loss=2.49, lr=0.03]Task 8 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.29it/s, loss=2.41, lr=0.03]Task 8 - Epoch 1:  82%|████████▎ | 33/40 [00:39<00:05,  1.29it/s, loss=2.55, lr=0.03]Task 8 - Epoch 1:  85%|████████▌ | 34/40 [00:40<00:04,  1.29it/s, loss=2.34, lr=0.03]Task 8 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.29it/s, loss=2.29, lr=0.03]Task 8 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.29it/s, loss=2.35, lr=0.03]Task 8 - Epoch 1:  92%|█████████▎| 37/40 [00:42<00:02,  1.29it/s, loss=2.31, lr=0.03]Task 8 - Epoch 1:  95%|█████████▌| 38/40 [00:43<00:01,  1.28it/s, loss=2.25, lr=0.03]Task 8 - Epoch 1:  98%|█████████▊| 39/40 [00:44<00:00,  1.27it/s, loss=2.42, lr=0.03]Task 8 - Epoch 1: 100%|██████████| 40/40 [00:44<00:00,  1.59it/s, loss=2.31, lr=0.03]Task 8 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.13s/it, loss=2.31, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 7 → LR: 0.003000 (multiplier: 0.100)
+[INFO] 20-Oct-25 11:24:12 - 
+============================================================
+[INFO] 20-Oct-25 11:24:12 - END OF TASK 7 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:24:12 - ============================================================
+[INFO] 20-Oct-25 11:24:12 - Buffer size: 400/500
+
+[Causal-DER] End of Task 7
+  Buffer size: 400/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50, 6: 50, 7: 50}
+Evaluating:   0%|          | 0/64 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   2%|▏         | 1/64 [00:07<07:24,  7.06s/it, acc_task_1=9.38]Evaluating Task 1:   5%|▍         | 3/64 [00:07<01:56,  1.90s/it, acc_task_1=8.85]Evaluating Task 1:   6%|▋         | 4/64 [00:07<01:16,  1.28s/it, acc_task_1=9.57]Evaluating Task 1:   8%|▊         | 5/64 [00:07<00:52,  1.12it/s, acc_task_1=10]  Evaluating Task 1:   9%|▉         | 6/64 [00:07<00:36,  1.57it/s, acc_task_1=9.51]Evaluating Task 1:  11%|█         | 7/64 [00:07<00:26,  2.13it/s, acc_task_1=9.6] /Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  14%|█▍        | 9/64 [00:15<01:52,  2.05s/it, acc_task_2=0]  Evaluating Task 2:  16%|█▌        | 10/64 [00:15<01:24,  1.56s/it, acc_task_2=0]Evaluating Task 2:  19%|█▉        | 12/64 [00:15<00:49,  1.06it/s, acc_task_2=0]Evaluating Task 2:  20%|██        | 13/64 [00:15<00:38,  1.33it/s, acc_task_2=0]Evaluating Task 2:  22%|██▏       | 14/64 [00:15<00:29,  1.70it/s, acc_task_2=0]Evaluating Task 2:  25%|██▌       | 16/64 [00:15<00:18,  2.61it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  27%|██▋       | 17/64 [00:23<01:33,  1.99s/it, acc_task_3=0]Evaluating Task 3:  28%|██▊       | 18/64 [00:23<01:10,  1.53s/it, acc_task_3=0]Evaluating Task 3:  31%|███▏      | 20/64 [00:23<00:41,  1.07it/s, acc_task_3=0]Evaluating Task 3:  34%|███▍      | 22/64 [00:23<00:26,  1.60it/s, acc_task_3=0]Evaluating Task 3:  36%|███▌      | 23/64 [00:23<00:21,  1.94it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  39%|███▉      | 25/64 [00:31<01:09,  1.79s/it, acc_task_4=0]Evaluating Task 4:  41%|████      | 26/64 [00:31<00:54,  1.43s/it, acc_task_4=0]Evaluating Task 4:  44%|████▍     | 28/64 [00:32<00:33,  1.07it/s, acc_task_4=0]Evaluating Task 4:  47%|████▋     | 30/64 [00:32<00:21,  1.56it/s, acc_task_4=0]Evaluating Task 4:  50%|█████     | 32/64 [00:32<00:14,  2.19it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  52%|█████▏    | 33/64 [00:40<00:56,  1.82s/it, acc_task_5=0]Evaluating Task 5:  55%|█████▍    | 35/64 [00:40<00:35,  1.21s/it, acc_task_5=0]Evaluating Task 5:  56%|█████▋    | 36/64 [00:40<00:27,  1.01it/s, acc_task_5=0]Evaluating Task 5:  59%|█████▉    | 38/64 [00:40<00:17,  1.51it/s, acc_task_5=0]Evaluating Task 5:  62%|██████▎   | 40/64 [00:40<00:11,  2.15it/s, acc_task_5=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 6:  64%|██████▍   | 41/64 [00:47<00:41,  1.80s/it, acc_task_6=0]Evaluating Task 6:  66%|██████▌   | 42/64 [00:48<00:31,  1.43s/it, acc_task_6=0]Evaluating Task 6:  69%|██████▉   | 44/64 [00:48<00:18,  1.09it/s, acc_task_6=0]Evaluating Task 6:  72%|███████▏  | 46/64 [00:48<00:11,  1.60it/s, acc_task_6=0]Evaluating Task 6:  75%|███████▌  | 48/64 [00:48<00:07,  2.25it/s, acc_task_6=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 7:  77%|███████▋  | 49/64 [00:56<00:26,  1.79s/it, acc_task_7=0]Evaluating Task 7:  80%|███████▉  | 51/64 [00:56<00:15,  1.19s/it, acc_task_7=0]Evaluating Task 7:  81%|████████▏ | 52/64 [00:56<00:11,  1.03it/s, acc_task_7=0]Evaluating Task 7:  83%|████████▎ | 53/64 [00:56<00:08,  1.29it/s, acc_task_7=0]Evaluating Task 7:  86%|████████▌ | 55/64 [00:56<00:04,  1.96it/s, acc_task_7=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 8:  89%|████████▉ | 57/64 [01:04<00:11,  1.68s/it, acc_task_8=6.25]Evaluating Task 8:  91%|█████████ | 58/64 [01:04<00:08,  1.36s/it, acc_task_8=5.47]Evaluating Task 8:  92%|█████████▏| 59/64 [01:04<00:05,  1.08s/it, acc_task_8=4.43]Evaluating Task 8:  95%|█████████▌| 61/64 [01:04<00:02,  1.44it/s, acc_task_8=4.84]Evaluating Task 8:  98%|█████████▊| 63/64 [01:04<00:00,  2.09it/s, acc_task_8=5.69]Evaluating Task 8: 100%|██████████| 64/64 [01:05<00:00,  1.02s/it, acc_task_8=5.4] 
+Accuracy for 8 task(s): 	 [Class-IL]: 1.84 % 	 [Task-IL]: 12.71 %
+[INFO] 20-Oct-25 11:25:18 - Accuracy for 8 task(s): 	 [Class-IL]: 1.84 % 	 [Task-IL]: 12.71 %
+	Raw accuracy values: Class-IL [9.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.4] | Task-IL [10.0, 12.1, 10.299999999999999, 12.6, 10.4, 10.0, 13.200000000000001, 23.1]
+[INFO] 20-Oct-25 11:25:18 - 	Raw accuracy values: Class-IL [9.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.4] | Task-IL [10.0, 12.1, 10.299999999999999, 12.6, 10.4, 10.0, 13.200000000000001, 23.1]
+
+
+[INFO] 20-Oct-25 11:25:19 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:25:19 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 9 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 9 - Epoch 1:   2%|▎         | 1/40 [00:15<09:50, 15.15s/it, loss=8.38, lr=0.03]Task 9 - Epoch 1:   5%|▌         | 2/40 [00:15<04:15,  6.71s/it, loss=8.18, lr=0.03]Task 9 - Epoch 1:   8%|▊         | 3/40 [00:16<02:28,  4.01s/it, loss=7.69, lr=0.03]Task 9 - Epoch 1:  10%|█         | 4/40 [00:17<01:38,  2.73s/it, loss=7.17, lr=0.03]Task 9 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:11,  2.03s/it, loss=6.48, lr=0.03]Task 9 - Epoch 1:  15%|█▌        | 6/40 [00:19<00:54,  1.61s/it, loss=5.96, lr=0.03]Task 9 - Epoch 1:  18%|█▊        | 7/40 [00:19<00:44,  1.33s/it, loss=5.29, lr=0.03]Task 9 - Epoch 1:  20%|██        | 8/40 [00:20<00:37,  1.16s/it, loss=4.8, lr=0.03] Task 9 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.04s/it, loss=4.48, lr=0.03]Task 9 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=3.97, lr=0.03]Task 9 - Epoch 1:  28%|██▊       | 11/40 [00:22<00:26,  1.10it/s, loss=3.5, lr=0.03] Task 9 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.15it/s, loss=inf, lr=0.03]Task 9 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:22,  1.20it/s, loss=3.16, lr=0.03]Task 9 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.22it/s, loss=3.1, lr=0.03] Task 9 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.24it/s, loss=inf, lr=0.03]Task 9 - Epoch 1:  40%|████      | 16/40 [00:26<00:19,  1.25it/s, loss=2.97, lr=0.03]Task 9 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.26it/s, loss=2.86, lr=0.03]Task 9 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.26it/s, loss=2.98, lr=0.03]Task 9 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:16,  1.27it/s, loss=2.74, lr=0.03]Task 9 - Epoch 1:  50%|█████     | 20/40 [00:30<00:15,  1.27it/s, loss=2.63, lr=0.03]Task 9 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:14,  1.28it/s, loss=2.67, lr=0.03]Task 9 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.28it/s, loss=2.57, lr=0.03]Task 9 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.28it/s, loss=inf, lr=0.03] Task 9 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.28it/s, loss=2.68, lr=0.03]Task 9 - Epoch 1:  62%|██████▎   | 25/40 [00:33<00:11,  1.28it/s, loss=2.43, lr=0.03]Task 9 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:10,  1.29it/s, loss=2.56, lr=0.03]Task 9 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.29it/s, loss=2.4, lr=0.03] Task 9 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.21it/s, loss=2.56, lr=0.03]Task 9 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.22it/s, loss=2.27, lr=0.03]Task 9 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:08,  1.24it/s, loss=2.32, lr=0.03]Task 9 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.25it/s, loss=2.38, lr=0.03]Task 9 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.26it/s, loss=2.42, lr=0.03]Task 9 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.26it/s, loss=2.25, lr=0.03]Task 9 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.27it/s, loss=2.08, lr=0.03]Task 9 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.27it/s, loss=2.3, lr=0.03] Task 9 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.27it/s, loss=inf, lr=0.03]Task 9 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.27it/s, loss=inf, lr=0.03]Task 9 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.28it/s, loss=2.29, lr=0.03]Task 9 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.28it/s, loss=2.1, lr=0.03] Task 9 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.59it/s, loss=inf, lr=0.03]Task 9 - Epoch 1: 100%|██████████| 40/40 [00:46<00:00,  1.15s/it, loss=inf, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 8 → LR: 0.003000 (multiplier: 0.100)
+[INFO] 20-Oct-25 11:26:05 - 
+============================================================
+[INFO] 20-Oct-25 11:26:05 - END OF TASK 8 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:26:05 - ============================================================
+[INFO] 20-Oct-25 11:26:05 - Buffer size: 450/500
+
+[Causal-DER] End of Task 8
+  Buffer size: 450/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50, 6: 50, 7: 50, 8: 50}
+Evaluating:   0%|          | 0/72 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   1%|▏         | 1/72 [00:07<09:08,  7.72s/it, acc_task_1=11.7]Evaluating Task 1:   3%|▎         | 2/72 [00:07<03:47,  3.24s/it, acc_task_1=10.5]Evaluating Task 1:   6%|▌         | 4/72 [00:08<01:26,  1.27s/it, acc_task_1=10.7]Evaluating Task 1:   7%|▋         | 5/72 [00:08<01:00,  1.10it/s, acc_task_1=10.9]Evaluating Task 1:  10%|▉         | 7/72 [00:08<00:34,  1.89it/s, acc_task_1=10.3]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  12%|█▎        | 9/72 [00:15<01:50,  1.76s/it, acc_task_2=0]   Evaluating Task 2:  15%|█▌        | 11/72 [00:15<01:10,  1.15s/it, acc_task_2=0]Evaluating Task 2:  18%|█▊        | 13/72 [00:15<00:46,  1.26it/s, acc_task_2=0]Evaluating Task 2:  21%|██        | 15/72 [00:16<00:32,  1.77it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  24%|██▎       | 17/72 [00:23<01:23,  1.53s/it, acc_task_3=0]Evaluating Task 3:  26%|██▋       | 19/72 [00:23<00:57,  1.08s/it, acc_task_3=0]Evaluating Task 3:  29%|██▉       | 21/72 [00:23<00:39,  1.29it/s, acc_task_3=0]Evaluating Task 3:  32%|███▏      | 23/72 [00:23<00:27,  1.76it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  35%|███▍      | 25/72 [00:31<01:10,  1.50s/it, acc_task_4=0]Evaluating Task 4:  36%|███▌      | 26/72 [00:31<00:57,  1.25s/it, acc_task_4=0]Evaluating Task 4:  39%|███▉      | 28/72 [00:31<00:37,  1.16it/s, acc_task_4=0]Evaluating Task 4:  42%|████▏     | 30/72 [00:31<00:25,  1.63it/s, acc_task_4=0]Evaluating Task 4:  43%|████▎     | 31/72 [00:31<00:21,  1.94it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  46%|████▌     | 33/72 [00:38<01:01,  1.58s/it, acc_task_5=0]Evaluating Task 5:  49%|████▊     | 35/72 [00:38<00:40,  1.09s/it, acc_task_5=0]Evaluating Task 5:  50%|█████     | 36/72 [00:39<00:32,  1.12it/s, acc_task_5=0]Evaluating Task 5:  53%|█████▎    | 38/72 [00:39<00:20,  1.63it/s, acc_task_5=0]Evaluating Task 5:  56%|█████▌    | 40/72 [00:39<00:13,  2.29it/s, acc_task_5=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 6:  57%|█████▋    | 41/72 [00:46<00:52,  1.70s/it, acc_task_6=0]Evaluating Task 6:  60%|█████▉    | 43/72 [00:46<00:32,  1.13s/it, acc_task_6=0]Evaluating Task 6:  61%|██████    | 44/72 [00:46<00:25,  1.08it/s, acc_task_6=0]Evaluating Task 6:  62%|██████▎   | 45/72 [00:46<00:19,  1.35it/s, acc_task_6=0]Evaluating Task 6:  65%|██████▌   | 47/72 [00:47<00:12,  2.05it/s, acc_task_6=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 7:  68%|██████▊   | 49/72 [00:54<00:36,  1.59s/it, acc_task_7=0]Evaluating Task 7:  71%|███████   | 51/72 [00:54<00:22,  1.08s/it, acc_task_7=0]Evaluating Task 7:  72%|███████▏  | 52/72 [00:54<00:17,  1.12it/s, acc_task_7=0]Evaluating Task 7:  75%|███████▌  | 54/72 [00:54<00:10,  1.64it/s, acc_task_7=0]Evaluating Task 7:  78%|███████▊  | 56/72 [00:54<00:06,  2.31it/s, acc_task_7=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 8:  79%|███████▉  | 57/72 [01:01<00:25,  1.72s/it, acc_task_8=0]Evaluating Task 8:  82%|████████▏ | 59/72 [01:02<00:14,  1.14s/it, acc_task_8=0]Evaluating Task 8:  85%|████████▍ | 61/72 [01:02<00:08,  1.27it/s, acc_task_8=0]Evaluating Task 8:  88%|████████▊ | 63/72 [01:02<00:05,  1.78it/s, acc_task_8=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 9:  90%|█████████ | 65/72 [01:09<00:10,  1.57s/it, acc_task_9=0]Evaluating Task 9:  92%|█████████▏| 66/72 [01:10<00:07,  1.30s/it, acc_task_9=0]Evaluating Task 9:  93%|█████████▎| 67/72 [01:10<00:05,  1.05s/it, acc_task_9=0]Evaluating Task 9:  96%|█████████▌| 69/72 [01:10<00:02,  1.44it/s, acc_task_9=0.156]Evaluating Task 9:  99%|█████████▊| 71/72 [01:10<00:00,  2.06it/s, acc_task_9=0.112]Evaluating Task 9: 100%|██████████| 72/72 [01:11<00:00,  1.01it/s, acc_task_9=0.1]  
+Accuracy for 9 task(s): 	 [Class-IL]: 1.12 % 	 [Task-IL]: 12.1 %
+[INFO] 20-Oct-25 11:27:16 - Accuracy for 9 task(s): 	 [Class-IL]: 1.12 % 	 [Task-IL]: 12.1 %
+	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1] | Task-IL [10.0, 6.9, 9.9, 14.299999999999999, 10.100000000000001, 11.1, 12.6, 9.700000000000001, 24.3]
+[INFO] 20-Oct-25 11:27:16 - 	Raw accuracy values: Class-IL [10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1] | Task-IL [10.0, 6.9, 9.9, 14.299999999999999, 10.100000000000001, 11.1, 12.6, 9.700000000000001, 24.3]
+
+
+[INFO] 20-Oct-25 11:27:17 - Using 4 workers for the dataloader.
+[INFO] 20-Oct-25 11:27:17 - Using 4 workers for the dataloader.
+  0%|          | 0/40 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 10 - Epoch 1:   0%|          | 0/40 [00:07<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Task 10 - Epoch 1:   2%|▎         | 1/40 [00:14<09:43, 14.96s/it, loss=8.93, lr=0.03]Task 10 - Epoch 1:   5%|▌         | 2/40 [00:15<04:11,  6.62s/it, loss=inf, lr=0.03] Task 10 - Epoch 1:   8%|▊         | 3/40 [00:16<02:26,  3.95s/it, loss=inf, lr=0.03]Task 10 - Epoch 1:  10%|█         | 4/40 [00:17<01:37,  2.70s/it, loss=inf, lr=0.03]Task 10 - Epoch 1:  12%|█▎        | 5/40 [00:18<01:10,  2.01s/it, loss=inf, lr=0.03]Task 10 - Epoch 1:  15%|█▌        | 6/40 [00:18<00:54,  1.60s/it, loss=inf, lr=0.03]Task 10 - Epoch 1:  18%|█▊        | 7/40 [00:19<00:43,  1.33s/it, loss=7.82, lr=0.03]Task 10 - Epoch 1:  20%|██        | 8/40 [00:20<00:36,  1.16s/it, loss=inf, lr=0.03] Task 10 - Epoch 1:  22%|██▎       | 9/40 [00:21<00:32,  1.04s/it, loss=7.45, lr=0.03]Task 10 - Epoch 1:  25%|██▌       | 10/40 [00:22<00:28,  1.04it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  28%|██▊       | 11/40 [00:22<00:26,  1.10it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  30%|███       | 12/40 [00:23<00:24,  1.14it/s, loss=6, lr=0.03]  Task 10 - Epoch 1:  32%|███▎      | 13/40 [00:24<00:23,  1.16it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  35%|███▌      | 14/40 [00:25<00:21,  1.18it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  38%|███▊      | 15/40 [00:26<00:20,  1.21it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  40%|████      | 16/40 [00:26<00:19,  1.21it/s, loss=5.01, lr=0.03]Task 10 - Epoch 1:  42%|████▎     | 17/40 [00:27<00:18,  1.22it/s, loss=4.76, lr=0.03]Task 10 - Epoch 1:  45%|████▌     | 18/40 [00:28<00:17,  1.23it/s, loss=4.47, lr=0.03]Task 10 - Epoch 1:  48%|████▊     | 19/40 [00:29<00:17,  1.23it/s, loss=inf, lr=0.03] Task 10 - Epoch 1:  50%|█████     | 20/40 [00:30<00:16,  1.24it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  52%|█████▎    | 21/40 [00:30<00:15,  1.24it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  55%|█████▌    | 22/40 [00:31<00:14,  1.25it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  57%|█████▊    | 23/40 [00:32<00:13,  1.25it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  60%|██████    | 24/40 [00:33<00:12,  1.25it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  62%|██████▎   | 25/40 [00:34<00:11,  1.26it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  65%|██████▌   | 26/40 [00:34<00:11,  1.26it/s, loss=3.17, lr=0.03]Task 10 - Epoch 1:  68%|██████▊   | 27/40 [00:35<00:10,  1.27it/s, loss=inf, lr=0.03] Task 10 - Epoch 1:  70%|███████   | 28/40 [00:36<00:09,  1.26it/s, loss=3.01, lr=0.03]Task 10 - Epoch 1:  72%|███████▎  | 29/40 [00:37<00:08,  1.26it/s, loss=inf, lr=0.03] Task 10 - Epoch 1:  75%|███████▌  | 30/40 [00:37<00:07,  1.27it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  78%|███████▊  | 31/40 [00:38<00:07,  1.27it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  80%|████████  | 32/40 [00:39<00:06,  1.27it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  82%|████████▎ | 33/40 [00:40<00:05,  1.26it/s, loss=2.76, lr=0.03]Task 10 - Epoch 1:  85%|████████▌ | 34/40 [00:41<00:04,  1.26it/s, loss=inf, lr=0.03] Task 10 - Epoch 1:  88%|████████▊ | 35/40 [00:41<00:03,  1.26it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  90%|█████████ | 36/40 [00:42<00:03,  1.26it/s, loss=inf, lr=0.03]Task 10 - Epoch 1:  92%|█████████▎| 37/40 [00:43<00:02,  1.27it/s, loss=2.47, lr=0.03]Task 10 - Epoch 1:  95%|█████████▌| 38/40 [00:44<00:01,  1.27it/s, loss=inf, lr=0.03] Task 10 - Epoch 1:  98%|█████████▊| 39/40 [00:45<00:00,  1.27it/s, loss=inf, lr=0.03]Task 10 - Epoch 1: 100%|██████████| 40/40 [00:45<00:00,  1.59it/s, loss=2.31, lr=0.03]Task 10 - Epoch 1: 100%|██████████| 40/40 [00:46<00:00,  1.15s/it, loss=2.31, lr=0.03]
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+[DEBUG] Using pure DER++ bypass (all causal features disabled)
+STOP ITERATION
+[LR Decay] Task 9 → LR: 0.003000 (multiplier: 0.100)
+[INFO] 20-Oct-25 11:28:03 - 
+============================================================
+[INFO] 20-Oct-25 11:28:03 - END OF TASK 9 - PURE DER++ MODE (no causal analysis)
+[INFO] 20-Oct-25 11:28:03 - ============================================================
+[INFO] 20-Oct-25 11:28:03 - Buffer size: 500/500
+
+[Causal-DER] End of Task 9
+  Buffer size: 500/500
+  Avg causal importance: 1.0000
+  Samples per task: {0: 50, 1: 50, 2: 50, 3: 50, 4: 50, 5: 50, 6: 50, 7: 50, 8: 50, 9: 50}
+Evaluating:   0%|          | 0/80 [00:00<?, ?it/s]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 1:   1%|▏         | 1/80 [00:07<10:16,  7.80s/it, acc_task_1=9.38]Evaluating Task 1:   2%|▎         | 2/80 [00:07<04:15,  3.28s/it, acc_task_1=8.98]Evaluating Task 1:   5%|▌         | 4/80 [00:08<01:37,  1.29s/it, acc_task_1=8.59]Evaluating Task 1:   6%|▋         | 5/80 [00:08<01:08,  1.09it/s, acc_task_1=8.91]Evaluating Task 1:   8%|▊         | 6/80 [00:08<00:49,  1.50it/s, acc_task_1=8.59]Evaluating Task 1:   9%|▉         | 7/80 [00:08<00:36,  2.02it/s, acc_task_1=8.71]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 2:  11%|█▏        | 9/80 [00:15<02:18,  1.95s/it, acc_task_2=0]   Evaluating Task 2:  14%|█▍        | 11/80 [00:15<01:23,  1.21s/it, acc_task_2=0]Evaluating Task 2:  15%|█▌        | 12/80 [00:15<01:05,  1.04it/s, acc_task_2=0]Evaluating Task 2:  16%|█▋        | 13/80 [00:16<00:50,  1.32it/s, acc_task_2=0]Evaluating Task 2:  19%|█▉        | 15/80 [00:16<00:31,  2.05it/s, acc_task_2=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 3:  21%|██▏       | 17/80 [00:23<01:45,  1.67s/it, acc_task_3=0]Evaluating Task 3:  22%|██▎       | 18/80 [00:23<01:23,  1.35s/it, acc_task_3=0]Evaluating Task 3:  25%|██▌       | 20/80 [00:23<00:52,  1.13it/s, acc_task_3=0]Evaluating Task 3:  26%|██▋       | 21/80 [00:24<00:42,  1.39it/s, acc_task_3=0]Evaluating Task 3:  29%|██▉       | 23/80 [00:24<00:27,  2.06it/s, acc_task_3=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 4:  31%|███▏      | 25/80 [00:31<01:26,  1.57s/it, acc_task_4=0]Evaluating Task 4:  32%|███▎      | 26/80 [00:31<01:09,  1.28s/it, acc_task_4=0]Evaluating Task 4:  35%|███▌      | 28/80 [00:31<00:44,  1.18it/s, acc_task_4=0]Evaluating Task 4:  38%|███▊      | 30/80 [00:31<00:29,  1.69it/s, acc_task_4=0]Evaluating Task 4:  40%|████      | 32/80 [00:32<00:20,  2.34it/s, acc_task_4=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 5:  41%|████▏     | 33/80 [00:39<01:19,  1.68s/it, acc_task_5=0]Evaluating Task 5:  42%|████▎     | 34/80 [00:39<01:01,  1.34s/it, acc_task_5=0]Evaluating Task 5:  44%|████▍     | 35/80 [00:39<00:47,  1.05s/it, acc_task_5=0]Evaluating Task 5:  45%|████▌     | 36/80 [00:39<00:35,  1.23it/s, acc_task_5=0]Evaluating Task 5:  48%|████▊     | 38/80 [00:39<00:21,  1.93it/s, acc_task_5=0]Evaluating Task 5:  50%|█████     | 40/80 [00:39<00:14,  2.80it/s, acc_task_5=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 6:  51%|█████▏    | 41/80 [00:46<01:09,  1.77s/it, acc_task_6=0]Evaluating Task 6:  52%|█████▎    | 42/80 [00:47<00:52,  1.39s/it, acc_task_6=0]Evaluating Task 6:  55%|█████▌    | 44/80 [00:47<00:31,  1.14it/s, acc_task_6=0]Evaluating Task 6:  57%|█████▊    | 46/80 [00:47<00:20,  1.69it/s, acc_task_6=0]Evaluating Task 6:  59%|█████▉    | 47/80 [00:47<00:16,  2.04it/s, acc_task_6=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 7:  61%|██████▏   | 49/80 [00:54<00:50,  1.63s/it, acc_task_7=0]Evaluating Task 7:  64%|██████▍   | 51/80 [00:54<00:31,  1.10s/it, acc_task_7=0]Evaluating Task 7:  66%|██████▋   | 53/80 [00:55<00:20,  1.30it/s, acc_task_7=0]Evaluating Task 7:  69%|██████▉   | 55/80 [00:55<00:13,  1.81it/s, acc_task_7=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 8:  71%|███████▏  | 57/80 [01:02<00:34,  1.50s/it, acc_task_8=0]Evaluating Task 8:  72%|███████▎  | 58/80 [01:02<00:27,  1.24s/it, acc_task_8=0]Evaluating Task 8:  75%|███████▌  | 60/80 [01:02<00:16,  1.18it/s, acc_task_8=0]Evaluating Task 8:  78%|███████▊  | 62/80 [01:02<00:10,  1.66it/s, acc_task_8=0]Evaluating Task 8:  79%|███████▉  | 63/80 [01:02<00:08,  1.97it/s, acc_task_8=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 9:  81%|████████▏ | 65/80 [01:10<00:24,  1.66s/it, acc_task_9=0]Evaluating Task 9:  84%|████████▍ | 67/80 [01:10<00:14,  1.13s/it, acc_task_9=0]Evaluating Task 9:  86%|████████▋ | 69/80 [01:10<00:08,  1.25it/s, acc_task_9=0]Evaluating Task 9:  89%|████████▉ | 71/80 [01:11<00:05,  1.73it/s, acc_task_9=0]/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/zulhilmirahmat/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+Evaluating Task 10:  91%|█████████▏| 73/80 [01:18<00:10,  1.51s/it, acc_task_10=1.56]Evaluating Task 10:  92%|█████████▎| 74/80 [01:18<00:07,  1.25s/it, acc_task_10=1.95]Evaluating Task 10:  95%|█████████▌| 76/80 [01:18<00:03,  1.17it/s, acc_task_10=2.15]Evaluating Task 10:  96%|█████████▋| 77/80 [01:18<00:02,  1.41it/s, acc_task_10=2.34]Evaluating Task 10:  99%|█████████▉| 79/80 [01:18<00:00,  2.04it/s, acc_task_10=2.68]Evaluating Task 10: 100%|██████████| 80/80 [01:19<00:00,  1.01it/s, acc_task_10=2.7] 
+Accuracy for 10 task(s): 	 [Class-IL]: 1.12 % 	 [Task-IL]: 13.91 %
+[INFO] 20-Oct-25 11:29:23 - Accuracy for 10 task(s): 	 [Class-IL]: 1.12 % 	 [Task-IL]: 13.91 %
+	Raw accuracy values: Class-IL [8.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.7] | Task-IL [10.0, 10.2, 9.5, 10.0, 11.200000000000001, 8.1, 16.8, 14.7, 19.900000000000002, 28.7]
+[INFO] 20-Oct-25 11:29:23 - 	Raw accuracy values: Class-IL [8.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.7] | Task-IL [10.0, 10.2, 9.5, 10.0, 11.200000000000001, 8.1, 16.8, 14.7, 19.900000000000002, 28.7]
+
+
+[INFO] 20-Oct-25 11:29:23 - System stats:
+[INFO] 20-Oct-25 11:29:23 - 	Initial CPU memory usage: 517472.00 MB
+[INFO] 20-Oct-25 11:29:23 - 	Average CPU memory usage: 1035467.20 MB
+[INFO] 20-Oct-25 11:29:23 - 	Final CPU memory usage: 1069984.00 MB
+[INFO] 20-Oct-25 11:29:23 - 	Max CPU memory usage: 1069360.00 MB
+[INFO] 20-Oct-25 11:29:23 - Logging results and arguments in ./data/results/class-il/seq-cifar100/causal-der/logs.pyd
+
+================================================================
+Test completed!
+Expected: Task-IL ≈ 56% (matching DER++ baseline)
+If not matched, there are still bugs to fix
+================================================================
