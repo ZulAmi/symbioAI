@@ -801,6 +801,8 @@ class CausalDEREngine:
         self.replay_warmup_tasks = int(replay_warmup_tasks)
         self.kd_conf_threshold = float(kd_conf_threshold)
         self.global_step = 0
+        self.current_task_id = -1  # Track current task for per-task step counting
+        self.task_step = 0  # Steps within current task
         # Pruning
         self.prune_interval_steps = int(prune_interval_steps)
         self.prune_fraction = float(prune_fraction)
@@ -1128,6 +1130,140 @@ class CausalDEREngine:
         Loss = CE(current) + alpha * KD_T(replay) + beta * CE(buffer) + IRM_penalty
         """
         device = data.device
+        
+        # ===== PURE DER++ MODE (BYPASS ALL CAUSAL FEATURES) =====
+        # When ALL causal features are disabled, use simple DER++ implementation
+        use_pure_derpp = (
+            not self.use_causal_sampling and
+            not self.use_mir_sampling and
+            not self.use_counterfactual_replay and
+            not self.use_neural_causal_discovery and
+            not self.use_task_free_streaming and
+            not self.use_enhanced_irm and
+            self.feature_kd_weight == 0.0
+        )
+        
+        if use_pure_derpp:
+            # SIMPLE DER++ IMPLEMENTATION (NO SANITIZATION - TRUST PYTORCH)
+            print(f"[DEBUG] Using pure DER++ bypass (all causal features disabled)")
+            current_loss = F.cross_entropy(output, target)
+            
+            info = {
+                'current_loss': float(current_loss.detach().cpu()),
+                'replay_mse': 0.0,
+                'replay_ce': 0.0,
+                'total_loss': float(current_loss.detach().cpu())
+            }
+            
+            # Skip replay if buffer is empty
+            if len(self.buffer.buffer) == 0:
+                self.global_step += 1
+                if task_id != self.current_task_id:
+                    self.current_task_id = task_id
+                    self.task_step = 0
+                self.task_step += 1
+                return current_loss, info
+            
+            # Determine replay batch size
+            replay_batch_size = min(32, len(self.buffer.buffer))
+            
+            # Sample from buffer TWICE (match DER++ exactly)
+            # First sample: for MSE distillation
+            replay_data_mse = self.buffer.sample(
+                replay_batch_size,
+                device,
+                use_causal_sampling=False,
+                model=None,
+                use_mir_sampling=False,
+                mir_candidate_factor=1,
+                task_bias=None,
+                include_features=False,
+            )
+            
+            if replay_data_mse is None:
+                self.global_step += 1
+                if task_id != self.current_task_id:
+                    self.current_task_id = task_id
+                    self.task_step = 0
+                self.task_step += 1
+                return current_loss, info
+            
+            buf_data_mse, buf_targets_mse, buf_logits_mse, _, _ = replay_data_mse
+            
+            # Forward on first batch
+            buf_outputs_mse = model(buf_data_mse)
+            
+            # Safety check: if buffer logits contain NaN/Inf, skip replay
+            if torch.isnan(buf_logits_mse).any() or torch.isinf(buf_logits_mse).any():
+                print(f"[ERROR] NaN/Inf detected in stored logits from buffer! Skipping replay.")
+                self.global_step += 1
+                if task_id != self.current_task_id:
+                    self.current_task_id = task_id
+                    self.task_step = 0
+                self.task_step += 1
+                return current_loss, info
+            
+            # Safety check: if model outputs contain NaN/Inf, skip replay
+            if torch.isnan(buf_outputs_mse).any() or torch.isinf(buf_outputs_mse).any():
+                print(f"[ERROR] NaN/Inf detected in model outputs on replay data! Skipping replay.")
+                self.global_step += 1
+                if task_id != self.current_task_id:
+                    self.current_task_id = task_id
+                    self.task_step = 0
+                self.task_step += 1
+                return current_loss, info
+            
+            # MSE distillation (match DER++ exactly - NO temperature scaling)
+            replay_mse = F.mse_loss(buf_outputs_mse, buf_logits_mse)
+            
+            # Second sample: for CE loss
+            replay_data_ce = self.buffer.sample(
+                replay_batch_size,
+                device,
+                use_causal_sampling=False,
+                model=None,
+                use_mir_sampling=False,
+                mir_candidate_factor=1,
+                task_bias=None,
+                include_features=False,
+            )
+            
+            if replay_data_ce is None:
+                total_loss = current_loss + self.alpha * replay_mse
+                info['replay_mse'] = float(replay_mse.detach().cpu())
+                info['total_loss'] = float(total_loss.detach().cpu())
+                self.global_step += 1
+                if task_id != self.current_task_id:
+                    self.current_task_id = task_id
+                    self.task_step = 0
+                self.task_step += 1
+                return total_loss, info
+            
+            buf_data_ce, buf_targets_ce, _, _, _ = replay_data_ce
+            buf_outputs_ce = model(buf_data_ce)
+            replay_ce = F.cross_entropy(buf_outputs_ce, buf_targets_ce)
+            
+            # Combine losses (match DER++ exactly)
+            total_loss = current_loss + self.alpha * replay_mse + self.beta * replay_ce
+            
+            info['replay_mse'] = float(replay_mse.detach().cpu())
+            info['replay_ce'] = float(replay_ce.detach().cpu())
+            info['total_loss'] = float(total_loss.detach().cpu())
+            
+            # Increment counters
+            self.global_step += 1
+            if task_id != self.current_task_id:
+                self.current_task_id = task_id
+                self.task_step = 0
+            self.task_step += 1
+            
+            return total_loss, info
+        
+        # ===== ORIGINAL CAUSAL-DER IMPLEMENTATION (when features enabled) =====
+        print(f"[DEBUG] Using original Causal-DER (bypass NOT triggered)")
+        print(f"[DEBUG] Flags: causal={self.use_causal_sampling}, mir={self.use_mir_sampling}, "
+              f"cf={self.use_counterfactual_replay}, neural={self.use_neural_causal_discovery}, "
+              f"stream={self.use_task_free_streaming}, irm={self.use_enhanced_irm}, feat_kd={self.feature_kd_weight}")
         
         # Current task loss
         current_loss = F.cross_entropy(output, target)
@@ -1482,12 +1618,29 @@ class CausalDEREngine:
         # CRITICAL FIX: Store ALL samples like DER++, not just 10%
         # The buffer's reservoir sampling will handle capacity management
         
+        # Check if we're in pure DER++ mode (all causal features disabled)
+        use_pure_derpp = (
+            not self.use_causal_sampling and
+            not self.use_mir_sampling and
+            not self.use_counterfactual_replay and
+            not self.use_neural_causal_discovery and
+            not self.use_task_free_streaming and
+            not self.use_enhanced_irm and
+            not self.enable_causal_graph_learning and
+            self.feature_kd_weight == 0.0
+        )
+        
         for idx in range(batch_size):
-            # Compute causal importance (INNOVATION)
-            with torch.inference_mode():
-                importance = self.importance_estimator.compute_importance(
-                    data[idx], target[idx], logits[idx], task_id, model
-                )
+            # Compute causal importance (INNOVATION) - SKIP if pure DER++ mode
+            if use_pure_derpp:
+                # Pure DER++ mode: uniform importance
+                importance = 1.0
+            else:
+                # Causal mode: compute importance
+                with torch.inference_mode():
+                    importance = self.importance_estimator.compute_importance(
+                        data[idx], target[idx], logits[idx], task_id, model
+                    )
             
             # Create causal sample with compact storage
             d = data[idx].detach().cpu().to(dtype=self.store_dtype, copy=True)
@@ -1546,6 +1699,26 @@ class CausalDEREngine:
         CORE INNOVATION: Learn causal graph between tasks.
         """
         self.tasks_seen += 1
+        
+        # Check if we're in pure DER++ mode (all causal features disabled)
+        use_pure_derpp = (
+            not self.use_causal_sampling and
+            not self.use_mir_sampling and
+            not self.use_counterfactual_replay and
+            not self.use_neural_causal_discovery and
+            not self.use_task_free_streaming and
+            not self.use_enhanced_irm and
+            not self.enable_causal_graph_learning and
+            self.feature_kd_weight == 0.0
+        )
+        
+        if use_pure_derpp:
+            # Pure DER++ mode: skip all causal analysis
+            logger.info(f"\n{'='*60}")
+            logger.info(f"END OF TASK {task_id} - PURE DER++ MODE (no causal analysis)")
+            logger.info(f"{'='*60}")
+            logger.info(f"Buffer size: {len(self.buffer.buffer)}/{self.buffer.capacity}")
+            return
         
         logger.info(f"\n{'='*60}")
         logger.info(f"END OF TASK {task_id} - CAUSAL ANALYSIS")
