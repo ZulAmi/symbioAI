@@ -283,6 +283,64 @@ experiments/              # 3.3M - Experiment outputs
 logs/                     # 648K - Log files
 symbioai_test_suite/data/ # Part of 188M test suite data
 
+# ============================================================================
+# STRATEGIC IP PROTECTION - Balance transparency with competitive advantage
+# ============================================================================
+# Training code is PUBLIC (demonstrates skills and reproducibility)
+# Only protect: optimized variants, tuned hyperparameters, and WIP experiments
+
+# Optimized/tuned variants of algorithms (competitive advantage)
+training/*_optimized.py
+training/*_tuned.py
+training/*_secret.py
+training/*_private.py
+
+# Specific hyperparameter configurations that work exceptionally well
+config/*_optimized.yaml
+config/*_tuned.yaml
+config/production.yaml
+config/best_*.yaml
+
+# Advanced validation with proprietary datasets or methods
+validation/tier1_continual_learning/*_optimized.py
+validation/proprietary_datasets/
+
+# Experimental model architectures still under development
+mammoth/models/*_experimental.py
+mammoth/models/*_wip.py
+
+# Internal documentation and work-in-progress notes (private)
+documents/
+notes/
+experiments_log/
+*.md
+!README.md
+!LICENSE.md
+!CONTRIBUTING.md
+
+# Training scripts with best-performing hyperparameters
+run_*_optimized.sh
+run_*_tuned.sh
+run_*_best.sh
+test_*_optimized.sh
+test_*_final.sh
+*_secret.sh
+
+# Training logs and experiment outputs
+*.log
+logs/
+runs/
+wandb/
+
+# Checkpoints and trained models (too large, share separately if needed)
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.bin
+*.weights
+
 # Generated files
 requirements-mac.txt
 requirements-filtered.txt
