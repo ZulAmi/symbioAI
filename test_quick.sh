@@ -18,6 +18,9 @@ echo ""
 echo "================================================================"
 echo ""
 
+# Create results directory if it doesn't exist
+mkdir -p validation/results
+
 python3 mammoth/utils/main.py --model causal-der \
   --dataset seq-cifar100 \
   --buffer_size 500 \
@@ -28,16 +31,19 @@ python3 mammoth/utils/main.py --model causal-der \
   --lr 0.03 \
   --optim_mom 0 \
   --optim_wd 0.0 \
-  --seed 1
+  --seed 1 \
+  | tee validation/results/quick_test_1epoch.log
 
 echo ""
 echo "================================================================"
 echo "QUICK TEST COMPLETE!"
 echo "================================================================"
 echo ""
+echo "Results saved to: validation/results/quick_test_1epoch.log"
+echo ""
 echo "If successful:"
-echo "  ✅ No errors - proceed to full 50-epoch test"
-echo "  → Run: ./test_baseline.sh"
+echo "  ✅ No errors - proceed to full baseline test"
+echo "  → Run: ./test_baseline_corrected.sh"
 echo ""
 echo "If errors:"
 echo "  ❌ Fix issues before running full test"
