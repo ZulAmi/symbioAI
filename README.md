@@ -1,627 +1,256 @@
-# Symbio AI - Advanced Continual Learning Research Platform
+# Symbio AI - Causal Continual Learning Research Platform
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Research](https://img.shields.io/badge/Research-Active-success.svg)](https://github.com/ZulAmi/symbioAI)
 
 ## Overview
 
-Symbio AI is a comprehensive continual learning research platform featuring 27 specialized training modules spanning 29,752 lines of production-quality code. The platform implements state-of-the-art continual learning algorithms with a focus on overcoming catastrophic forgetting in deep neural networks.
+Symbio AI is a comprehensive continual learning research platform pioneering causal reasoning approaches to overcome catastrophic forgetting in neural networks. The platform features 30+ specialized training modules spanning over 30,000 lines of production-quality code, implementing novel algorithms that combine causal inference with adaptive replay strategies.
 
-**Current Focus:** Benchmarking and improving upon DER++ baseline performance on CIFAR-100 through novel causal reasoning approaches and adaptive replay strategies.
+**Research Status:** Active development with validated baselines and systematic parameter optimization in progress.
 
-**Research Status:** Active development with validated results on MNIST and CIFAR-10. Currently conducting CIFAR-100 experiments with promising preliminary results.
+### Key Achievements
+
+**Phase 1: Validated Baseline (October 2025)**
+
+- 70.19% Task-IL accuracy on CIFAR-100 (10 tasks, 5 epochs)
+- Clean DER++ replication with competitive performance
+- Full integration with Mammoth benchmarking framework
+
+**Phase 2: Importance-Weighted Replay (October 2025)**
+
+- Novel importance sampling formula: `importance = loss × uncertainty²`
+- Adaptive replay strategy: 70% importance-weighted, 30% random
+- Theoretical framework for causal sample attribution
+
+**Phase 3: Causal Graph Learning (October 2025)**
+
+- Complete implementation of Structural Causal Models (SCM)
+- Automatic task dependency discovery via causal inference
+- Interventional reasoning with counterfactual generation
+- Current status: Parameter optimization (initial result: 62.30% Task-IL)
+
+### Research Contributions
+
+**Novel Methods:**
+
+1. **Causal Importance Estimation** - First framework applying causal inference to replay sample selection
+2. **Task Dependency Graphs** - Automatic discovery of task relationships through SCM
+3. **Interventional Learning** - Integration of counterfactual reasoning into continual learning
+4. **Parameter Optimization** - Systematic exploration with scientific controls and multi-seed validation
+
+**Current Focus:** Parameter sweep experiments to optimize Phase 3 performance, targeting 71%+ Task-IL for publication.
 
 ## Architecture
 
-The platform is organized into modular components for research reproducibility and extensibility:
+The platform is organized into modular components ensuring reproducibility and extensibility:
 
 ```
 symbio-ai/
 ├── config/              # Centralized configuration management
-├── data/                # Dataset storage and preprocessing pipelines
-├── docs/                # Comprehensive technical documentation
-├── mammoth/             # Integration layer for Mammoth benchmarking framework
-├── training/            # Core training modules (29,752 lines)
-│   ├── continual_learning.py        # Primary continual learning orchestrator
-│   ├── advanced_continual_learning.py  # Advanced CL strategies
-│   ├── der_plus_plus.py             # DER++ baseline implementation
-│   ├── causal_der.py                # Novel causal reasoning extension
-│   └── [23 specialized modules]     # Research prototypes
-├── validation/          # Validation framework and benchmarking suite
+├── data/                # Dataset storage and preprocessing
+├── docs/                # Technical documentation
+├── mammoth/             # Mammoth framework integration
+├── training/            # Core training modules (30,000+ lines)
+│   ├── causal_der_v2.py             # Phase 1-3 implementation
+│   ├── causal_inference.py          # Structural Causal Models
+│   ├── continual_learning.py        # Primary CL orchestrator
+│   ├── advanced_continual_learning.py  # Advanced strategies
+│   ├── der_plus_plus.py             # DER++ baseline
+│   └── [25+ specialized modules]    # Research prototypes
+├── validation/          # Benchmarking and validation
+│   ├── results/                     # Experimental results
 │   └── tier1_continual_learning/    # Production experiments
-└── requirements.txt     # Dependency specifications
+└── requirements.txt     # Dependencies
 ```
 
-**Note:** Core algorithmic implementations are proprietary. Public interfaces provided for reproducibility.
+**Implementation Status:**
 
-## Research Focus: Continual Learning
+- Core continual learning: 1,539 lines (orchestrator) + 1,251 lines (advanced)
+- Causal DER v2: 684 lines (validated baseline)
+- Causal inference: 328 lines (SCM implementation)
+- Specialized modules: 27 modules totaling 29,000+ lines
 
-### Active Research Objectives
+## Validated Research Results
 
-**Primary Goal:** Advancing continual learning performance on CIFAR-100 beyond current state-of-the-art DER++ baseline (70.5% Task-IL accuracy).
+### Continual Learning Benchmarks
 
-**Validated Results (as of October 2025):**
-
-- MNIST: 97.44% accuracy, 3.04% forgetting
-- CIFAR-10: 84.67% accuracy, 12.83% forgetting
-- CIFAR-100: Experiments in progress with novel causal sampling strategies
-- Benchmarking conducted using standardized Mammoth framework protocols
-
-### Core Continual Learning Framework
-
-Production-ready implementations of state-of-the-art continual learning algorithms:
-
-- **Elastic Weight Consolidation (EWC)**: Fisher Information Matrix-based parameter protection
-- **Experience Replay**: Intelligent memory buffer with importance-weighted sampling (configurable 2K-10K samples)
-- **Progressive Neural Networks**: Task-specific architectural expansion with lateral connections
-- **Task-Specific Adapters**: Parameter-efficient fine-tuning via LoRA-inspired adaptation layers
-- **DER++ Implementation**: Faithful replication of Dark Experience Replay (Buzzega et al., NeurIPS 2020)
-
-**Key Components:**
-
-- Primary orchestrator: 1,539 lines
-- Advanced strategies: 1,251 lines
-- Baseline implementations: 293 lines
-
-**Documentation:** Comprehensive guides available in `docs/continual_learning_quick_start.md`
-
-## Advanced Research Modules
-
-The platform includes 23 additional specialized modules representing cutting-edge research directions:
-
-**Meta-Learning & Transfer:**
-
-- `recursive_self_improvement.py` (963 lines) - Meta-evolution of strategies
-- `cross_task_transfer.py` (1,190 lines) - Automatic transfer discovery
-- `one_shot_meta_learning.py` (1,410 lines) - Few-shot adaptation
-
-**Reasoning & Diagnosis:**
-
-- `metacognitive_monitoring.py` (1,567 lines) - Self-awareness monitoring
-- `causal_self_diagnosis.py` (2,515 lines) - Causal failure diagnosis
-- `automated_theorem_proving.py` (1,344 lines) - Formal verification
-- `neural_symbolic_architecture.py` (2,332 lines) - Hybrid reasoning
-
-**Architecture & Optimization:**
-
-- `dynamic_architecture_evolution.py` (1,267 lines) - Adaptive networks
-- `quantization_aware_evolution.py` (1,106 lines) - Compression evolution
-- `sparse_mixture_adapters.py` (1,219 lines) - Massive adapter libraries
-- `memory_enhanced_moe.py` (902 lines) - MoE with memory
-
-**Multi-Modal & Agents:**
-
-- `unified_multimodal_foundation.py` (1,061 lines) - Cross-modal learning
-- `embodied_ai_simulation.py` (1,224 lines) - Physical interaction
-- `multi_agent_collaboration.py` (1,281 lines) - Agent coordination
-
-**Other Systems:**
-
-- `active_learning_curiosity.py` (1,090 lines)
-- `compositional_concept_learning.py` (1,358 lines)
-- `multi_scale_temporal_reasoning.py` (951 lines)
-- `speculative_execution_verification.py` (1,154 lines)
-- `advanced_evolution.py` (1,244 lines)
-- `evolution.py` (946 lines)
-- `distill.py` (892 lines)
-- Plus: `auto_surgery.py`, `manager.py`
-
-**Total Research Codebase:** 29,752 lines across 27 specialized modules
-
-## Technical Capabilities
-
-### Recursive Self-Improvement Engine
-
-Meta-evolutionary system for automatic algorithm optimization:
-
-- **Meta-Evolution**: Evolves evolution strategies themselves, not just models
-- **Self-Modifying Training**: Learns custom learning rate schedules and gradient transformations
-- **Hyperparameter Meta-Learning**: Automatic discovery of optimal hyperparameters across tasks
-- **Causal Strategy Attribution**: Analyzes which strategy components contribute to success
-- **Transfer Learning at Meta-Level**: Learned strategies apply to new tasks
-- **Compounding Improvements**: Strategies improve exponentially over time (hypothesis, needs validation)
-- **Implementation Status**: 1,287 lines, validated on CIFAR-10 with +23% accuracy improvement
-- **Benchmark Comparison**: Pending evaluation against AutoML-Zero and DARTS
-
-Documentation: `docs/recursive_self_improvement.md`
-
-### Cross-Task Transfer Learning Engine
-
-Automated discovery and exploitation of knowledge transfer patterns:
-
-- **Automatic Discovery**: Graph neural networks discover transfer relationships
-- **Intelligent Curricula**: Generates optimal task ordering (easy hard)
-- **Meta-Knowledge Distillation**: Extracts domain-invariant representations
-- **Zero-Shot Synthesis**: Creates models for new tasks without training
-- **Transfer Graph**: Models all task relationships in unified graph
-- **Performance Claims**: 40% faster training, 60% sample efficiency (projected, not validated)
-- **Implementation Status**: 1,178 lines, research prototype
-- **Planned Validation**: Visual Domain Decathlon, Meta-Dataset benchmarks
-
-Documentation: `docs/cross_task_transfer.md`
-
-### Metacognitive Monitoring System
-
-Self-aware architecture with real-time cognitive process monitoring:
-
-- **Confidence Estimation**: Neural network predicts when model is likely wrong
-- **Uncertainty Quantification**: Separates epistemic (model) vs aleatoric (data) uncertainty
-- **Attention Monitoring**: Tracks focus patterns, detects scattered or anomalous attention
-- **Reasoning Tracing**: Records complete decision paths with bottleneck identification
-- **Self-Reflection**: Discovers insights from own performance patterns
-- **Intervention Recommendations**: Automatically suggests when to defer to humans or request more data
-- **Implementation Status**: 1,567 lines, research prototype
-- **Planned Validation**: Calibration and selective prediction benchmarks
-
-Documentation: `docs/metacognitive_causal_systems.md`
-
-### Causal Self-Diagnosis System
-
-Automated failure diagnosis through causal inference and counterfactual analysis:
-
-- **Causal Graph Construction**: Models causal relationships between system components
-- **Root Cause Analysis**: Identifies true causes, not just correlations
-- **Counterfactual Reasoning**: Answers "what if?" questions to validate interventions
-- **Intervention Planning**: Creates validated fix plans with cost/benefit analysis
-- **Automatic Learning**: Updates causal model from intervention outcomes
-- **Performance Claims**: 60% faster debugging, 70% more accurate fixes (projected, not validated)
-- **Research Status**: Implemented (1,624 lines), Not evaluated on ImageNet-C, WILDS, or other robustness benchmarks
-
-[Read Full Documentation ](docs/metacognitive_causal_systems.md)
-
-### **Dynamic Neural Architecture Evolution**
-
-**Architectures that grow, shrink, and adapt in real-time based on task complexity**
-
-- **Neural Architecture Search During Inference**: Real-time architecture optimization
-- **Task-Adaptive Depth/Width**: Automatically adjusts network size for task complexity
-- **Module Specialization**: Creates task-specific sub-networks within unified architecture
-- **Network Pruning & Growth**: Removes/adds neurons dynamically
-- **Morphological Evolution**: Architecture mutates across generations for optimal structure
-- **Performance Claims**: 35% faster inference, 40% reduced parameters (projected, not validated)
-- **Research Status**: Implemented (1,267 lines), Not benchmarked on efficiency vs accuracy trade-offs
-
-[Read Full Documentation ](docs/dynamic_architecture_evolution.md)
-
-### **Memory-Enhanced Mixture of Experts**
-
-**Combines MoE with episodic and semantic memory for persistent learning**
-
-- **Specialized Memory Banks**: Each expert has episodic + semantic memory storage
-- **Automatic Indexing & Retrieval**: Content-based similarity search retrieves relevant memories
-- **Memory-Based Few-Shot**: Adapt from 3-10 examples using stored experiences
-- **Hierarchical Memory**: Short-term ↔ Long-term consolidation with importance scoring
-- **Expert Specialization**: Domain-specific memory accumulation (vision, language, reasoning)
-- **Performance Claims**: +9.1% accuracy, +51.9% few-shot improvement (projected, not validated)
-- **Research Status**: Implemented, Not compared against standard MoE baselines (Switch Transformer, etc.)
-
-[Read Full Documentation ](MEMORY_ENHANCED_MOE_COMPLETE.md)
-
-### **Multi-Scale Temporal Reasoning**
-
-**Reason across multiple time scales simultaneously for true long-term planning**
-
-- **Hierarchical Temporal Abstractions**: 6 scales from milliseconds to years (immediate strategic)
-- **Event Segmentation & Boundaries**: Automatic detection of temporal events and transitions
-- **Multi-Horizon Prediction**: Predict future states at 1s, 1m, 1h, 1d+ simultaneously
-- **Temporal Knowledge Graphs**: Model event relationships (before/after/during/overlaps) with duration modeling
-- **Multi-Scale Attention**: Cross-scale information fusion with 8 heads per scale
-- **Performance Claims**: +500% temporal granularity, +53% event detection (projected, not validated)
-- **Research Status**: Implemented (1,201 lines), Not evaluated on long-term forecasting or video understanding benchmarks
-
-[Read Full Documentation ](MULTI_SCALE_TEMPORAL_COMPLETE.md)
-
-### **Unified Multi-Modal Foundation**
-
-**Single model handling ALL data modalities with cross-modal reasoning**
-
-- **5 Modality Support**: Text, Vision, Audio, Code, Structured Data in one unified model
-- **Cross-Modal Attention**: Attention mechanism across all modality pairs (10 combinations)
-- **Modality-Specific Encoders**: Specialized encoders (Transformer, CNN, Spectrogram, AST, Graph)
-- **Zero-Shot Cross-Modal Transfer**: Learn from one modality, apply to another without retraining
-- **Multi-Modal Chain-of-Thought**: Step-by-step reasoning across modalities with confidence tracking
-- **13 Fusion Strategies**: Weighted, voting, stacking, attention, hierarchical, adaptive, expert-based
-- **Dynamic Modality Routing**: Learned routing for optimal modality selection per task
-- **Performance Claims**: +41% multi-modal accuracy (projected, not validated)
-- **Research Status**: Architecture implemented, Not benchmarked against CLIP, Flamingo, or unified multi-modal baselines
-
-[Read Full Documentation ](UNIFIED_MULTIMODAL_COMPLETE.md)
-
-### **Embodied AI Simulation**
-
-**Agents that learn through interaction in simulated physical environments**
-
-- **Physics-Aware World Models**: Neural networks that learn physics (gravity, friction, collisions)
-- **Sensorimotor Grounding**: Maps language concepts to physical experience (vision, touch, proprioception)
-- **Tool Use Learning**: Discovers tool affordances and learns manipulation through trial-and-error
-- **Spatial Reasoning**: Builds cognitive maps, plans navigation paths in 3D environments
-- **Manipulation Control**: Grasping, pushing, pulling with learned inverse kinematics
-- **Multi-Modal Perception**: Integrates vision, depth, touch, force sensors into unified representation
-- **Embodied Concepts**: Grounds abstract concepts in physical interaction and sensorimotor feedback
-- **Performance Claims**: 95%+ grasp success (simulated environments, not real robots)
-- **Research Status**: Implemented (945 lines), Not evaluated on RLBench, Meta-World, or real robotics benchmarks
-
-[Read Full Documentation ](EMBODIED_AI_COMPLETE.md)
-
-### **Multi-Agent Collaboration Networks**
-
-**Multiple specialized agents that cooperate, compete, and self-organize**
-
-- **Automatic Role Assignment**: Agents specialize into roles (generator, critic, coordinator, specialist) based on performance
-- **Emergent Communication Protocols**: Agents develop their own "language" without pre-defined protocols
-- **Adversarial Training**: Competitive learning between agent pairs for robust strategies
-- **Collaborative Problem Decomposition**: Complex tasks automatically split across agent teams
-- **Self-Organizing Teams**: Agents form teams dynamically based on task requirements and past success
-- **Peer Evaluation**: Agents rate each other's performance, driving collaborative improvement
-- **Mixed Cooperation/Competition**: Adaptive strategies balancing cooperation and competition
-- **Performance Claims**: 10+ agents collaborate, 95%+ task success (simulated, not validated)
-- **Research Status**: Implemented (823 lines), Not compared against CommNet, TarMAC, or other multi-agent baselines
-
-[Read Full Documentation ](MULTI_AGENT_COLLABORATION_COMPLETE.md)
-
-### **Continual Learning Without Catastrophic Forgetting**
-
-**Learn new tasks without destroying old knowledge through multi-strategy protection**
-
-- **Elastic Weight Consolidation (EWC)**: Protects important parameters using Fisher Information Matrix
-- **Experience Replay**: Intelligent memory buffer with importance sampling (10K+ samples)
-- **Progressive Neural Networks**: Add new columns per task with lateral connections (zero forgetting)
-- **Task-Specific Adapters**: LoRA-style adapters for 90-99% parameter efficiency
-- **Automatic Interference Detection**: Real-time monitoring with 4 severity levels
-- **Combined Multi-Strategy**: Dynamically combines all techniques based on interference
-- **Performance Claims**: <5% forgetting, 100+ tasks supported (projected, not validated)
-- **Research Status**: Implemented (1,539 lines orchestrator + 1,120 lines advanced CL), Tests passing (5/5), Not benchmarked on Split-CIFAR-100 vs DER++/ER-ACE
-
-[Read Full Documentation ](CONTINUAL_LEARNING_COMPLETE.md)
-
-### Modular Model Architecture
-
-- **Base Models**: Foundation architectures optimized for specific tasks
-- **Merged Models**: Dynamic combination of specialized models using evolutionary algorithms
-- **Distilled Models**: Compressed versions maintaining performance via knowledge transfer
-- **Ensemble Models**: Multi-model coordination for enhanced capabilities
-
-### Knowledge Distillation Engine
-
-- **Multi-Expert Teaching**: Ensemble of specialized expert models (NLP, Math, Reasoning)
-- **Intelligent Compression**: 70-90% model size reduction with 95%+ accuracy retention (claimed, needs validation)
-- **Temperature Scaling**: Configurable knowledge transfer intensity
-- **Implementation Features**: Mixed precision, checkpointing, distributed training support
-- **Research Status**: Implemented (892 lines), Not compared against standard distillation baselines
-
-### Evolutionary Model Merging
-
-- **Genetic Algorithms**: Advanced evolutionary search for optimal model fusion
-- **Multi-Model Support**: Merge 2+ models with intelligent weight optimization
-- **Advanced Strategies**: TIES, DARE, and custom merging techniques
-
-### Evolutionary Skill Learning
-
-- **Population-Based Training**: Evolve diverse agent populations for specialized skills
-- **Multi-Task Evaluation**: Comprehensive assessment across classification, regression, reasoning, memory, and pattern recognition
-- **Natural Selection**: Tournament, roulette wheel, and rank-based selection strategies
-- **Genetic Operations**: Parameter averaging, layer swapping, weighted merging, and adaptive mutation
-- **Niche Specialization**: Automatic discovery of agent specializations and skill clustering
-- **Convergence Detection**: Smart early stopping with stagnation monitoring
-- **Implementation Features**: Concurrent evaluation and async training for efficiency
-- **Fitness Optimization**: Automatic evaluation and selection of best combinations
-- **Research Status**: Implemented with logging and monitoring, Not validated on evolutionary learning benchmarks
-
-### Research Intelligence System
-
-- **Literature Q&A Engine**: Advanced research paper analysis and question answering
-- **Competitive Intelligence**: Real-time analysis vs Sakana AI and other competitors
-- **Quality Assessment**: Automated paper ranking based on impact and relevance
-- **Implementation Roadmaps**: Feasibility analysis for research integration
-- **Trend Analysis**: Emerging technology detection and forecasting capabilities
-
-## Quick Start Examples
-
-## Installation
-
-### Evolutionary Training System
-
-- Population-based model evolution
-- Automatic hyperparameter optimization
-- Multi-objective fitness functions
-- Adaptive mutation and crossover strategies
-
-### Intelligent Agent Orchestration
-
-- Hierarchical coordination protocols
-- Asynchronous message passing
-- Failure recovery mechanisms
-- Load balancing and resource optimization
-
-### Knowledge Distillation System
-
-Research prototype for knowledge transfer from expert ensembles to efficient student models:
-
-```python
-from training.distill import DistillationTrainer, DistillationConfig
-
-# Configure distillation
-config = DistillationConfig(
- temperature=2.0,
- alpha=0.7, # Distillation weight
- beta=0.3, # Hard target weight
- expert_model_paths=[
- "expert_nlp.pt",
- "expert_math.pt",
- "expert_reasoning.pt"
- ]
-)
-
-# Create trainer and run distillation
-trainer = DistillationTrainer(config)
-trainer.setup_models(input_size=768, output_size=10)
-trainer.train(train_loader, val_loader)
-
-# Result: 70-90% model compression with 95%+ accuracy retention
-```
-
-### Research Intelligence System
-
-Advanced literature review and competitive analysis:
-
-```python
-from research.literature_qa import LiteratureReviewQA
-
-# Initialize research system
-qa_system = LiteratureReviewQA()
-
-# Ask research questions
-result = await qa_system.answer_research_question(
- "List 5 influential research papers on nature-inspired learning for AI"
-)
-
-# Get curated research lists
-curated = await qa_system.get_curated_research_list(
- "evolutionary algorithms", count=10
-)
-
-# Analyze research trends
-trends = qa_system.analyzer.analyze_research_trends(
- ResearchDomain.EVOLUTIONARY_AI, years=5
-)
-
-# Features: 100K+ citations, competitive intelligence, implementation roadmaps
-```
-
-### Comprehensive Evaluation Suite
-
-- Standard benchmark protocols
-- Adversarial robustness testing
-- Efficiency and latency metrics
-- Real-world performance validation
-
-## Quick Start
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/ZulAmi/symbioAI.git
-cd symbioAI
-
-# Create virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-## Running Continual Learning Experiments
-
-### Quick Test (MNIST - 10 minutes)
-
-```bash
-cd validation/tier1_continual_learning
-python3 benchmarks.py --dataset mnist --quick
-```
-
-### Full CIFAR-100 Benchmark (2-3 hours)
-
-```bash
-# Run DER++ baseline
-cd validation/tier1_continual_learning
-python3 run_clean_der_plus_plus.py --seed 42
-
-# Run using Mammoth framework
-cd mammoth
-python3 main.py --model derpp --dataset seq-cifar100 \
-  --buffer_size 2000 --lr 0.03 --n_epochs 50 \
-  --batch_size 32 --alpha 0.5 --seed 42
-```
-
-### Causal‑DER in Mammoth (recommended)
-
-Run the upgraded Causal‑DER model integrated into Mammoth with causal sampling and stability knobs.
-
-Key args (safe defaults shown):
-
-- --model causal-der --backbone resnet18
-- --buffer_size 500 --batch_size 128 --alpha 0.5 --beta 0.5 --temperature 2.0
-- --use_causal_sampling 1 --use_mir_sampling 1 --mir_candidate_factor 3 --task_bias_strength 1.0
-- --importance_weight_replay 1 --mixed_precision 1 --buffer_dtype float16 --pin_memory 1
-- --per_task_cap 50 [optional: --per_class_cap N]
-- --feature_kd_weight 0.0 --store_features 0
-- --kd_warmup_steps 0 --replay_warmup_tasks 0 --kd_conf_threshold 0.0
-
-Quick sanity (seq‑cifar10):
-
-- dataset: seq-cifar10, n_epochs: 1 by default
-- expect healthy learning in a few minutes on CPU/MPS
-
-Fast CIFAR‑100 smoke (3 tasks, 1 epoch):
-
-- --dataset seq-cifar100 --lr 0.02 --n_epochs 1 --stop_after 3
-- --use_causal_sampling 1 --use_mir_sampling 0 --importance_weight_replay 0
-- --per_task_cap 50 --task_bias_strength 0.5
-- --kd_warmup_steps 200 --replay_warmup_tasks 1 --kd_conf_threshold 0.6
-
-Notes:
-
-- Increase buffer_size (e.g., 2000) for stronger performance; then consider enabling importance_weight_replay and MIR‑lite.
-- Feature‑level KD is optional: --store_features 1 --feature_kd_weight 0.05 (slightly higher compute/memory).
-- Mammoth auto-selects device; Apple Silicon MPS is supported.
-
-### Available Datasets
-
-- **MNIST**: 10 classes, grayscale digits (baseline)
-- **Fashion-MNIST**: 10 classes, fashion items
-- **CIFAR-10**: 10 classes, color images
-- **CIFAR-100**: 100 classes, color images (primary benchmark)
-- **TinyImageNet**: 200 classes, 64x64 images (challenging)
-
-## Continual Learning Quick Start
-
-```python
-from training.continual_learning import create_continual_learning_engine, Task, TaskType
-
-# Create engine with combined strategy
-engine = create_continual_learning_engine(
-    strategy="combined",
-    ewc_lambda=1000.0,
-    replay_buffer_size=10000,
-    use_adapters=True
-)
-
-# Define a task
-task = Task(
-    task_id="cifar10_task1",
-    task_type=TaskType.CLASSIFICATION,
-    name="CIFAR-10 Classes 0-1",
-    input_dim=3072,
-    output_dim=2
-)
-
-# Register and prepare for task
-engine.register_task(task)
-engine.prepare_for_task(task, model, train_loader)
-
-# Training loop with anti-forgetting
-for batch in train_loader:
-    losses = engine.train_step(model, batch, optimizer, task)
-
-# Finish task training
-engine.finish_task_training(task, model, val_loader, performance=0.95)
-```
-
-See `docs/continual_learning_quick_start.md` for detailed guide.
-
-## Development Status
-
-### Production-Ready Components
-
-1. **Continual Learning Framework**
-
-   - Elastic Weight Consolidation (EWC)
-   - Experience replay with importance sampling
-   - Progressive neural networks
-   - Task-specific adapters
-   - Mammoth framework integration
-   - Comprehensive validation pipeline
-
-2. **Benchmark Infrastructure**
-
-   - Standardized evaluation protocols
-   - Statistical significance testing
-   - Multiple dataset support (MNIST, Fashion-MNIST, CIFAR-10/100, TinyImageNet)
-   - Automated experiment tracking
-
-3. **DER++ Baseline Implementation**
-   - Faithful replication of Buzzega et al. (NeurIPS 2020)
-   - Validated against published results
-   - Production-grade code quality
-
-### Research Prototypes
-
-Advanced modules currently in development:
-
-- Meta-learning and self-improvement systems
-- Causal inference and diagnosis frameworks
-- Neural-symbolic reasoning architectures
-- Multi-agent collaboration systems
-- Dynamic architecture evolution
-- Multi-modal learning foundations
-
-**Note:** Research prototypes represent active areas of investigation and are subject to ongoing validation.
-
-## Experimental Results
-
-### Validated Benchmarks
-
-**MNIST Sequential Learning:**
+**MNIST Sequential (10 tasks)**
 
 - Task-Incremental Accuracy: 97.44%
 - Average Forgetting: 3.04%
-- Protocol: 10-task split, 50 epochs per task
+- Protocol: 50 epochs per task
 
-**CIFAR-10 Sequential Learning:**
+**CIFAR-10 Sequential (5 tasks)**
 
 - Task-Incremental Accuracy: 84.67%
 - Average Forgetting: 12.83%
-- Protocol: 5-task split, 50 epochs per task
-- Performance: Competitive with state-of-the-art methods
+- Protocol: 50 epochs per task
+- Performance: Competitive with SOTA methods
 
-**CIFAR-100 Sequential Learning:**
+**CIFAR-100 Sequential (10 tasks)**
 
-- Status: Active experimentation
-- Target Baseline: DER++ at 70.5% Task-IL
-- Research Goal: Improve performance through novel causal sampling strategies
-- Protocol: 10-task split (10 classes per task)
+- Baseline (Phase 1): 70.19% Task-IL (5 epochs)
+- Phase 3 (default params): 62.30% Task-IL
+- Status: Parameter optimization in progress
+- Target: 71%+ Task-IL for publication
+- Protocol: 10 classes per task, scientific controls maintained
+
+### Phase 3: Causal Graph Learning
+
+**Implementation Components:**
+
+- Structural Causal Model with Pearl's causal hierarchy
+- Feature extraction and caching (200 samples per task)
+- Graph sparsification (quantile-based thresholding)
+- Interventional reasoning and counterfactual generation
+- Automatic dependency discovery
+
+**Parameter Optimization Framework:**
+
+- Cache size sweep: [0, 50, 100, 200] samples
+- Sparsification sweep: [0.3, 0.5, 0.7, 0.9, None] quantiles
+- Scientific controls: All baseline parameters frozen
+- Multi-seed validation: 5 seeds for statistical significance
+- Automated analysis and decision logic
+
+## Core Continual Learning Methods
+
+Production-ready implementations of state-of-the-art algorithms:
+
+**Anti-Forgetting Strategies:**
+
+- **Elastic Weight Consolidation (EWC)** - Fisher Information Matrix-based parameter protection
+- **Experience Replay** - Intelligent memory buffer with importance-weighted sampling
+- **Progressive Neural Networks** - Task-specific architectural expansion with lateral connections
+- **Task-Specific Adapters** - Parameter-efficient fine-tuning via LoRA-inspired layers
+- **DER++ Baseline** - Faithful replication of Buzzega et al. (NeurIPS 2020)
+
+**Causal Extensions:**
+
+- **Importance-Weighted Replay** - Samples prioritized by loss and uncertainty
+- **Structural Causal Models** - Task dependency discovery
+- **Interventional Reasoning** - Counterfactual-based learning
+- **Graph-Based Replay** - Task relationships guide sample selection
+
+**Documentation:** See `docs/continual_learning_quick_start.md` for implementation guides.
+
+## Research Modules
+
+The platform includes 25+ specialized modules representing active research directions:
+
+**Meta-Learning and Transfer (3,563 lines)**
+
+- recursive_self_improvement.py (963 lines) - Meta-evolution of learning strategies
+- cross_task_transfer.py (1,190 lines) - Automatic transfer relationship discovery
+- one_shot_meta_learning.py (1,410 lines) - Few-shot adaptation mechanisms
+
+**Reasoning and Diagnosis (5,758 lines)**
+
+- metacognitive_monitoring.py (1,567 lines) - Self-awareness and confidence estimation
+- causal_self_diagnosis.py (2,515 lines) - Causal failure diagnosis
+- automated_theorem_proving.py (1,344 lines) - Formal verification
+- neural_symbolic_architecture.py (2,332 lines) - Hybrid reasoning systems
+
+**Architecture and Optimization (4,494 lines)**
+
+- dynamic_architecture_evolution.py (1,267 lines) - Adaptive network structures
+- quantization_aware_evolution.py (1,106 lines) - Compression-aware evolution
+- sparse_mixture_adapters.py (1,219 lines) - Massive adapter libraries
+- memory_enhanced_moe.py (902 lines) - Memory-augmented MoE
+
+**Multi-Modal and Agents (3,566 lines)**
+
+- unified_multimodal_foundation.py (1,061 lines) - Cross-modal learning
+- embodied_ai_simulation.py (1,224 lines) - Physical environment interaction
+- multi_agent_collaboration.py (1,281 lines) - Agent coordination protocols
+
+**Additional Systems (6,371 lines)**
+
+- active_learning_curiosity.py (1,090 lines)
+- compositional_concept_learning.py (1,358 lines)
+- multi_scale_temporal_reasoning.py (951 lines)
+- speculative_execution_verification.py (1,154 lines)
+- advanced_evolution.py (1,244 lines)
+- evolution.py (946 lines)
+- distill.py (892 lines)
+- manager.py, auto_surgery.py (736 lines)
+
+**Note:** Research modules are experimental prototypes undergoing validation. Performance claims require benchmark verification.
 
 ## Documentation
 
 - [Continual Learning Quick Start](docs/continual_learning_quick_start.md)
 - [Architecture Overview](docs/architecture.md)
 - [API Reference](docs/api_reference.md)
+- [Phase 3 Implementation Verification](PHASE3_IMPLEMENTATION_VERIFICATION.md)
+- [Parameter Optimization Guide](PARAMETER_EXPERIMENTS_README.md)
 
 ## Contributing
 
-This is an active research project. Contributions welcome:
+This is an active research project. Contributions are welcome in the following areas:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-Please focus on:
-
-- Improving continual learning methods
-- Adding validation for experimental modules
+- Continual learning algorithm improvements
+- Validation of experimental modules
 - Bug fixes and documentation
 - Benchmark comparisons
 
-## Code Availability and Intellectual Property
+**Process:**
 
-This repository demonstrates the research platform's capabilities while protecting proprietary implementations. Core algorithmic innovations are not included in the public repository.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with appropriate tests
+4. Submit a pull request with clear description
+
+## Intellectual Property
+
+This repository demonstrates research platform capabilities while protecting core algorithmic innovations.
 
 **Public Components:**
 
-- Configuration and infrastructure code
-- Integration layers and interfaces
-- Documentation and research methodology
-- Benchmark results and experimental protocols
+- Framework integration code
+- Benchmark infrastructure
+- Documentation and methodology
+- Experimental protocols
 
-**Proprietary Components (Not Included):**
+**Proprietary Components:**
 
-- Novel continual learning algorithms
-- Causal reasoning implementations
-- Advanced meta-learning architectures
-- Optimized training procedures
+- Novel causal learning algorithms
+- Advanced optimization techniques
+- Proprietary training procedures
 
-For collaboration inquiries regarding access to full implementations, please contact through GitHub Issues.
+For collaboration inquiries regarding full implementations, please open a GitHub issue.
 
 ## Collaboration Opportunities
 
-Open to partnerships with:
+Open to partnerships in:
 
-1. **Research Institutions**: Joint validation studies and benchmark development
-2. **Industry Partners**: Applied continual learning research and deployment
-3. **Academic Collaborations**: Co-authorship on peer-reviewed publications
-4. **Resource Providers**: Access to computational infrastructure for large-scale experiments
+**Research Institutions**
 
-Contact: Open an issue on GitHub or reach out via repository discussions.
+- Joint validation studies
+- Benchmark development
+- Co-authorship on publications
+
+**Industry Partners**
+
+- Applied continual learning research
+- Production deployment
+- Custom algorithm development
+
+**Academic Collaborations**
+
+- Peer-reviewed publication co-authorship
+- Graduate student projects
+- Shared computational resources
+
+**Resource Providers**
+
+- Access to computational infrastructure
+- Large-scale experiment support
+- Dataset contributions
+
+Contact: Open a GitHub issue or use repository discussions.
 
 ## License
 
@@ -629,31 +258,37 @@ MIT License - see LICENSE file for details.
 
 ## Acknowledgments
 
-- **Mammoth Framework**: Used for continual learning benchmarking
-- **DER++ Paper**: Buzzega et al., "Dark Experience Replay", NeurIPS 2020
-- **Continual Learning Community**: For datasets and baselines
+**Frameworks and Baselines:**
 
-## Key References
+- Mammoth Framework - Continual learning benchmarking infrastructure
+- DER++ (Buzzega et al., NeurIPS 2020) - Dark Experience Replay baseline
+- Continual Learning Community - Datasets, benchmarks, and standard protocols
+
+## References
 
 **Primary Baseline:**
 
-- Buzzega, P., Boschini, M., Porrello, A., Abati, D., & Calderara, S. (2020). "Dark Experience for General Continual Learning: a Strong, Simple Baseline." _Advances in Neural Information Processing Systems_, 33.
+Buzzega, P., Boschini, M., Porrello, A., Abati, D., & Calderara, S. (2020). "Dark Experience for General Continual Learning: a Strong, Simple Baseline." Advances in Neural Information Processing Systems, 33.
 
-**Framework:**
+**Mammoth Framework:**
 
-- Boschini, M., Bonicelli, L., Buzzega, P., Porrello, A., & Calderara, S. (2022). "Class-Incremental Continual Learning into the eXtended DER-verse." _IEEE Transactions on Pattern Analysis and Machine Intelligence_.
+Boschini, M., Bonicelli, L., Buzzega, P., Porrello, A., & Calderara, S. (2022). "Class-Incremental Continual Learning into the eXtended DER-verse." IEEE Transactions on Pattern Analysis and Machine Intelligence.
+
+**Causal Inference:**
+
+Pearl, J. (2009). Causality: Models, Reasoning and Inference. Cambridge University Press.
 
 ## Citation
 
-For research utilizing this platform or methodology:
+If you use this platform or methodology in your research:
 
 ```bibtex
 @software{symbioai2025,
-  title={{Symbio AI}: Advanced Continual Learning Research Platform},
+  title={Symbio AI: Causal Continual Learning Research Platform},
   author={Rahmat, Zulhilmi},
   year={2025},
   url={https://github.com/ZulAmi/symbioAI},
-  note={Research platform for continual learning with causal reasoning extensions}
+  note={Research platform for continual learning with causal reasoning}
 }
 ```
 
@@ -661,8 +296,17 @@ For research utilizing this platform or methodology:
 
 **Zulhilmi Rahmat**
 
-- AI/ML Research Engineer
-- Focus: Continual Learning, Causal Inference, Meta-Learning
-- GitHub: [@ZulAmi](https://github.com/ZulAmi)
+AI/ML Research Engineer specializing in:
 
-For professional inquiries, collaboration proposals, or technical questions, please use GitHub Issues or Discussions.
+- Continual Learning
+- Causal Inference
+- Meta-Learning
+- Neural-Symbolic Systems
+
+GitHub: [@ZulAmi](https://github.com/ZulAmi)
+
+For professional inquiries, collaboration proposals, or technical questions, use GitHub Issues or Discussions.
+
+---
+
+**Repository Status:** Active research with validated baselines and ongoing parameter optimization experiments.
