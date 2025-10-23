@@ -38,36 +38,35 @@ echo "Number of seeds: ${NUM_SEEDS}"
 echo "Output directory: ${EXPERIMENT_DIR}"
 echo ""
 
-# Common parameters for all experiments
-COMMON_ARGS="--model causal-der --dataset seq-cifar100 \
+# Common parameters for all experiments (NEW: derpp-causal with proper LR schedule)
+COMMON_ARGS="--model derpp-causal --dataset seq-cifar100 \
 --buffer_size 500 --alpha 0.3 --beta 0.5 --n_epochs 5 \
---batch_size 32 --minibatch_size 32 --lr 0.03 --optim_mom 0.0 --optim_wd 0.0"
+--batch_size 32 --minibatch_size 32 --lr 0.03 \
+--lr_scheduler multisteplr --lr_milestones 3 4 --sched_multistep_lr_gamma 0.2"
 
 # Configuration-specific parameters
 case "${CONFIG_NAME}" in
   baseline)
-    echo "📋 Running BASELINE configuration (Phase 1)"
-    SPECIFIC_ARGS="--use_importance_sampling 0"
+    echo "📋 Running BASELINE configuration (Official DER++, causal OFF)"
+    SPECIFIC_ARGS="--enable_causal_graph_learning 0 --use_causal_sampling 0"
     ;;
   
-  importance)
-    echo "📋 Running IMPORTANCE SAMPLING configuration (Phase 2)"
-    SPECIFIC_ARGS="--use_importance_sampling 1 --importance_weight 0.5"
+  causal)
+    echo "📋 Running CAUSAL configuration (Phase 2: causal graph learning ON)"
+    SPECIFIC_ARGS="--enable_causal_graph_learning 1 --use_causal_sampling 1 \
+--num_tasks 10 --feature_dim 512 --causal_cache_size 200"
     ;;
   
-  graph_learning)
-    echo "📋 Running CAUSAL GRAPH LEARNING configuration (Phase 3)"
-    SPECIFIC_ARGS="--enable_causal_graph_learning 1"
-    ;;
-  
-  full_causal)
-    echo "📋 Running FULL CAUSAL configuration (Phase 4)"
-    SPECIFIC_ARGS="--enable_causal_graph_learning 1 --use_importance_sampling 1 --importance_weight 0.7"
+  quickwins)
+    echo "📋 Running QUICK WINS configuration (Phase 2 with optimizations)"
+    SPECIFIC_ARGS="--enable_causal_graph_learning 1 --use_causal_sampling 1 \
+--num_tasks 10 --feature_dim 512 --causal_cache_size 200"
+    echo "   (Warm start + smoother importance + adaptive sparsification)"
     ;;
   
   *)
     echo "❌ Unknown configuration: ${CONFIG_NAME}"
-    echo "Available: baseline, importance, graph_learning, full_causal"
+    echo "Available: baseline, causal, quickwins"
     exit 1
     ;;
 esac
