@@ -92,7 +92,8 @@ class StructuralCausalModel:
     def learn_causal_structure(self, 
                                task_data: Dict[int, torch.Tensor],
                                task_labels: Dict[int, torch.Tensor],
-                               model: nn.Module) -> torch.Tensor:
+                               model: nn.Module,
+                               sparsification_quantile: float = 0.7) -> torch.Tensor:
         """
         Discover causal relationships between tasks using independence testing.
         
@@ -103,11 +104,12 @@ class StructuralCausalModel:
             task_data: Dict mapping task_id -> feature representations
             task_labels: Dict mapping task_id -> labels
             model: The neural network (for extracting features)
+            sparsification_quantile: Quantile threshold for edge pruning (default 0.7)
         
         Returns:
             Adjacency matrix of causal graph
         """
-        logger.info("Learning causal structure via independence testing...")
+        logger.info(f"Learning causal structure via independence testing (quantile={sparsification_quantile:.2f})...")
         
         with torch.no_grad():
             # Extract feature distributions per task
@@ -153,11 +155,11 @@ class StructuralCausalModel:
                     effect = self._estimate_causal_effect(i, j, task_data, model)
                     self.task_graph[i, j] = effect
         
-        # Sparsify: only keep strong causal links
-        threshold = self.task_graph.abs().quantile(0.7)
+        # Sparsify: only keep strong causal links (adaptive threshold)
+        threshold = self.task_graph.abs().quantile(sparsification_quantile)
         self.task_graph[self.task_graph.abs() < threshold] = 0
         
-        logger.info(f"Discovered causal graph with {(self.task_graph != 0).sum().item()} edges")
+        logger.info(f"Discovered causal graph with {(self.task_graph != 0).sum().item()} edges (threshold={threshold:.3f})")
         return self.task_graph
     
     def _estimate_causal_effect(self, 

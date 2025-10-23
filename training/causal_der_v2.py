@@ -83,13 +83,17 @@ class CausalDEREngine:
         enable_causal_graph_learning: bool = False,  # Phase 3 feature
         num_tasks: int = 10,  # Phase 3: Total number of tasks
         feature_dim: int = 512,  # Phase 3: Feature dimensionality
+        temperature: float = 2.0,  # FIX 1: Temperature for KL divergence
+        replay_warmup_tasks: int = 1,  # FIX 4: Skip replay for first N tasks
+        initial_importance_weight: float = 0.3,  # FIX 3: Annealing start
+        final_importance_weight: float = 0.6,  # FIX 3: Annealing end
         **kwargs  # Accept extra args for future compatibility
     ):
         """
         Initialize DER++ engine with Phase 2 & Phase 3 enhancements.
         
         Args:
-            alpha: MSE distillation weight
+            alpha: MSE distillation weight (actually KL divergence weight)
             beta: CE replay weight  
             buffer_size: Buffer capacity
             minibatch_size: Replay batch size (CRITICAL: must match batch_size!)
@@ -98,6 +102,10 @@ class CausalDEREngine:
             enable_causal_graph_learning: Learn causal graph between tasks (Phase 3)
             num_tasks: Total number of tasks in sequence (Phase 3)
             feature_dim: Dimensionality of learned features (Phase 3)
+            temperature: Temperature scaling for KL divergence (FIX 1)
+            replay_warmup_tasks: Number of tasks before replay starts (FIX 4)
+            initial_importance_weight: Starting importance ratio (FIX 3)
+            final_importance_weight: Final importance ratio (FIX 3)
         """
         self.alpha = alpha
         self.beta = beta
@@ -106,10 +114,21 @@ class CausalDEREngine:
         self.use_importance_sampling = use_importance_sampling
         self.importance_weight = importance_weight
         
+        # FIX 1: Temperature for stable KL divergence
+        self.temperature = temperature
+        
+        # FIX 3: Importance annealing schedule
+        self.initial_importance_weight = initial_importance_weight
+        self.final_importance_weight = final_importance_weight
+        self.current_task = 0
+        
+        # FIX 4: Replay warmup
+        self.replay_warmup_tasks = replay_warmup_tasks
+        
         # Simple list-based buffer (matches Mammoth's Buffer class behavior)
         self.buffer_data = []
         self.buffer_labels = []
-        self.buffer_logits = []
+        self.buffer_log_probs = []  # FIX 1: Store log-probs instead of raw logits
         self.buffer_importances = []  # Phase 2: Store importance scores
         self.buffer_task_ids = []  # Phase 3: Track which task each sample belongs to
         self.num_seen = 0  # For reservoir sampling
@@ -156,6 +175,10 @@ class CausalDEREngine:
         
         print(f"[CausalDER-v2] {phase}")
         print(f"[CausalDER-v2] α={alpha}, β={beta}, buffer={buffer_size}, minibatch={minibatch_size}")
+        print(f"[CausalDER-v2] FIX 1: KL divergence with T={temperature}")
+        print(f"[CausalDER-v2] FIX 2: Importance noise 2% (was 10%)")
+        print(f"[CausalDER-v2] FIX 3: Importance annealing {initial_importance_weight:.1%}→{final_importance_weight:.1%}")
+        print(f"[CausalDER-v2] FIX 4: Replay warmup - skip first {replay_warmup_tasks} task(s)")
         if use_importance_sampling:
             print(f"[CausalDER-v2] Importance sampling: {importance_weight:.1%} by importance, {1-importance_weight:.1%} random")
         if enable_causal_graph_learning:
@@ -210,8 +233,8 @@ class CausalDEREngine:
         uncertainty = 1 - confidence
         importance = loss_normalized * (uncertainty ** 2)
         
-        # Add larger random noise to increase diversity (10% of range)
-        importance += 0.1 * torch.rand_like(importance)
+        # FIX 2: Reduce noise from 10% to 2% for better signal preservation
+        importance += 0.02 * torch.rand_like(importance)
         
         return importance
     
@@ -238,6 +261,10 @@ class CausalDEREngine:
         labels = labels.cpu()
         logits = logits.cpu()
         
+        # FIX 1: Convert logits to log-probs (fp32) for stable KL divergence
+        with torch.no_grad():
+            log_probs = F.log_softmax(logits / self.temperature, dim=1).float()
+        
         # Compute importance if not provided (Phase 2)
         if importances is None and self.use_importance_sampling:
             importances = self.compute_importance(logits, labels).cpu()
@@ -251,7 +278,7 @@ class CausalDEREngine:
                 # Buffer not full, just append
                 self.buffer_data.append(examples[i])
                 self.buffer_labels.append(labels[i])
-                self.buffer_logits.append(logits[i])
+                self.buffer_log_probs.append(log_probs[i])
                 self.buffer_importances.append(importance_score)
                 self.buffer_task_ids.append(task_id)
             else:
@@ -260,7 +287,7 @@ class CausalDEREngine:
                 if idx < self.buffer_size:
                     self.buffer_data[idx] = examples[i]
                     self.buffer_labels[idx] = labels[i]
-                    self.buffer_logits[idx] = logits[i]
+                    self.buffer_log_probs[idx] = log_probs[i]
                     self.buffer_importances[idx] = importance_score
                     self.buffer_task_ids[idx] = task_id
             
@@ -284,7 +311,7 @@ class CausalDEREngine:
         Sample data from buffer with importance-weighted sampling (Phase 2).
         
         Phase 1: Uniform random sampling
-        Phase 2: 70% importance-weighted + 30% random
+        Phase 2: Annealed importance-weighted + random (FIX 3)
         
         Args:
             size: Number of samples to retrieve
@@ -292,17 +319,27 @@ class CausalDEREngine:
             transform: Optional data augmentation
         
         Returns:
-            (data, labels, logits) tuple or (None, None, None) if empty
+            (data, labels, log_probs) tuple or (None, None, None) if empty
         """
         if self.is_empty():
             return None, None, None
         
         size = min(size, len(self.buffer_data))
         
-        # Phase 2: Importance-weighted sampling
+        # FIX 3: Annealed importance sampling (0.3 → 0.6 over tasks)
         if self.use_importance_sampling and len(self.buffer_importances) > 0:
-            # Split sampling: 70% by importance, 30% random
-            n_importance = int(size * self.importance_weight)
+            # Compute current importance weight using linear annealing
+            if self.num_tasks > 1:
+                progress = self.current_task / (self.num_tasks - 1)
+                current_weight = (
+                    self.initial_importance_weight + 
+                    progress * (self.final_importance_weight - self.initial_importance_weight)
+                )
+            else:
+                current_weight = self.importance_weight
+            
+            # Split sampling: annealed% by importance, remaining% random
+            n_importance = int(size * current_weight)
             n_random = size - n_importance
             
             # Sample by importance (weighted by importance scores)
@@ -332,7 +369,7 @@ class CausalDEREngine:
         # Gather samples
         data = torch.stack([self.buffer_data[i] for i in indices])
         labels = torch.stack([self.buffer_labels[i] for i in indices])
-        logits = torch.stack([self.buffer_logits[i] for i in indices])
+        log_probs = torch.stack([self.buffer_log_probs[i] for i in indices])
         
         # Apply transform if provided (before moving to device, like official buffer)
         if transform is not None:
@@ -341,9 +378,9 @@ class CausalDEREngine:
         # Move to device
         data = data.to(device)
         labels = labels.to(device)
-        logits = logits.to(device)
+        log_probs = log_probs.to(device)
         
-        return data, labels, logits
+        return data, labels, log_probs
     
     def compute_loss(
         self,
@@ -355,16 +392,20 @@ class CausalDEREngine:
         transform=None
     ) -> Tuple[torch.Tensor, Dict]:
         """
-        Compute DER++ loss - EXACT copy of official derpp.py observe() logic.
+        Compute DER++ loss with FIXED numerics.
         
-        Loss = CE(current) + α·MSE(replay_logits) + β·CE(replay_labels)
+        FIXES APPLIED:
+        - FIX 1: Use KL divergence instead of MSE (with temperature)
+        - FIX 4: Skip replay for first N tasks (warmup period)
+        
+        Loss = CE(current) + α·KL(replay_log_probs || current_log_probs) + β·CE(replay_labels)
         
         Args:
             model: The neural network
             data: Current batch inputs
             target: Current batch labels
             output: Model predictions on current batch (already computed)
-            task_id: Current task ID (unused in Phase 1)
+            task_id: Current task ID
             transform: Data augmentation for replay
         
         Returns:
@@ -377,26 +418,41 @@ class CausalDEREngine:
         
         info = {
             'current_loss': float(loss.detach().cpu()),
-            'replay_mse': 0.0,
+            'replay_kl': 0.0,
             'replay_ce': 0.0,
         }
+        
+        # FIX 4: Skip replay during warmup period
+        if task_id < self.replay_warmup_tasks:
+            return loss, info
         
         # If buffer is empty, return current loss only
         if self.is_empty():
             return loss, info
         
-        # ========== MSE Term (First Sampling) ==========
-        buf_inputs, _, buf_logits = self.get_data(
+        # ========== KL Divergence Term (First Sampling) - FIX 1 ==========
+        buf_inputs, _, buf_log_probs = self.get_data(
             size=self.minibatch_size,
             device=device,
             transform=transform
         )
         
         if buf_inputs is not None:
+            # Current model's predictions on buffer samples
             buf_outputs = model(buf_inputs)
-            loss_mse = self.alpha * F.mse_loss(buf_outputs, buf_logits)
-            loss += loss_mse
-            info['replay_mse'] = float(loss_mse.detach().cpu())
+            buf_log_probs_current = F.log_softmax(buf_outputs / self.temperature, dim=1)
+            
+            # KL divergence: KL(old || new) using stored log-probs as target
+            # KL(P||Q) = sum(P * (log(P) - log(Q)))
+            # We have log(P) stored, so: exp(log P) * (log P - log Q)
+            loss_kl = self.alpha * F.kl_div(
+                buf_log_probs_current,  # log Q (current model)
+                buf_log_probs,          # log P (stored)
+                log_target=True,
+                reduction='batchmean'
+            )
+            loss += loss_kl
+            info['replay_kl'] = float(loss_kl.detach().cpu())
         
         # ========== CE Term (Second Sampling) ==========
         buf_inputs, buf_labels, _ = self.get_data(
@@ -417,29 +473,36 @@ class CausalDEREngine:
     
     def extract_features(self, model: nn.Module, data: torch.Tensor) -> Optional[torch.Tensor]:
         """
-        Extract feature representations from the model (Phase 3).
+        Extract 512D feature representations from penultimate layer (Phase 3).
+        
+        FIXED: Now extracts features from penultimate layer instead of logits.
         
         Args:
             model: Neural network
             data: Input data (B, C, H, W)
         
         Returns:
-            Feature representations (B, D) or None if extraction fails
+            Feature representations (B, 512) or None if extraction fails
         """
         if model is None:
             return None
         
         with torch.no_grad():
             try:
-                # Try to access the backbone's feature extractor
+                # CRITICAL FIX: Extract features from penultimate layer
                 if hasattr(model, 'net'):
                     # Mammoth models have .net attribute
-                    features = model.net(data)
+                    # Use returnt='features' to get penultimate layer (512D)
+                    features = model.net(data, returnt='features')
                 elif hasattr(model, 'feature_extractor'):
                     features = model.feature_extractor(data)
                 else:
-                    # Fallback: forward pass
-                    features = model(data)
+                    # Fallback: forward pass with returnt parameter if supported
+                    try:
+                        features = model(data, returnt='features')
+                    except TypeError:
+                        # Model doesn't support returnt, use regular forward
+                        features = model(data)
                 
                 # If features are spatial (e.g., conv features), global average pool
                 if isinstance(features, torch.Tensor) and features.dim() > 2:
@@ -512,11 +575,15 @@ class CausalDEREngine:
         Phase 1: Print buffer statistics
         Phase 2: Print importance statistics with distribution details
         Phase 2.5: Compute comprehensive CL metrics (for publication)
+        FIX 3: Update current task for importance annealing
         
         Args:
             model: The neural network
             task_id: Completed task ID
         """
+        # FIX 3: Update task counter for annealing
+        self.current_task = task_id + 1
+        
         print(f"\n[Causal-DER] End of Task {task_id}")
         print(f"  Buffer: {len(self)}/{self.buffer_size} samples")
         print(f"  Total seen: {self.num_seen} samples")
