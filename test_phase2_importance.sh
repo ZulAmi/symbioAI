@@ -54,7 +54,6 @@ python3 utils/main.py \
   --sched_multistep_lr_gamma 0.2 \
   --use_importance_sampling 1 \
   --importance_weight 0.7 \
-  --nowand 1 \
   --seed 1 \
   2>&1 | tee ../validation/results/phase2_importance_seed1.log
 
