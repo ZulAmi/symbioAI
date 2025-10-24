@@ -1,4 +1,4 @@
-# Symbio AI - Causal Continual Learning Research Platform
+# Symbio AI - Causal Continual Learning Research
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -6,251 +6,210 @@
 
 ## Overview
 
-Symbio AI is a comprehensive continual learning research platform pioneering causal reasoning approaches to overcome catastrophic forgetting in neural networks. The platform features 30+ specialized training modules spanning over 30,000 lines of production-quality code, implementing novel algorithms that combine causal inference with adaptive replay strategies.
+**CausalDER** integrates causal graph discovery with continual learning to address catastrophic forgetting in neural networks. This research project extends the official DER++ implementation (Mammoth framework) with causal relationship modeling between sequential tasks.
 
-**Research Status:** Active development with validated baselines and systematic parameter optimization in progress.
+**Research Status:** Working implementation with validated results (72.11% Task-IL on CIFAR-100). Seeking academic collaboration for publication.
 
-### Key Achievements
+### Validated Results (October 2025)
 
-**Phase 1: Validated Baseline (October 2025)**
+**CIFAR-100 Sequential (10 tasks, 5 epochs per task)**
 
-- 70.19% Task-IL accuracy on CIFAR-100 (10 tasks, 5 epochs)
-- Clean DER++ replication with competitive performance
-- Full integration with Mammoth benchmarking framework
+| Method               | Task-IL    | Gap to Baseline | Key Features             |
+| -------------------- | ---------- | --------------- | ------------------------ |
+| Official DER++       | 73.81%     | -               | Memory replay baseline   |
+| **CausalDER (Ours)** | **72.11%** | **-1.70%**      | + Causal graph discovery |
 
-**Phase 2: Importance-Weighted Replay (October 2025)**
+**Causal Graph Discovered:**
 
-- Novel importance sampling formula: `importance = loss × uncertainty²`
-- Adaptive replay strategy: 70% importance-weighted, 30% random
-- Theoretical framework for causal sample attribution
-
-**Phase 3: Causal Graph Learning (October 2025)**
-
-- Complete implementation of Structural Causal Models (SCM)
-- Automatic task dependency discovery via causal inference
-- Interventional reasoning with counterfactual generation
-- Current status: Parameter optimization (initial result: 62.30% Task-IL)
+- 30 strong causal edges (strength 0.5-0.69)
+- Task 3 identified as causal hub (influences 4+ downstream tasks)
+- Graph density: 33.3% (30/90 possible edges)
 
 ### Research Contributions
 
-**Novel Methods:**
+**Novel Method:**
 
-1. **Causal Importance Estimation** - First framework applying causal inference to replay sample selection
-2. **Task Dependency Graphs** - Automatic discovery of task relationships through SCM
-3. **Interventional Learning** - Integration of counterfactual reasoning into continual learning
-4. **Parameter Optimization** - Systematic exploration with scientific controls and multi-seed validation
+First integration of causal graph discovery into memory-based continual learning:
 
-**Current Focus:** Parameter sweep experiments to optimize Phase 3 performance, targeting 71%+ Task-IL for publication.
+1. **Causal-Weighted Replay** - Samples prioritized by discovered task dependencies
+2. **Adaptive Sparsification** - Dynamic threshold (0.9→0.7 quantile) as tasks progress
+3. **Warm Start Blending** - Gradual transition from uniform to causal sampling
+4. **Minimal Trade-off** - Only 1.70% performance cost for explainable task relationships
 
-## Architecture
+**Key Innovation:** Discovers which tasks causally depend on others (e.g., Task 3→Task 4 with 0.686 strength), enabling interpretable replay strategies.
 
-The platform is organized into modular components ensuring reproducibility and extensibility:
+## Implementation
+
+Built on top of the official [Mammoth continual learning framework](https://github.com/aimagelab/mammoth):
 
 ```
 symbio-ai/
-├── config/              # Centralized configuration management
-├── data/                # Dataset storage and preprocessing
-├── docs/                # Technical documentation
-├── mammoth/             # Mammoth framework integration
-├── training/            # Core training modules (30,000+ lines)
-│   ├── causal_der_v2.py             # Phase 1-3 implementation
-│   ├── causal_inference.py          # Structural Causal Models
-│   ├── continual_learning.py        # Primary CL orchestrator
-│   ├── advanced_continual_learning.py  # Advanced strategies
-│   ├── der_plus_plus.py             # DER++ baseline
-│   └── [25+ specialized modules]    # Research prototypes
-├── validation/          # Benchmarking and validation
-│   ├── results/                     # Experimental results
-│   └── tier1_continual_learning/    # Production experiments
+├── mammoth/             # Official Mammoth framework (unchanged)
+│   └── models/
+│       └── derpp.py     # Official DER++ implementation
+├── training/            # CausalDER implementation (~2,400 lines)
+│   ├── derpp_causal.py      # Main: Extends official DER++ (443 lines)
+│   ├── causal_inference.py  # Causal graph discovery (758 lines)
+│   ├── metrics_tracker.py   # Experiment tracking (469 lines)
+│   └── causal_der_v2.py     # Deprecated (750 lines)
+├── validation/          # Test scripts and results
+│   └── results/         # Experimental logs
+├── documents/           # Research documentation
+│   └── RESEARCH_SUMMARY_1PAGE.md  # One-page summary for outreach
 └── requirements.txt     # Dependencies
 ```
 
-**Implementation Status:**
+**Core Implementation:**
 
-- Core continual learning: 1,539 lines (orchestrator) + 1,251 lines (advanced)
-- Causal DER v2: 684 lines (validated baseline)
-- Causal inference: 328 lines (SCM implementation)
-- Specialized modules: 27 modules totaling 29,000+ lines
+- `training/derpp_causal.py` (443 lines): Extends official `mammoth/models/derpp.py` with causal sampling
+- `training/causal_inference.py` (758 lines): Structural Causal Model with PC algorithm
+- Uses ResNet-18 feature extraction (512D penultimate layer)
+- Runtime: ~52 minutes per full experiment on Apple Silicon (MPS)
 
-## Validated Research Results
+## Technical Details
 
-### Continual Learning Benchmarks
+### Method Overview
 
-**MNIST Sequential (10 tasks)**
+**CausalDER** discovers causal relationships between tasks during continual learning:
 
-- Task-Incremental Accuracy: 97.44%
-- Average Forgetting: 3.04%
-- Protocol: 50 epochs per task
+```
+Current Task Training
+    ↓
+Feature Extraction (ResNet-18, 512D)
+    ↓
+Causal Graph Learning (PC algorithm)
+    ↓
+Causal-Weighted Replay Sampling
+    importance = 0.7 × causal_strength + 0.3 × recency
+    ↓
+DER++ Loss (classification + distillation + replay)
+```
 
-**CIFAR-10 Sequential (5 tasks)**
+### Key Hyperparameters
 
-- Task-Incremental Accuracy: 84.67%
-- Average Forgetting: 12.83%
-- Protocol: 50 epochs per task
-- Performance: Competitive with SOTA methods
+- **Buffer size**: 500 samples (50 per task)
+- **Learning rate**: 0.03 with MultiStepLR (milestones=[3,4], gamma=0.2)
+- **Batch size**: 128 (minibatch_size=32 for replay)
+- **Epochs**: 5 per task
+- **Causal discovery**: PC algorithm with partial correlation tests
+- **Sparsification**: Adaptive 0.9→0.7 quantile threshold
 
-**CIFAR-100 Sequential (10 tasks)**
+### Experimental Protocol
 
-- Baseline (Phase 1): 70.19% Task-IL (5 epochs)
-- Phase 3 (default params): 62.30% Task-IL
-- Status: Parameter optimization in progress
-- Target: 71%+ Task-IL for publication
-- Protocol: 10 classes per task, scientific controls maintained
+**Dataset**: CIFAR-100 (10 tasks, 10 classes per task)
+**Splits**: Standard train/test splits
+**Seed**: 1 (multi-seed validation pending)
+**Device**: MPS (Apple Silicon) tested, NVIDIA GPU compatible
+**Framework**: Mammoth (official continual learning library)
 
-### Phase 3: Causal Graph Learning
+## Running the Code
 
-**Implementation Components:**
+### Installation
 
-- Structural Causal Model with Pearl's causal hierarchy
-- Feature extraction and caching (200 samples per task)
-- Graph sparsification (quantile-based thresholding)
-- Interventional reasoning and counterfactual generation
-- Automatic dependency discovery
+```bash
+# Clone repository
+git clone https://github.com/ZulAmi/symbioAI.git
+cd symbioAI
 
-**Parameter Optimization Framework:**
+# Install dependencies
+pip install -r requirements.txt
+```
 
-- Cache size sweep: [0, 50, 100, 200] samples
-- Sparsification sweep: [0.3, 0.5, 0.7, 0.9, None] quantiles
-- Scientific controls: All baseline parameters frozen
-- Multi-seed validation: 5 seeds for statistical significance
-- Automated analysis and decision logic
+### Quick Start
 
-## Core Continual Learning Methods
+```bash
+# Run CausalDER on CIFAR-100 (10 tasks, 5 epochs)
+python3 mammoth/utils/main.py \
+  --model derpp-causal \
+  --dataset seq-cifar100 \
+  --buffer_size 500 \
+  --n_epochs 5 \
+  --batch_size 128 \
+  --minibatch_size 32 \
+  --lr 0.03 \
+  --seed 1
 
-Production-ready implementations of state-of-the-art algorithms:
+# Run official DER++ baseline for comparison
+python3 mammoth/utils/main.py \
+  --model derpp \
+  --dataset seq-cifar100 \
+  --buffer_size 500 \
+  --n_epochs 5 \
+  --batch_size 128 \
+  --alpha 0.1 \
+  --beta 0.5 \
+  --seed 1
+```
 
-**Anti-Forgetting Strategies:**
+### Expected Results
 
-- **Elastic Weight Consolidation (EWC)** - Fisher Information Matrix-based parameter protection
-- **Experience Replay** - Intelligent memory buffer with importance-weighted sampling
-- **Progressive Neural Networks** - Task-specific architectural expansion with lateral connections
-- **Task-Specific Adapters** - Parameter-efficient fine-tuning via LoRA-inspired layers
-- **DER++ Baseline** - Faithful replication of Buzzega et al. (NeurIPS 2020)
-
-**Causal Extensions:**
-
-- **Importance-Weighted Replay** - Samples prioritized by loss and uncertainty
-- **Structural Causal Models** - Task dependency discovery
-- **Interventional Reasoning** - Counterfactual-based learning
-- **Graph-Based Replay** - Task relationships guide sample selection
-
-**Documentation:** See `docs/continual_learning_quick_start.md` for implementation guides.
-
-## Research Modules
-
-The platform includes 25+ specialized modules representing active research directions:
-
-**Meta-Learning and Transfer (3,563 lines)**
-
-- recursive_self_improvement.py (963 lines) - Meta-evolution of learning strategies
-- cross_task_transfer.py (1,190 lines) - Automatic transfer relationship discovery
-- one_shot_meta_learning.py (1,410 lines) - Few-shot adaptation mechanisms
-
-**Reasoning and Diagnosis (5,758 lines)**
-
-- metacognitive_monitoring.py (1,567 lines) - Self-awareness and confidence estimation
-- causal_self_diagnosis.py (2,515 lines) - Causal failure diagnosis
-- automated_theorem_proving.py (1,344 lines) - Formal verification
-- neural_symbolic_architecture.py (2,332 lines) - Hybrid reasoning systems
-
-**Architecture and Optimization (4,494 lines)**
-
-- dynamic_architecture_evolution.py (1,267 lines) - Adaptive network structures
-- quantization_aware_evolution.py (1,106 lines) - Compression-aware evolution
-- sparse_mixture_adapters.py (1,219 lines) - Massive adapter libraries
-- memory_enhanced_moe.py (902 lines) - Memory-augmented MoE
-
-**Multi-Modal and Agents (3,566 lines)**
-
-- unified_multimodal_foundation.py (1,061 lines) - Cross-modal learning
-- embodied_ai_simulation.py (1,224 lines) - Physical environment interaction
-- multi_agent_collaboration.py (1,281 lines) - Agent coordination protocols
-
-**Additional Systems (6,371 lines)**
-
-- active_learning_curiosity.py (1,090 lines)
-- compositional_concept_learning.py (1,358 lines)
-- multi_scale_temporal_reasoning.py (951 lines)
-- speculative_execution_verification.py (1,154 lines)
-- advanced_evolution.py (1,244 lines)
-- evolution.py (946 lines)
-- distill.py (892 lines)
-- manager.py, auto_surgery.py (736 lines)
-
-**Note:** Research modules are experimental prototypes undergoing validation. Performance claims require benchmark verification.
+- **Official DER++**: ~73.81% Task-IL
+- **CausalDER**: ~72.11% Task-IL (with 30-edge causal graph)
+- **Runtime**: ~52 minutes on Apple Silicon M1/M2
 
 ## Documentation
 
+- **[One-Page Research Summary](documents/RESEARCH_SUMMARY_1PAGE.md)** - Complete overview for collaboration inquiries
 - [Continual Learning Quick Start](docs/continual_learning_quick_start.md)
 - [Architecture Overview](docs/architecture.md)
-- [API Reference](docs/api_reference.md)
-- [Phase 3 Implementation Verification](PHASE3_IMPLEMENTATION_VERIFICATION.md)
-- [Parameter Optimization Guide](PARAMETER_EXPERIMENTS_README.md)
 
-## Contributing
+## Next Steps
 
-This is an active research project. Contributions are welcome in the following areas:
+### Research Roadmap
 
-- Continual learning algorithm improvements
-- Validation of experimental modules
-- Bug fixes and documentation
-- Benchmark comparisons
+**Immediate (Weeks 1-2):**
 
-**Process:**
+- Multi-seed validation (5 seeds) for statistical significance
+- Additional datasets (MNIST, CIFAR-10, TinyImageNet)
+- Ablation studies (warm start, importance blending, sparsification)
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with appropriate tests
-4. Submit a pull request with clear description
+**Short-term (Weeks 3-4):**
 
-## Intellectual Property
+- Workshop/conference paper draft (4-8 pages)
+- Comparison with SOTA causal learning methods
+- Theoretical analysis of causal discovery complexity
 
-This repository demonstrates research platform capabilities while protecting core algorithmic innovations.
+**Long-term (Months 3-6):**
 
-**Public Components:**
+- Application to real-world domains (robotics, vision, NLP)
+- Extended causal inference methods (interventions, counterfactuals)
+- Full NeurIPS/ICLR conference paper
 
-- Framework integration code
-- Benchmark infrastructure
-- Documentation and methodology
-- Experimental protocols
+### Target Venues
 
-**Proprietary Components:**
-
-- Novel causal learning algorithms
-- Advanced optimization techniques
-- Proprietary training procedures
-
-For collaboration inquiries regarding full implementations, please open a GitHub issue.
+- **NeurIPS 2026** (June deadline) - Main conference or CLeaR workshop
+- **ICLR 2026** (January deadline) - Conference or workshop track
+- **CoLLAs 2025** - Lifelong learning focused venue
 
 ## Collaboration Opportunities
 
-Open to partnerships in:
+**Seeking academic collaboration for co-authorship on workshop/conference paper.**
 
-**Research Institutions**
+### What We're Looking For
 
-- Joint validation studies
-- Benchmark development
-- Co-authorship on publications
+**Expertise Areas** (any of):
 
-**Industry Partners**
+- Causal inference (improving graph discovery, theoretical guarantees)
+- Continual learning (optimizing replay strategies, multi-dataset validation)
+- Theory (sample complexity bounds, convergence analysis)
 
-- Applied continual learning research
-- Production deployment
-- Custom algorithm development
+### What We Bring
 
-**Academic Collaborations**
+- ✅ Working implementation extending official Mammoth DER++
+- ✅ Validated results (72.11% Task-IL with 30-edge causal graph)
+- ✅ Clear experimental protocol (reproducible)
+- ✅ 6-week timeline to workshop submission
+- ✅ Open to co-authorship with fair credit
 
-- Peer-reviewed publication co-authorship
-- Graduate student projects
-- Shared computational resources
+### Collaboration Levels
 
-**Resource Providers**
+| Level           | Time Commitment | Role                            | Benefits                |
+| --------------- | --------------- | ------------------------------- | ----------------------- |
+| **Advisory**    | 1-2 hrs/month   | Review design & drafts          | Co-authorship           |
+| **Active**      | 4-6 hrs/month   | Joint experiments & writing     | Primary co-author       |
+| **Partnership** | 10+ hrs/month   | Research direction & mentorship | Long-term collaboration |
 
-- Access to computational infrastructure
-- Large-scale experiment support
-- Dataset contributions
-
-Contact: Open a GitHub issue or use repository discussions.
+**Contact:** Open a GitHub issue or see [RESEARCH_SUMMARY_1PAGE.md](documents/RESEARCH_SUMMARY_1PAGE.md) for full details.
 
 ## License
 
@@ -266,47 +225,33 @@ MIT License - see LICENSE file for details.
 
 ## References
 
-**Primary Baseline:**
-
-Buzzega, P., Boschini, M., Porrello, A., Abati, D., & Calderara, S. (2020). "Dark Experience for General Continual Learning: a Strong, Simple Baseline." Advances in Neural Information Processing Systems, 33.
-
-**Mammoth Framework:**
-
-Boschini, M., Bonicelli, L., Buzzega, P., Porrello, A., & Calderara, S. (2022). "Class-Incremental Continual Learning into the eXtended DER-verse." IEEE Transactions on Pattern Analysis and Machine Intelligence.
-
-**Causal Inference:**
-
-Pearl, J. (2009). Causality: Models, Reasoning and Inference. Cambridge University Press.
+1. **Buzzega et al.** (2020). "Dark Experience for General Continual Learning: a Strong, Simple Baseline." _NeurIPS_.
+2. **Boschini et al.** (2022). "Class-Incremental Continual Learning into the eXtended DER-verse." _IEEE TPAMI_.
+3. **Pearl, J.** (2009). _Causality: Models, Reasoning and Inference_. Cambridge University Press.
+4. **Spirtes et al.** (2000). _Causation, Prediction, and Search_. MIT Press.
+5. **Schölkopf et al.** (2021). "Toward Causal Representation Learning." _PNAS_.
 
 ## Citation
 
-If you use this platform or methodology in your research:
+If you use this code in your research:
 
 ```bibtex
-@software{symbioai2025,
-  title={Symbio AI: Causal Continual Learning Research Platform},
+@software{causalder2025,
+  title={CausalDER: Causal Graph Discovery for Continual Learning},
   author={Rahmat, Zulhilmi},
   year={2025},
   url={https://github.com/ZulAmi/symbioAI},
-  note={Research platform for continual learning with causal reasoning}
+  note={Integration of causal inference with DER++ continual learning}
 }
 ```
 
-## Author
+## Contact
 
-**Zulhilmi Rahmat**
-
-AI/ML Research Engineer specializing in:
-
-- Continual Learning
-- Causal Inference
-- Meta-Learning
-- Neural-Symbolic Systems
-
+**Zulhilmi Rahmat**  
 GitHub: [@ZulAmi](https://github.com/ZulAmi)
 
-For professional inquiries, collaboration proposals, or technical questions, use GitHub Issues or Discussions.
+For collaboration inquiries or questions, open a GitHub issue or see [RESEARCH_SUMMARY_1PAGE.md](documents/RESEARCH_SUMMARY_1PAGE.md).
 
 ---
 
-**Repository Status:** Active research with validated baselines and ongoing parameter optimization experiments.
+**Status:** Active research (October 2025) | Validated 72.11% Task-IL on CIFAR-100 | Seeking collaboration
