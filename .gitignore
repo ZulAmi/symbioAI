@@ -496,4 +496,9 @@ __pycache__/
 *_generated.py
 *_temp.py
 
+# Exclude mammoth framework (official code, not ours)
+mammoth/
+# BUT include our custom model adapter (required for Mammoth to discover CausalDER)
+!mammoth/models/derpp_causal.py
+
 mammoth/
