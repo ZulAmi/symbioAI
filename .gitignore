@@ -310,7 +310,7 @@ mammoth/models/*_experimental.py
 mammoth/models/*_wip.py
 
 # Internal documentation and work-in-progress notes (private)
-documents/
+PersonalDocuments/
 notes/
 experiments_log/
 *.md
