@@ -84,6 +84,16 @@ class DerppCausal(Derpp):
         parser.add_argument('--use_importance_sampling', type=int, default=0,
                           help='Enable importance sampling (0=off, 1=on)')
         
+        # Causal-specific tuning parameters
+        parser.add_argument('--causal_blend_ratio', type=float, default=0.7,
+                          help='Causal vs recency blend (0.7 = 70%% causal, 30%% recency)')
+        parser.add_argument('--sparsity_start', type=float, default=0.9,
+                          help='Initial sparsification quantile (keep top X%%)')
+        parser.add_argument('--sparsity_end', type=float, default=0.7,
+                          help='Final sparsification quantile')
+        parser.add_argument('--causal_warmup_tasks', type=int, default=3,
+                          help='Number of tasks to warm up causal sampling (0=immediate)')
+        
         return parser
     
     def __init__(self, backbone, loss, args, transform, dataset=None):
@@ -100,6 +110,12 @@ class DerppCausal(Derpp):
         self.feature_dim = getattr(args, 'feature_dim', 512)
         self.causal_cache_size = getattr(args, 'causal_cache_size', 200)
         self.importance_weight = getattr(args, 'importance_weight', 0.5)
+        
+        # Causal-specific tuning parameters
+        self.causal_blend_ratio = getattr(args, 'causal_blend_ratio', 0.7)
+        self.sparsity_start = getattr(args, 'sparsity_start', 0.9)
+        self.sparsity_end = getattr(args, 'sparsity_end', 0.7)
+        self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 3)
         
         # Initialize Structural Causal Model if enabled
         self.scm = None
@@ -246,16 +262,19 @@ class DerppCausal(Derpp):
             indices = torch.randperm(buf_inputs.size(0))[:size]
             return buf_inputs[indices], buf_labels[indices], buf_logits[indices]
         
-        # QUICK WIN #1: Warm start blending
-        # Gradually transition from uniform (Tasks 0-1) to full causal (Task 3+)
+        # Warm start blending with tunable warmup schedule
+        # Gradually transition from uniform to full causal based on warmup_tasks parameter
         current_task = self.current_task
-        if current_task <= 1:
-            # Early tasks: use uniform sampling (no causal graph yet)
-            indices = torch.randperm(buf_inputs.size(0))[:size]
-            return buf_inputs[indices], buf_labels[indices], buf_logits[indices]
         
-        # Blend factor: 0.0 at Task 2, 1.0 at Task 4+
-        causal_blend = min(1.0, (current_task - 1) / 3.0)
+        if self.causal_warmup_tasks == 0:
+            # No warmup - use causal immediately
+            causal_blend = 1.0
+        elif current_task < self.causal_warmup_tasks:
+            # Gradual warmup over specified number of tasks
+            causal_blend = current_task / self.causal_warmup_tasks
+        else:
+            # Full causal after warmup period
+            causal_blend = 1.0
         
         # Compute causal importance for each sample
         # Higher importance = more critical for preventing forgetting
@@ -277,10 +296,10 @@ class DerppCausal(Derpp):
                 # Causal effect of past task on current task
                 causal_strength = abs(self.causal_graph[task_id, current_task].item())
                 
-                # QUICK WIN #2: Smoother importance scores
                 # Blend causal strength with recency (newer tasks get slight boost)
+                # Using tunable blend ratio instead of hardcoded 0.7
                 recency_weight = 1.0 - (current_task - task_id) / max(current_task, 1)
-                blended_importance = 0.7 * causal_strength + 0.3 * recency_weight
+                blended_importance = self.causal_blend_ratio * causal_strength + (1 - self.causal_blend_ratio) * recency_weight
                 
                 importance_scores[i] = blended_importance
             else:
@@ -380,11 +399,12 @@ class DerppCausal(Derpp):
         for tid, data in task_data.items():
             print(f"    Task {tid}: {data.shape[0]} samples, {data.shape[1]}D features")
         
-        # QUICK WIN #3: Adaptive sparsification
-        # Start loose (keep more edges early), tighten over time
-        adaptive_quantile = 0.9 - 0.2 * (task_id / max(self.num_tasks - 1, 1))
-        adaptive_quantile = max(0.5, min(0.9, adaptive_quantile))  # Clamp to [0.5, 0.9]
-        print(f"  Using adaptive sparsification: {adaptive_quantile:.2f} quantile")
+        # Adaptive sparsification using tunable start/end thresholds
+        # Gradually transition from sparsity_start to sparsity_end as tasks progress
+        task_progress = task_id / max(self.num_tasks - 1, 1)
+        adaptive_quantile = self.sparsity_start - (self.sparsity_start - self.sparsity_end) * task_progress
+        adaptive_quantile = max(0.5, min(0.95, adaptive_quantile))  # Clamp to safe range [0.5, 0.95]
+        print(f"  Using adaptive sparsification: {adaptive_quantile:.2f} quantile (start={self.sparsity_start:.2f}, end={self.sparsity_end:.2f})")
         
         try:
             # Learn causal structure using SCM with adaptive threshold
