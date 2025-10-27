@@ -59,8 +59,8 @@ The proposed system follows a sequential pipeline:
 **Statistical Analysis**:
 
 - Consistent minimal performance gap (-1.80%, -1.65%, ~0%) across all benchmarks
-- High stability: CIFAR-100 std=0.56%, MNIST std=0.04%
-- Near-optimal performance on MNIST (~99% accuracy)
+- High stability: CIFAR-100 std=0.56% (CV=0.77%), MNIST std=0.037% (CV=0.037%)
+- Near-optimal performance on MNIST (99.04% accuracy)
 - Validated generalization: vision datasets (CIFAR-100, CIFAR-10) and digit recognition (MNIST)
 
 ### 3.2 CIFAR-100 Detailed Analysis (Primary Dataset)
@@ -71,23 +71,29 @@ The proposed system follows a sequential pipeline:
 - Standard deviation: 0.56%
 - Range: [71.31%, 72.77%]
 - Individual seeds: 72.11%, 71.66%, 72.21%, 71.31%, 72.77%
-- Task-wise performance (seed 1): [51.5%, 64.6%, 68.1%, 70.3%, 73.3%, 72.1%, 75.1%, 75.9%, 80.1%, 90.1%]
+- Low variance demonstrates method stability (CV=0.78%)
+
+**Task-wise performance trajectory (seed 1)**:
+
+Progressive accuracy improvement across 10 sequential tasks: [44.7%, 67.1%, 69.8%, 70.8%, 71.8%, 72.5%, 75.4%, 73.6%, 81.0%, 89.9%] demonstrating successful knowledge retention and positive forward transfer.
 
 ### 3.3 Discovered Causal Structure
 
-**Graph Statistics**:
+**Graph Statistics** (seed 2, representative):
 
-- 30 strong causal edges (strength threshold: 0.5-0.69)
+- 30 strong causal edges (strength threshold: 0.5-0.688)
 - Graph density: 33.3% (30 out of 90 possible edges)
+- Mean edge strength: 0.189 (across all potential edges)
 - Hub identification: Task 3 exhibits strongest causal influence
 
 **Key Causal Relationships**:
 
-- Task 3 → Task 4: strength 0.686 (strongest edge)
-- Task 2 → Task 3: strength 0.672
-- Task 1 → Task 2: strength 0.667
-- Task 3 strongly influences Tasks 1, 2, 4, 5, 6 (strength 0.61-0.69)
-- Bidirectional dependencies observed: Task 1 ↔ Task 2 (mutual strength 0.67)
+- Task 3 → Task 4: strength 0.688 (strongest edge)
+- Task 2 → Task 3: strength 0.663
+- Task 1 → Task 2: strength 0.648
+- Task 0 ↔ Task 1: strength 0.621 (bidirectional)
+- Task 3 strongly influences Tasks 1, 2, 4 (strength 0.60-0.688)
+- Task 2 influences Tasks 1, 3, 4 (strength 0.604-0.663)
 
 ### 3.4 Optimization Strategy
 
@@ -283,6 +289,6 @@ Availability for introductory discussions to explore collaboration opportunities
 
 **Document Information**  
 **Prepared**: October 24, 2025  
-**Version**: 4.0  
+**Version**: 4.1  
 **Status**: Actively Seeking Academic Collaborators  
-**Last Updated**: Following 3-dataset validation (CIFAR-100: 72.01±0.56%, CIFAR-10: 89.98%, MNIST: 99.04±0.04%)
+**Last Updated**: October 27, 2025 - Complete 3-dataset validation (CIFAR-100: 72.01±0.56%, CIFAR-10: 89.98%, MNIST: 99.05±0.04%)
