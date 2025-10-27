@@ -502,3 +502,12 @@ mammoth/
 !mammoth/models/derpp_causal.py
 
 mammoth/
+
+# ============================================================================
+# Completed Experiment Scripts (archived)
+# ============================================================================
+validation/scripts/completed_experiments/
+
+# Experiment results (keep structure only)
+validation/results/*/
+!validation/results/.gitkeep
