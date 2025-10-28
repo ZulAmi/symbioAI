@@ -14,9 +14,9 @@
 
 Continual learning systems struggle with catastrophic forgetting when they learn tasks one after another. The current best methods - replay buffers (Buzzega et al., 2020) and regularization (Kirkpatrick et al., 2017) - treat each task independently. This means we're missing opportunities to understand how tasks actually relate to each other and which relationships matter for knowledge transfer.
 
-**The Gap**: Current continual learning methods don't have a way to discover and interpret causal dependencies between tasks. We don't really understand how tasks influence each other or which relationships drive forgetting versus transfer.
+**The Gap**: Current methods can't discover or interpret causal dependencies between tasks. We don't understand how tasks influence each other or which relationships drive forgetting versus transfer.
 
-**My Hypothesis**: If we explicitly learn causal relationships between tasks (like "Task 3 causally influences Task 7"), we can get interpretable insights into task dependencies and knowledge transfer patterns that help us understand continual learning dynamics better.
+**My Hypothesis**: Learning explicit causal relationships between tasks (like "Task 3 causally influences Task 7") gives us interpretable insights into task dependencies and knowledge transfer patterns.
 
 ---
 
@@ -26,24 +26,24 @@ I've built CausalDER by combining causal graph discovery with DER++ (Buzzega et 
 
 ### 2.1 How It Works
 
-The system has a straightforward pipeline:
+Straightforward pipeline:
 
-1. **Feature Extraction**: Pull 512-dimensional embeddings from ResNet-18's penultimate layer
-2. **Causal Discovery**: Use the PC algorithm (Spirtes et al., 2000) to find task dependencies
-3. **Graph Analysis**: Visualize task relationships in an interpretable way
-4. **DER++ Training**: Run standard classification, distillation, and replay losses
+1. **Feature Extraction**: Pull 512D embeddings from ResNet-18's penultimate layer
+2. **Causal Discovery**: Use PC algorithm (Spirtes et al., 2000) to find task dependencies
+3. **Graph Analysis**: Visualize task relationships
+4. **DER++ Training**: Standard classification, distillation, and replay losses
 
 ### 2.2 What's New Here
 
-1. **First Integration**: As far as I know, this is the first systematic attempt to bring causal graph discovery into continual learning for understanding task relationships
-2. **Clear Structure**: The method discovers explicit causal task dependencies (found 30 edges with strength 0.5-0.69)
+1. **First Integration**: First systematic attempt at causal graph discovery in continual learning for task relationships
+2. **Clear Structure**: Discovers explicit causal dependencies (found 30 edges with strength 0.5-0.69)
 3. **Smart Discovery**:
-   - Dynamic sparsification that adapts (0.9 → 0.7 quantile threshold)
-   - Temporal constraints - only forward edges (i→j where i<j) since time moves forward
-4. **Zero Cost**: Graph learning barely affects performance (+0.07%, basically noise)
-5. **Honest Ablation**: Found that importance sampling actually hurts performance (-2.06%), which shows balanced replay matters
-6. **Works Broadly**: Tested on vision tasks (CIFAR-100, CIFAR-10) and digits (MNIST)
-7. **Reproducible**: Graph structure stays consistent across different random seeds
+   - Adaptive sparsification (0.9 → 0.7 quantile threshold)
+   - Temporal constraints - only forward edges (i→j where i<j)
+4. **Free**: Graph learning costs nothing (+0.07% is noise)
+5. **Honest Ablation**: Importance sampling hurts performance (-2.06%), shows balanced replay matters
+6. **Works Broadly**: Tested on CIFAR-100, CIFAR-10, MNIST
+7. **Reproducible**: Consistent graph structure across random seeds
 
 ---
 
@@ -59,10 +59,10 @@ The system has a straightforward pipeline:
 
 **Key Findings**:
 
-- **Graph learning is performance-neutral**: +0.07% is within statistical noise
-- **Importance sampling destroys diversity**: -2.06% degradation from concentrating on single tasks
-- **Balanced replay is critical**: Uniform sampling outperforms importance-based sampling
-- **Graph provides interpretability**: 30 discovered edges reveal task relationships without affecting performance
+- **Graph learning is free**: +0.07% is statistical noise
+- **Importance sampling kills diversity**: -2.06% by concentrating on single tasks
+- **Balanced replay wins**: Uniform sampling beats importance-based sampling
+- **Interpretability for free**: 30 edges reveal task relationships without hurting performance
 
 ### 3.2 CIFAR-100 Detailed Analysis (Primary Dataset)
 
@@ -84,9 +84,9 @@ The system has a straightforward pipeline:
 **Experiment 3: Graph Only (Graph Learning, No Sampling)**:
 
 - Result: 73.88% Task-IL
-- Gap from baseline: +0.07% (negligible, likely statistical noise)
-- Graph learned but not used for sampling decisions
-- Proves graph learning doesn't interfere with training
+- Gap from baseline: +0.07% (statistical noise)
+- Graph learned but not used for sampling
+- Shows graph learning doesn't hurt training
 
 ### 3.3 Discovered Causal Structure
 
@@ -106,11 +106,11 @@ The system has a straightforward pipeline:
 - Task 3 acts as hub: influences Tasks 4, 5, 6 with strengths 0.60-0.69
 - No backward edges (temporal causality preserved)
 
-**Interpretation**:
+**What this shows**:
 
 - Early tasks (0-3) form foundational knowledge
-- Task 3 emerges as central hub with broadest influence
-- Graph reveals interpretable task relationships without performance cost
+- Task 3 is the central hub with broadest influence
+- Graph reveals interpretable task relationships for free
 
 ### 3.4 Why Importance Sampling Failed
 
@@ -134,7 +134,7 @@ The system has a straightforward pipeline:
 3. Multinomial sampling heavily favors high-importance tasks
 4. Result: Catastrophic forgetting of low-importance tasks
 
-**Conclusion**: Balanced replay is fundamental to continual learning. Importance sampling trades diversity for structure, resulting in severe performance degradation.
+**Bottom line**: Balanced replay is fundamental. Importance sampling trades diversity for structure, killing performance.
 
 ---
 
@@ -165,10 +165,11 @@ I'd love to work with researchers who have expertise in:
 - Validation across CIFAR-100, CIFAR-10, and MNIST
 - All experiments are reproducible with full documentation
 
-**Timeline**:
+**Timeline & Code**:
 
-- Could realistically submit to a workshop in 6 weeks (targeting NeurIPS 2026 or ICLR 2026)
-- Open to discussing fair co-authorship arrangements
+- Could submit to a workshop in 6 weeks (NeurIPS 2026 or ICLR 2026)
+- Code already public: [github.com/ZulAmi/symbioAI](https://github.com/ZulAmi/symbioAI)
+- Open to fair co-authorship arrangements
 
 ### 4.3 Collaboration Models
 
@@ -203,13 +204,13 @@ I'd love to work with researchers who have expertise in:
 
 ### 6.1 Scientific Contributions
 
-- **New Method**: First systematic attempt at integrating causal graph discovery into continual learning for analyzing task relationships
-- **Interpretability**: The causal graphs give you an explicit model of task dependencies without hurting performance
-- **Honest Negative Result**: Shows that importance sampling fails by destroying diversity - this is actually a valuable finding
-- **Robust**: Graph discovery is consistent across different experiments
-- **Reproducible**: Built on the established Mammoth framework with everything documented
-- **Clean Ablations**: Clearly separates graph learning (neutral) from importance sampling (harmful)
-- **Temporal Causality**: Respects task ordering by only allowing forward edges
+- **New Method**: First systematic integration of causal graph discovery into continual learning for task relationships
+- **Interpretability**: Causal graphs give you explicit task dependencies without hurting performance
+- **Honest Negative Result**: Importance sampling fails by destroying diversity - valuable finding
+- **Robust**: Consistent graph discovery across experiments
+- **Reproducible**: Built on Mammoth framework with full documentation
+- **Clean Ablations**: Separates graph learning (neutral) from importance sampling (harmful)
+- **Temporal Causality**: Only forward edges respecting task ordering
 
 ### 6.2 Practical Applications
 
@@ -236,10 +237,10 @@ I'd love to work with researchers who have expertise in:
 
 ### 7.1 Immediate Outcomes
 
-- Co-authorship on publication targeting top-tier ML venue (NeurIPS/ICLR)
-- Access to validated implementation with multi-dataset results
+- Co-authorship on publication targeting NeurIPS/ICLR workshop
+- Validated implementation with multi-dataset results (code already public)
 - Publication-ready experimental results with statistical significance
-- Early position in emerging research area (causal inference + continual learning)
+- Early position in emerging area (causal inference + continual learning)
 
 ### 7.2 Medium-Term Opportunities
 
@@ -283,7 +284,7 @@ I'd love to work with researchers who have expertise in:
 
 ### 9.1 Initial Contact
 
-Interested collaborators are invited to contact via email (zulhilmirahmat@gmail.com) to arrange an introductory discussion (30-minute video call recommended).
+Email me at zulhilmirahmat@gmail.com to set up a 30-minute call.
 
 ### 9.2 How We'd Work Together
 

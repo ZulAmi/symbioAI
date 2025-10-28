@@ -8,7 +8,9 @@
 
 **CausalDER** combines causal graph discovery with continual learning to understand how tasks relate to each other in neural networks. I've extended the official DER++ implementation from the Mammoth framework by adding causal structure learning between sequential tasks.
 
-**Current Status:** I have a working implementation with completed ablation studies on CIFAR-100. The graph learning reveals interpretable task relationships without hurting performance. Looking for academic collaborators interested in pushing this work toward publication.
+**Current Status:** Working implementation with completed ablation studies on CIFAR-100. Graph learning reveals interpretable task relationships without hurting performance. Looking for academic collaborators to push this toward publication.
+
+**Code:** Public on GitHub at [github.com/ZulAmi/symbioAI](https://github.com/ZulAmi/symbioAI)
 
 ### Validated Results (October 2025)
 
@@ -20,13 +22,13 @@
 | **Graph Only**     | ✅             | ❌                  | **73.88%** | +0.07% (negligible)     |
 | **Full Causal**    | ✅             | ✅                  | **71.75%** | -2.06% (sampling hurts) |
 
-**Key findings**:
+**What I found**:
 
-- ✅ **Graph learning is neutral**: +0.07% (within statistical noise)
-- ❌ **Importance sampling degrades**: -2.06% by destroying diversity
-- ✅ **Interpretable structure**: 30-edge causal graph discovered
-- ✅ **Balanced replay critical**: Uniform sampling outperforms importance weighting
-- ✅ **Rigorous negative result**: Valuable insight that importance sampling fails
+- Graph learning is free: +0.07% is just noise
+- Importance sampling hurts: -2.06% by killing diversity
+- Got interpretable structure: 30-edge causal graph
+- Balanced replay matters: Uniform sampling beats importance weighting
+- Useful failure: Importance sampling doesn't work here
 
 **CIFAR-100 detailed (primary dataset, 10 tasks, 5 epochs)**:
 
@@ -50,11 +52,11 @@
 - Configuration: Graph learning enabled, importance sampling disabled
 - Graph computed but not used for sampling
 
-**Interpretation**:
+**What this means**:
 
-- Graph learning: Performance neutral (+0.07%, likely noise)
-- Importance sampling: Degrades by -2.06% through diversity loss
-- Conclusion: Graph provides interpretability without performance cost
+- Graph learning: Free interpretability (+0.07% is noise)
+- Importance sampling: Kills performance (-2.06% by destroying diversity)
+- Bottom line: You get interpretability without any performance hit
 
 **Causal Graph Discovered (Experiment 3, Graph Only)**:
 
@@ -165,23 +167,23 @@ Clean ablation to separate graph learning from importance sampling:
 
 **Total Compute Time**: ~5.2 hours (6×52min)
 
-**Key Lesson**: Importance sampling incompatible with balanced replay - graph learning provides interpretability without performance cost
+**Key Lesson**: Importance sampling breaks balanced replay - graph learning gives you interpretability for free
 
-### What This Research Contributes
+### What This Does
 
 **Main Idea:**
 
-I'm bringing causal graph discovery into continual learning to see which tasks actually depend on each other:
+Bringing causal graph discovery into continual learning to see which tasks actually depend on each other:
 
-1. **Interpretable Task Graphs** - The method finds task dependencies without messing up training
-2. **Temporal Causality** - Only allows forward edges (i→j where i<j) since later tasks can't affect earlier ones
-3. **Zero Performance Cost** - Graph learning is basically free (+0.07%, just noise)
-4. **A Useful Failure** - Importance sampling actually hurts performance by -2.06%
-5. **Clean Experimental Design** - Ablations clearly separate graph learning from sampling
+1. **Interpretable Task Graphs** - Finds task dependencies without messing up training
+2. **Temporal Causality** - Only forward edges (i→j where i<j) since later tasks can't affect earlier ones
+3. **Free** - Graph learning costs nothing (+0.07% is noise)
+4. **Honest Failure** - Importance sampling hurts performance by -2.06%
+5. **Clean Experiments** - Ablations clearly separate graph learning from sampling
 
-**The Cool Part:** You can see which tasks causally influence others (like Task 2→Task 3 at 0.698 strength) and get interpretable insights without any performance penalty.
+**The Cool Part:** See which tasks causally influence others (like Task 2→Task 3 at 0.698 strength) without any performance penalty.
 
-**Unexpected Discovery:** Importance-based sampling turns out to be fundamentally incompatible with balanced replay - this negative result is actually pretty valuable for the field.
+**Unexpected Finding:** Importance sampling breaks balanced replay - turns out to be a valuable negative result.
 
 ## Implementation
 
@@ -312,8 +314,8 @@ python3 mammoth/utils/main.py \
 - DER++ Baseline: 73.81% (seed 1)
 - Graph Only: 73.88% (+0.07%, negligible)
 - Full Causal: 71.75% (-2.06%, importance sampling hurts)
-- **Conclusion**: Graph learning provides interpretability without performance cost
-- **Finding**: Importance sampling fundamentally incompatible with balanced replay
+- **Takeaway**: Graph learning gives interpretability for free
+- **Finding**: Importance sampling breaks balanced replay
 
 ### Pending Research Tasks
 
@@ -459,4 +461,4 @@ For collaboration inquiries or questions, open a GitHub issue or see [RESEARCH_S
 
 ---
 
-**Status:** Active research (October 2025) | **Ablation complete**: Graph learning neutral (+0.07%), importance sampling harmful (-2.06%) | Causal graph provides interpretability without performance cost
+**Status:** Active research (October 2025) | **Ablation complete**: Graph learning neutral (+0.07%), importance sampling harmful (-2.06%) | Code public on GitHub
