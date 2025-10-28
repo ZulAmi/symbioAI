@@ -151,6 +151,13 @@ class StructuralCausalModel:
                     if i == j or i not in task_data or j not in task_data:
                         continue
                     
+                    # TEMPORAL CONSTRAINT: In continual learning, only allow forward edges (i < j)
+                    # Task i can only causally influence Task j if i was learned before j
+                    if i >= j:
+                        # Backward edge (i→j where i≥j) - set to zero (violates temporal ordering)
+                        self.task_graph[i, j] = 0.0
+                        continue
+                    
                     # Test: Does intervening on task i affect task j?
                     effect = self._estimate_causal_effect(i, j, task_data, model)
                     self.task_graph[i, j] = effect

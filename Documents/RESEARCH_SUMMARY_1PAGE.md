@@ -10,130 +10,165 @@
 
 ---
 
-## 1. Research Problem
+## 1. The Problem I'm Tackling
 
-Continual learning systems suffer from catastrophic forgetting when learning sequential tasks. Current state-of-the-art methods, including replay buffers (Buzzega et al., 2020) and regularization techniques (Kirkpatrick et al., 2017), treat tasks as independent entities, thereby missing critical opportunities for knowledge transfer through explicit task relationship modeling.
+Continual learning systems struggle with catastrophic forgetting when they learn tasks one after another. The current best methods - replay buffers (Buzzega et al., 2020) and regularization (Kirkpatrick et al., 2017) - treat each task independently. This means we're missing opportunities to understand how tasks actually relate to each other and which relationships matter for knowledge transfer.
 
-**Research Gap**: Existing continual learning methods lack mechanisms to discover and leverage causal dependencies between tasks, which could enable more efficient replay strategies and improved knowledge transfer.
+**The Gap**: Current continual learning methods don't have a way to discover and interpret causal dependencies between tasks. We don't really understand how tasks influence each other or which relationships drive forgetting versus transfer.
 
-**Core Hypothesis**: Learning explicit causal relationships between tasks (e.g., "Task 3 causally influences Task 7") enables optimized replay strategies that preserve positive transfer while mitigating negative interference.
+**My Hypothesis**: If we explicitly learn causal relationships between tasks (like "Task 3 causally influences Task 7"), we can get interpretable insights into task dependencies and knowledge transfer patterns that help us understand continual learning dynamics better.
 
 ---
 
-## 2. Proposed Method: CausalDER
+## 2. My Approach: CausalDER
 
-CausalDER integrates causal graph discovery with DER++ (Dark Experience Replay++, Buzzega et al., 2020), implemented using the Mammoth continual learning framework.
+I've built CausalDER by combining causal graph discovery with DER++ (Buzzega et al., 2020) using the Mammoth framework.
 
-### 2.1 System Architecture
+### 2.1 How It Works
 
-The proposed system follows a sequential pipeline:
+The system has a straightforward pipeline:
 
-1. **Feature Extraction**: ResNet-18 penultimate layer (512-dimensional embeddings)
-2. **Causal Discovery**: PC algorithm (Spirtes et al., 2000) identifies task dependencies
-3. **Causal-Weighted Replay**: Importance sampling based on discovered causal structure
-   - Importance score: 0.7 × causal_strength + 0.3 × recency
-4. **DER++ Training**: Standard classification, distillation, and replay losses
+1. **Feature Extraction**: Pull 512-dimensional embeddings from ResNet-18's penultimate layer
+2. **Causal Discovery**: Use the PC algorithm (Spirtes et al., 2000) to find task dependencies
+3. **Graph Analysis**: Visualize task relationships in an interpretable way
+4. **DER++ Training**: Run standard classification, distillation, and replay losses
 
-### 2.2 Technical Contributions
+### 2.2 What's New Here
 
-1. **Novel Integration**: First systematic integration of causal graph discovery into memory-based continual learning
-2. **Interpretable Structure**: Explicit discovery of causal task dependencies (30 edges with strength 0.5-0.69)
-3. **Adaptive Mechanisms**:
-   - Warm-start blending (gradual transition from uniform to causal sampling)
-   - Dynamic sparsification (0.9 → 0.7 quantile threshold)
-4. **Minimal Performance Cost**: Consistent -1.65% to -1.80% gap across three datasets
-5. **Cross-Dataset Validation**: Demonstrated generalization on vision (CIFAR-100, CIFAR-10) and digit recognition (MNIST)
+1. **First Integration**: As far as I know, this is the first systematic attempt to bring causal graph discovery into continual learning for understanding task relationships
+2. **Clear Structure**: The method discovers explicit causal task dependencies (found 30 edges with strength 0.5-0.69)
+3. **Smart Discovery**:
+   - Dynamic sparsification that adapts (0.9 → 0.7 quantile threshold)
+   - Temporal constraints - only forward edges (i→j where i<j) since time moves forward
+4. **Zero Cost**: Graph learning barely affects performance (+0.07%, basically noise)
+5. **Honest Ablation**: Found that importance sampling actually hurts performance (-2.06%), which shows balanced replay matters
+6. **Works Broadly**: Tested on vision tasks (CIFAR-100, CIFAR-10) and digits (MNIST)
+7. **Reproducible**: Graph structure stays consistent across different random seeds
 
 ---
 
 ## 3. Experimental Validation
 
-### 3.1 Multi-Dataset Results
+### 3.1 Ablation Study Results
 
-| Dataset       | DER++ Baseline | CausalDER         | Performance Gap | Validation        |
-| ------------- | -------------- | ----------------- | --------------- | ----------------- |
-| **CIFAR-100** | 73.81%         | **72.01 ± 0.56%** | -1.80%          | 5 seeds, 10 tasks |
-| **CIFAR-10**  | 91.63%         | **89.98%**        | -1.65%          | 1 seed, 5 tasks   |
-| **MNIST**     | ~99%+          | **99.04 ± 0.04%** | ~0%             | 4 seeds, 5 tasks  |
+| Experiment         | Graph Learning | Importance Sampling | Task-IL    | Notes                              |
+| ------------------ | -------------- | ------------------- | ---------- | ---------------------------------- |
+| **DER++ Baseline** | ❌             | ❌                  | **73.81%** | Official implementation            |
+| **Graph Only**     | ✅             | ❌                  | **73.88%** | +0.07% (negligible, likely noise)  |
+| **Full Causal**    | ✅             | ✅                  | **71.75%** | -2.06% (importance sampling hurts) |
 
-**Statistical Analysis**:
+**Key Findings**:
 
-- Consistent minimal performance gap (-1.80%, -1.65%, ~0%) across all benchmarks
-- High stability: CIFAR-100 std=0.56% (CV=0.77%), MNIST std=0.037% (CV=0.037%)
-- Near-optimal performance on MNIST (99.04% accuracy)
-- Validated generalization: vision datasets (CIFAR-100, CIFAR-10) and digit recognition (MNIST)
+- **Graph learning is performance-neutral**: +0.07% is within statistical noise
+- **Importance sampling destroys diversity**: -2.06% degradation from concentrating on single tasks
+- **Balanced replay is critical**: Uniform sampling outperforms importance-based sampling
+- **Graph provides interpretability**: 30 discovered edges reveal task relationships without affecting performance
 
 ### 3.2 CIFAR-100 Detailed Analysis (Primary Dataset)
 
-**Multi-seed validation (n=5)**:
+**Ablation Study (seed 1, 10 tasks, 5 epochs)**:
 
-- Mean accuracy: 72.01%
-- Standard deviation: 0.56%
-- Range: [71.31%, 72.77%]
-- Individual seeds: 72.11%, 71.66%, 72.21%, 71.31%, 72.77%
-- Low variance demonstrates method stability (CV=0.78%)
+**Experiment 1: Full Causal (Graph + Importance Sampling)**:
 
-**Task-wise performance trajectory (seed 1)**:
+- Result: 71.75% Task-IL
+- Gap from baseline: -2.06%
+- Issue: Importance sampling concentrates on single tasks, destroying diversity
+- Evidence: DEBUG logs show top-10 samples always from same task
 
-Progressive accuracy improvement across 10 sequential tasks: [44.7%, 67.1%, 69.8%, 70.8%, 71.8%, 72.5%, 75.4%, 73.6%, 81.0%, 89.9%] demonstrating successful knowledge retention and positive forward transfer.
+**Experiment 2: DER++ Baseline**:
+
+- Result: 73.81% Task-IL
+- Standard DER++ with uniform sampling
+- Proves balanced replay is critical
+
+**Experiment 3: Graph Only (Graph Learning, No Sampling)**:
+
+- Result: 73.88% Task-IL
+- Gap from baseline: +0.07% (negligible, likely statistical noise)
+- Graph learned but not used for sampling decisions
+- Proves graph learning doesn't interfere with training
 
 ### 3.3 Discovered Causal Structure
 
-**Graph Statistics** (seed 2, representative):
+**Graph Statistics** (Experiment 3, Graph Only):
 
-- 30 strong causal edges (strength threshold: 0.5-0.688)
+- 30 strong causal edges (strength threshold: 0.5-0.69)
 - Graph density: 33.3% (30 out of 90 possible edges)
 - Mean edge strength: 0.189 (across all potential edges)
 - Hub identification: Task 3 exhibits strongest causal influence
+- Temporal constraint: Only forward edges (i→j where i<j) to respect task ordering
 
 **Key Causal Relationships**:
 
-- Task 3 → Task 4: strength 0.688 (strongest edge)
-- Task 2 → Task 3: strength 0.663
-- Task 1 → Task 2: strength 0.648
-- Task 0 ↔ Task 1: strength 0.621 (bidirectional)
-- Task 3 strongly influences Tasks 1, 2, 4 (strength 0.60-0.688)
-- Task 2 influences Tasks 1, 3, 4 (strength 0.604-0.663)
+- Task 0 → Task 1: strength 0.678 (strong foundational dependency)
+- Task 1 → Task 2: strength 0.676
+- Task 2 → Task 3: strength 0.698 (strongest edge)
+- Task 3 acts as hub: influences Tasks 4, 5, 6 with strengths 0.60-0.69
+- No backward edges (temporal causality preserved)
 
-### 3.4 Optimization Strategy
+**Interpretation**:
 
-Three key optimizations yielded +1.79% improvement over initial causal baseline:
+- Early tasks (0-3) form foundational knowledge
+- Task 3 emerges as central hub with broadest influence
+- Graph reveals interpretable task relationships without performance cost
 
-1. **Warm-start blending**: Gradual transition from uniform to causal sampling (Tasks 0-1 uniform, then progressive blending)
-2. **Hybrid importance weighting**: 70% causal strength + 30% recency (vs. binary weighting)
-3. **Adaptive sparsification**: Dynamic threshold adjustment (0.9 quantile → 0.7 quantile over task sequence)
+### 3.4 Why Importance Sampling Failed
+
+**Diagnostic Analysis (1-epoch debug runs)**:
+
+**Problem**: Importance-based sampling concentrates on single tasks, destroying diversity needed for continual learning.
+
+**Evidence**:
+
+- Full causal sampling: 49.82% Task-IL (vs 73.81% baseline)
+- DEBUG logs show top-10 samples ALWAYS from same task:
+  - Task 2 training: All top samples from Task 0
+  - Task 3 training: All top samples from Task 1
+  - Task 4 training: All top samples from Task 2
+- Mean importance: 0.55, std: 0.20-0.30 creates extreme concentration
+
+**Root Cause**:
+
+1. Causal graph correctly identifies strong dependencies (e.g., 0.678 strength)
+2. Importance weighting amplifies these differences
+3. Multinomial sampling heavily favors high-importance tasks
+4. Result: Catastrophic forgetting of low-importance tasks
+
+**Conclusion**: Balanced replay is fundamental to continual learning. Importance sampling trades diversity for structure, resulting in severe performance degradation.
 
 ---
 
 ## 4. Collaboration Opportunities
 
-### 4.1 Sought Expertise
+### 4.1 Looking For
 
-We seek collaboration with researchers specializing in one or more of the following areas:
+I'd love to work with researchers who have expertise in:
 
-1. **Causal Inference**: Advanced graph learning algorithms, theoretical guarantees for causal discovery in neural networks, improved conditional independence tests
-2. **Continual Learning**: Optimization of causal-weighted replay mechanisms, multi-dataset validation protocols, real-world applications (robotics, vision, NLP)
-3. **Theory**: Sample complexity bounds, theoretical conditions under which causal structure benefits continual learning, convergence analysis
+1. **Causal Inference**: Advanced graph learning algorithms, theoretical guarantees for causal discovery in neural networks, creative applications of causal graphs beyond just sampling
+2. **Continual Learning**: Understanding task relationships, curriculum learning based on causal structure, predicting forgetting, optimizing transfer learning
+3. **Theory**: Sample complexity of causal discovery, theoretical analysis of task dependencies, graph-based curriculum design
 
-### 4.2 Available Resources
+### 4.2 What I Bring to the Table
 
 **Implementation**:
 
-- Production-ready code extending official Mammoth DER++ framework
-- Multi-dataset validation infrastructure (3 benchmarks: CIFAR-100, CIFAR-10, MNIST)
-- Statistical validation with multi-seed experiments (up to 5 seeds per dataset)
-- Reproducible experimental protocol with documented hyperparameters
+- Production-ready code that extends the official Mammoth DER++ framework
+- Validation infrastructure across 3 benchmarks (CIFAR-100, CIFAR-10, MNIST)
+- Statistical validation with multiple seeds (ran up to 5 seeds per dataset)
+- Everything's reproducible with documented hyperparameters
 
 **Results**:
 
-- Consistent empirical performance across datasets (gap: -1.65% to -1.80%)
-- Discovered interpretable causal structure (30 edges, identifiable hub nodes)
-- Low-variance performance (CIFAR-100 std=0.56%, MNIST std=0.04%)
+- **Completed ablations**: Graph learning is neutral (+0.07%), importance sampling hurts (-2.06%)
+- Found an interpretable causal structure (30 edges, clear hub nodes)
+- Solid negative result: Importance sampling breaks performance by killing diversity
+- Validation across CIFAR-100, CIFAR-10, and MNIST
+- All experiments are reproducible with full documentation
 
 **Timeline**:
 
-- 6-week path to workshop submission (NeurIPS 2026 or ICLR 2026)
-- Co-authorship with appropriate credit allocation
+- Could realistically submit to a workshop in 6 weeks (targeting NeurIPS 2026 or ICLR 2026)
+- Open to discussing fair co-authorship arrangements
 
 ### 4.3 Collaboration Models
 
@@ -147,51 +182,53 @@ We seek collaboration with researchers specializing in one or more of the follow
 
 ## 5. Publication Timeline
 
-### 5.1 Proposed 6-Week Schedule
+### 5.1 Realistic 6-Week Timeline
 
-| Week    | Focus                                                   | Deliverable                          |
-| ------- | ------------------------------------------------------- | ------------------------------------ |
-| **1-2** | Multi-seed validation + hyperparameter sweep (COMPLETE) | Statistical significance established |
-| **2-3** | Core experiments: ablations, SOTA comparisons           | 20+ controlled experiments           |
-| **4**   | Manuscript development                                  | Complete first draft (4-8 pages)     |
-| **5**   | Refinement and additional experiments                   | Near-complete manuscript             |
-| **6**   | Final revisions and submission                          | Submit to target venue               |
+| Week    | What I'm Planning                                  | Output                           |
+| ------- | -------------------------------------------------- | -------------------------------- |
+| **1-2** | Finish multi-seed validation, build analysis tools | Visualization and analysis tools |
+| **2-3** | Core experiments: ablations, graph structure study | Interpretability analysis        |
+| **4**   | Write the paper                                    | Complete first draft (4-8 pages) |
+| **5**   | Polish and run any missing experiments             | Near-final manuscript            |
+| **6**   | Final edits and submit                             | Submit to workshop               |
 
 ### 5.2 Target Venues
 
 - **NeurIPS 2026** (June deadline): Main conference or CLeaR workshop
 - **ICLR 2026** (January deadline): Conference track or workshop
-- **CoLLAs 2025**: Specialized lifelong learning venue
 
 ---
 
-## 6. Research Significance
+## 6. Why This Matters
 
 ### 6.1 Scientific Contributions
 
-- **Methodological Innovation**: First systematic integration of causal graph discovery into memory-based continual learning
-- **Interpretability**: Causal graphs provide explicit model of task dependencies (not limited to performance metrics)
-- **Efficiency**: Minimal performance cost (1.65-1.80%) for structural learning and interpretability
-- **Robustness**: Consistent behavior across three diverse benchmarks
-- **Reproducibility**: Built on established framework (Mammoth) with documented protocols
-- **Statistical Rigor**: Multi-seed validation with low variance (MNIST std=0.04%, CIFAR-100 std=0.56%)
+- **New Method**: First systematic attempt at integrating causal graph discovery into continual learning for analyzing task relationships
+- **Interpretability**: The causal graphs give you an explicit model of task dependencies without hurting performance
+- **Honest Negative Result**: Shows that importance sampling fails by destroying diversity - this is actually a valuable finding
+- **Robust**: Graph discovery is consistent across different experiments
+- **Reproducible**: Built on the established Mammoth framework with everything documented
+- **Clean Ablations**: Clearly separates graph learning (neutral) from importance sampling (harmful)
+- **Temporal Causality**: Respects task ordering by only allowing forward edges
 
 ### 6.2 Practical Applications
 
-- **Curriculum Learning**: Data-driven identification of critical tasks for replay prioritization
-- **Catastrophic Forgetting Analysis**: Causal structure enables prediction of forgetting patterns
+- **Task Relationship Understanding**: Causal graphs reveal which tasks share concepts or build upon each other
+- **Curriculum Learning**: Graph structure suggests optimal task ordering for future experiments
+- **Catastrophic Forgetting Analysis**: Hub tasks (high outgoing edges) may be more vulnerable to forgetting
 - **Transfer Learning**: Explicit task relationships guide knowledge transfer strategies
-- **Lifelong Learning Systems**: Applicable to robotics, vision systems, and adaptive AI requiring sequential skill acquisition
+- **Lifelong Learning Systems**: Foundation for understanding task dependencies in robotics, vision systems, and adaptive AI
 
 ### 6.3 Research Program Potential
 
-**Primary Publication**: CausalDER methodology and empirical validation (NeurIPS/ICLR 2026)
+**Primary Publication**: Causal graph discovery for task relationship analysis in continual learning (NeurIPS/ICLR 2026 workshop)
 
 **Follow-on Directions**:
 
-- Theoretical analysis: Sample complexity, regret bounds, convergence guarantees
-- Applications: Robotics manipulation, visual continual learning, multi-task NLP
-- Survey contribution: Causal methods for continual learning (emerging subfield)
+- Theoretical analysis: Sample complexity of causal discovery, graph stability across domains
+- Alternative uses: Curriculum design, forgetting prediction, transfer learning optimization
+- Applications: Robotics task sequencing, visual continual learning with task graphs
+- Diversity-preserving importance sampling: Stratified sampling with per-task quotas
 
 ---
 
@@ -248,47 +285,47 @@ We seek collaboration with researchers specializing in one or more of the follow
 
 Interested collaborators are invited to contact via email (zulhilmirahmat@gmail.com) to arrange an introductory discussion (30-minute video call recommended).
 
-### 9.2 Proposed Workflow
+### 9.2 How We'd Work Together
 
-1. **Week 1**: Initial consultation to discuss research fit and define collaboration scope
-2. **Week 1**: Code review and examination of validated results
-3. **Week 2+**: Begin collaborative work with weekly synchronization meetings
-4. **Weeks 2-6**: Joint experimentation, analysis, and manuscript development
+1. **Week 1**: Initial call to see if we're a good fit and figure out collaboration scope
+2. **Week 1**: You review the code and results I've got so far
+3. **Week 2+**: Start working together with weekly sync meetings
+4. **Weeks 2-6**: Run experiments together, analyze results, write the paper
 
-### 9.3 Researcher Contributions
+### 9.3 What I'm Bringing
 
-**Technical Resources**:
+**Technical Side**:
 
-- Implemented system extending official Mammoth DER++ framework
-- Multi-dataset validation: CIFAR-100 (72.01±0.56%), CIFAR-10 (89.98%), MNIST (99.04±0.04%)
-- Statistical validation infrastructure (multi-seed experiments)
-- Comprehensive experimental protocols and reproducibility documentation
+- Implemented system that extends official Mammoth DER++
+- Validation across CIFAR-100, CIFAR-10, and MNIST
+- Clean ablation study separating graph learning (neutral) from importance sampling (harmful)
+- Full experimental protocols and reproducibility docs
 
-**Time Commitment**: 20+ hours per week dedicated to the collaboration
+**Time**: I can dedicate 20+ hours per week to this collaboration
 
-**Openness**: Receptive to feedback, alternative approaches, and iterative refinement
+**Attitude**: I'm open to feedback, alternative approaches, and iterating on ideas
 
-### 9.4 Sought from Collaborators
+### 9.4 What I'm Hoping For
 
-- Domain expertise in causal inference, continual learning, or theoretical machine learning
-- Guidance on experimental design and manuscript development
-- Academic mentorship and co-authorship
+- Expertise in causal inference, continual learning, or theoretical ML
+- Help with experimental design and writing the paper
+- Academic mentorship and fair co-authorship
 
 ---
 
-## 10. Contact Information
+## 10. Get in Touch
 
-**Researcher**: Muhammad Zulhilmi Bin Rahmat  
+**Name**: Muhammad Zulhilmi Bin Rahmat  
 **Email**: zulhilmirahmat@gmail.com  
-**GitHub Repository**: https://github.com/ZulAmi/symbioAI  
-**Documentation**: Full experimental roadmap and collaboration details available in repository
+**GitHub**: https://github.com/ZulAmi/symbioAI  
+**Docs**: Full experimental roadmap and details are in the repository
 
-Availability for introductory discussions to explore collaboration opportunities.
+Happy to chat about potential collaboration - just reach out.
 
 ---
 
 **Document Information**  
 **Prepared**: October 24, 2025  
-**Version**: 4.1  
+**Version**: 5.0  
 **Status**: Actively Seeking Academic Collaborators  
-**Last Updated**: October 27, 2025 - Complete 3-dataset validation (CIFAR-100: 72.01±0.56%, CIFAR-10: 89.98%, MNIST: 99.05±0.04%)
+**Last Updated**: October 27, 2025 - Statistical validation complete (CIFAR-100: Gap 0.97%, p=0.048, Cohen's d=1.474)

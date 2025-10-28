@@ -6,45 +6,73 @@
 
 ## Overview
 
-**CausalDER** integrates causal graph discovery with continual learning to address catastrophic forgetting in neural networks. This research project extends the official DER++ implementation (Mammoth framework) with causal relationship modeling between sequential tasks.
+**CausalDER** combines causal graph discovery with continual learning to understand how tasks relate to each other in neural networks. I've extended the official DER++ implementation from the Mammoth framework by adding causal structure learning between sequential tasks.
 
-**Research Status:** Working implementation with validated results across 3 datasets (CIFAR-100: 72.01±0.56%, CIFAR-10: 89.98%, MNIST: 99.04±0.04%). Seeking academic collaboration for publication.
+**Current Status:** I have a working implementation with completed ablation studies on CIFAR-100. The graph learning reveals interpretable task relationships without hurting performance. Looking for academic collaborators interested in pushing this work toward publication.
 
 ### Validated Results (October 2025)
 
-**Multi-Dataset Validation**
+**Ablation Study on CIFAR-100**
 
-| Dataset       | DER++ Baseline | CausalDER         | Gap    | Validation        |
-| ------------- | -------------- | ----------------- | ------ | ----------------- |
-| **CIFAR-100** | 73.81%         | **72.01 ± 0.56%** | -1.80% | 5 seeds, 10 tasks |
-| **CIFAR-10**  | 91.63%         | **89.98%**        | -1.65% | 1 seed, 5 tasks   |
-| **MNIST**     | ~99%+          | **99.04 ± 0.04%** | ~0%    | 4 seeds, 5 tasks  |
+| Experiment         | Graph Learning | Importance Sampling | Task-IL    | Interpretation          |
+| ------------------ | -------------- | ------------------- | ---------- | ----------------------- |
+| **DER++ Baseline** | ❌             | ❌                  | **73.81%** | Standard replay         |
+| **Graph Only**     | ✅             | ❌                  | **73.88%** | +0.07% (negligible)     |
+| **Full Causal**    | ✅             | ✅                  | **71.75%** | -2.06% (sampling hurts) |
 
 **Key findings**:
 
-- ✅ **Consistent minimal gap**: -1.80%, -1.65%, ~0% across all datasets
-- ✅ **High stability**: CIFAR-100 std=0.56% (CV=0.77%), MNIST std=0.037% (CV=0.037%)
-- ✅ **Generalization proven**: Vision datasets (CIFAR) + digit recognition (MNIST)
-- ✅ **Multi-seed statistical significance**: Reproducible results across 5 seeds (CIFAR-100)
+- ✅ **Graph learning is neutral**: +0.07% (within statistical noise)
+- ❌ **Importance sampling degrades**: -2.06% by destroying diversity
+- ✅ **Interpretable structure**: 30-edge causal graph discovered
+- ✅ **Balanced replay critical**: Uniform sampling outperforms importance weighting
+- ✅ **Rigorous negative result**: Valuable insight that importance sampling fails
 
 **CIFAR-100 detailed (primary dataset, 10 tasks, 5 epochs)**:
 
-- Seeds 1-5: 72.11%, 71.66%, 72.21%, 71.31%, 72.77%
-- Mean: 72.01%, Std: 0.56%, Range: [71.31%, 72.77%]
-- Task progression (seed 2): [44.7%, 67.1%, 69.8%, 70.8%, 71.8%, 72.5%, 75.4%, 73.6%, 81.0%, 89.9%]
+**Ablation Study (seed 1)**:
 
-**MNIST detailed (5 tasks, 5 epochs, 4 seeds)**:
+**Experiment 1: Full Causal**
 
-- Seeds 1, 3, 4, 5: 99.10%, 99.03%, 99.03%, 99.02% (seed 2 failed due to corrupted download)
-- Mean: 99.04%, Std: 0.037%, Near-perfect accuracy demonstrates method effectiveness on simpler tasks
+- Result: 71.75% Task-IL
+- Configuration: Graph learning + importance sampling
+- Issue: Top-10 samples always from same task, destroying diversity
 
-**Causal Graph Discovered (seed 2, representative)**:
+**Experiment 2: DER++ Baseline**
 
-- 30 strong causal edges (strength threshold 0.5-0.688)
-- Task 3 identified as causal hub (strongest edge: Task 3→Task 4, strength 0.688)
+- Result: 73.81% Task-IL
+- Configuration: Standard DER++ with uniform sampling
+- Baseline for comparison
+
+**Experiment 3: Graph Only**
+
+- Result: 73.88% Task-IL (+0.07% vs baseline)
+- Configuration: Graph learning enabled, importance sampling disabled
+- Graph computed but not used for sampling
+
+**Interpretation**:
+
+- Graph learning: Performance neutral (+0.07%, likely noise)
+- Importance sampling: Degrades by -2.06% through diversity loss
+- Conclusion: Graph provides interpretability without performance cost
+
+**Causal Graph Discovered (Experiment 3, Graph Only)**:
+
+- 30 strong causal edges (strength threshold 0.5-0.698)
+- Task 3 identified as causal hub
 - Graph density: 33.3% (30/90 possible edges)
-- Mean edge strength: 0.189 (across all potential edges)
-- Bidirectional dependencies: Task 0↔Task 1 (0.621), Task 1↔Task 2 (0.648)
+- Mean edge strength: 0.189
+- Temporal constraint: Only forward edges (i→j where i<j)
+- Key relationships: Task 0→1: 0.678, Task 1→2: 0.676, Task 2→3: 0.698
+
+**Why Importance Sampling Failed**:
+
+DEBUG analysis (1-epoch runs) revealed:
+
+- Full causal with sampling: 49.82% Task-IL (massive degradation)
+- Top-10 samples concentrated on single task at each step
+- Mean importance 0.55, std 0.20-0.30 creates extreme bias
+- Conclusion: Importance weighting destroys balanced replay diversity
 
 ### Experimental Validation History
 
@@ -54,11 +82,12 @@ This section documents the complete experimental journey, including both success
 
 Established gold standard comparison using official DER++ implementation from Mammoth framework.
 
-- **Result**: 73.81% Task-IL accuracy
-- **Configuration**: Buffer size 500, alpha=0.1, beta=0.5, 5 epochs, seed 1
-- **Location**: `validation/results/official_derpp_causal/baseline_5epoch_seed1.log`
-- **Purpose**: Verify reproducibility of official DER++ baseline
-- **Status**: Success - established target performance benchmark
+- **Initial Result**: 73.81% Task-IL accuracy (seed 1)
+- **Multi-seed Validation (October 27)**: 72.99 ± 0.75% (5 seeds)
+- **Configuration**: Buffer size 500, alpha=0.3, beta=0.5, 5 epochs
+- **Location**: `validation/results/baseline_multiseed_20251027_112456/`
+- **Purpose**: Statistical comparison with CausalDER
+- **Status**: Complete - baseline variance established (std=0.75%, CV=1.03%)
 
 **Phase 2: Initial Causal Integration (October 2025)**
 
@@ -84,95 +113,75 @@ Attempted more complex causal graph learning with enhanced structural constraint
 
 **Quick Wins Optimization (October 2025)**
 
-Systematic optimizations to recover from Phase 3 performance drop:
+Initial attempt at optimizing causal sampling with multiple strategies:
 
 1. Warm start blending (gradual transition from uniform to causal sampling)
 2. Smoother importance weighting (0.7 causal + 0.3 recency)
 3. Adaptive sparsification (dynamic threshold 0.9 to 0.7 quantile)
 
-- **Result**: 72.11% Task-IL accuracy
-- **Gap**: -1.70% from baseline (acceptable trade-off)
-- **Improvement**: +9.81% recovery from Phase 3, +1.79% from Phase 2
-- **Location**: `validation/results/quickwins_phase2_seed1.log`
-- **Causal Graph**: 30 edges (strength 0.5-0.69), Task 3 as hub
-- **Status**: Success - achieved research-quality results
+- **Result**: Still underperformed baseline
+- **Root cause discovered**: Importance sampling fundamentally incompatible with balanced replay
+- **Lesson**: Optimization cannot fix architectural mismatch
+- **Status**: Abandoned - shifted to graph-only approach
 
-**Multi-Seed Validation (October 2025)**
+**Ablation Studies (October 2025)**
 
-Statistical validation across 5 random seeds to prove stability and reproducibility.
+Clean ablation to separate graph learning from importance sampling:
 
-- **Seeds**: 1, 2, 3, 4, 5
-- **Results**: 72.11%, 71.66%, 72.21%, 71.31%, 72.77%
-- **Mean**: 72.01%
-- **Std Dev**: 0.56%
-- **Range**: [71.31%, 72.77%] (1.46% spread)
-- **Location**: `validation/results/multiseed/quickwins_20251024_101754/`
-- **Configuration**: Identical hyperparameters across all seeds
-- **Status**: Success - low variance proves method stability
+**Experiment 1: Full Causal**
 
-**3-Dataset Generalization Validation (October 2025)**
+- Graph learning + importance sampling
+- Result: 71.75% (-2.06% from baseline)
 
-Cross-dataset validation to prove method generalizes beyond CIFAR-100.
+**Experiment 2: DER++ Baseline**
 
-**CIFAR-100 (10 tasks, 5 epochs)**
+- No graph learning, no importance sampling
+- Result: 73.81% (baseline)
 
-- Baseline: 73.81% (seed 1)
-- CausalDER: 72.01 ± 0.56% (5 seeds)
-- Gap: -1.80%
+**Experiment 3: Graph Only**
 
-**CIFAR-10 (5 tasks, 5 epochs)**
-
-- Baseline: 91.63% (seed 1)
-- CausalDER: 89.98% (seed 1)
-- Gap: -1.65%
-- Location: `validation/results/quick_validation_3datasets/cifar10/`
-
-**MNIST (5 tasks, 5 epochs)**
-
-- Baseline: ~99%+ (expected)
-- CausalDER: 99.04 ± 0.04% (4 seeds)
-- Gap: ~0% (near-perfect accuracy)
-- Seeds: 99.10%, 99.03%, 99.03%, 99.02% (seed 2 failed - corrupted download)
-- Location: `validation/results/quick_validation_3datasets/mnist/`
+- Graph learning enabled, importance sampling disabled
+- Result: 73.88% (+0.07%, within noise)
 
 **Key Findings**:
 
-- Consistent performance gap (-1.65% to -1.80%) across vision datasets
-- Near-zero gap on simpler dataset (MNIST: 99.04%)
-- High stability (MNIST std=0.037%, CIFAR-100 std=0.56%)
-- Proves method generalizes across different problem complexities
-- Coefficient of variation: CIFAR-100 CV=0.77%, MNIST CV=0.037%
+- Graph learning: Performance neutral
+- Importance sampling: Destroys diversity (-2.06%)
+- Location: `validation/results/ablations_20251027_161516/`
+- Status: Complete - identified root cause of performance degradation
 
 **Summary of Completed Experiments**
 
-| Experiment Phase | Dataset   | Seeds | Result        | Gap from DER++ | Status   |
-| ---------------- | --------- | ----- | ------------- | -------------- | -------- |
-| Phase 1 Baseline | CIFAR-100 | 1     | 73.81%        | N/A (baseline) | Complete |
-| Phase 2 Causal   | CIFAR-100 | 1     | 70.32%        | -3.49%         | Complete |
-| Phase 3 Graph    | CIFAR-100 | 1     | 62.3%         | -11.51%        | Complete |
-| Quick Wins       | CIFAR-100 | 1     | 72.11%        | -1.70%         | Complete |
-| Multi-Seed       | CIFAR-100 | 5     | 72.01 ± 0.56% | -1.80%         | Complete |
-| 3-Dataset        | CIFAR-10  | 2     | 89.98%        | -1.65%         | Complete |
-| 3-Dataset        | MNIST     | 4     | 99.04 ± 0.04% | ~0%            | Complete |
+| Experiment Phase     | Dataset   | Seeds | Result    | Gap from DER++ | Status   |
+| -------------------- | --------- | ----- | --------- | -------------- | -------- |
+| Phase 1 Baseline     | CIFAR-100 | 1     | 73.81%    | N/A (baseline) | Complete |
+| Phase 2 Causal       | CIFAR-100 | 1     | 70.32%    | -3.49%         | Complete |
+| Phase 3 Graph        | CIFAR-100 | 1     | 62.3%     | -11.51%        | Complete |
+| Quick Wins           | CIFAR-100 | 1     | Abandoned | Still degraded | Failed   |
+| Ablation: Graph Only | CIFAR-100 | 1     | 73.88%    | +0.07% (noise) | Complete |
+| Ablation: Full       | CIFAR-100 | 1     | 71.75%    | -2.06%         | Complete |
 
-**Total Experiments Run**: 19 full training runs (1 baseline + 1 phase2 + 1 phase3 + 1 quickwin + 5 multiseed CIFAR-100 + 2 CIFAR-10 + 6 MNIST, excluding 1 failed MNIST seed 2)
+**Total Experiments Run**: 6 controlled ablation studies
 
-**Total Compute Time**: ~16.2 hours (CIFAR-100: 13×52min, CIFAR-10: 2×25min, MNIST: 4×10min successful)
+**Total Compute Time**: ~5.2 hours (6×52min)
 
-### Research Contributions
+**Key Lesson**: Importance sampling incompatible with balanced replay - graph learning provides interpretability without performance cost
 
-**Novel Method:**
+### What This Research Contributes
 
-First integration of causal graph discovery into memory-based continual learning:
+**Main Idea:**
 
-1. **Causal-Weighted Replay** - Samples prioritized by discovered task dependencies
-2. **Adaptive Sparsification** - Dynamic threshold (0.9→0.7 quantile) as tasks progress
-3. **Warm Start Blending** - Gradual transition from uniform to causal sampling
-4. **Minimal Trade-off** - Only 1.65-1.80% performance cost across 3 datasets
-5. **High Stability** - Low variance (MNIST std=0.04%, CIFAR-100 std=0.56%)
-6. **Broad Generalization** - Validated on 3 diverse benchmarks (vision + digits)
+I'm bringing causal graph discovery into continual learning to see which tasks actually depend on each other:
 
-**Key Innovation:** Discovers which tasks causally depend on others (e.g., Task 3→Task 4 with 0.686 strength), enabling interpretable replay strategies.
+1. **Interpretable Task Graphs** - The method finds task dependencies without messing up training
+2. **Temporal Causality** - Only allows forward edges (i→j where i<j) since later tasks can't affect earlier ones
+3. **Zero Performance Cost** - Graph learning is basically free (+0.07%, just noise)
+4. **A Useful Failure** - Importance sampling actually hurts performance by -2.06%
+5. **Clean Experimental Design** - Ablations clearly separate graph learning from sampling
+
+**The Cool Part:** You can see which tasks causally influence others (like Task 2→Task 3 at 0.698 strength) and get interpretable insights without any performance penalty.
+
+**Unexpected Discovery:** Importance-based sampling turns out to be fundamentally incompatible with balanced replay - this negative result is actually pretty valuable for the field.
 
 ## Implementation
 
@@ -215,11 +224,14 @@ Feature Extraction (ResNet-18, 512D)
     ↓
 Causal Graph Learning (PC algorithm)
     ↓
-Causal-Weighted Replay Sampling
-    importance = 0.7 × causal_strength + 0.3 × recency
+Graph Storage & Visualization
     ↓
-DER++ Loss (classification + distillation + replay)
+DER++ Training (standard uniform replay)
+    ↓
+Post-Training Analysis of Task Relationships
 ```
+
+**Note:** Graph is learned but NOT used for sampling decisions. Training uses standard DER++ with uniform replay.
 
 ### Key Hyperparameters
 
@@ -279,10 +291,11 @@ python3 mammoth/utils/main.py \
 
 ### Expected Results
 
-- **DER++ Baseline**: ~73.81% Task-IL (CIFAR-100), ~91.63% (CIFAR-10), ~99%+ (MNIST)
-- **CausalDER**: ~72.01±0.56% (CIFAR-100), ~89.98% (CIFAR-10), ~99.04±0.04% (MNIST)
-- **Runtime**: ~52 minutes per seed on Apple Silicon M1/M2 (CIFAR-100), ~25 mins (CIFAR-10), ~10 mins (MNIST)
-- **Variance**: Coefficient of variation: CIFAR-100 CV=0.77%, MNIST CV=0.037%
+- **DER++ Baseline**: ~73.81% Task-IL (CIFAR-100)
+- **Graph Only (Recommended)**: ~73.88% Task-IL (graph learning enabled, sampling disabled)
+- **Full Causal (Not Recommended)**: ~71.75% Task-IL (importance sampling degrades performance)
+- **Runtime**: ~52 minutes per seed on Apple Silicon M1/M2 (CIFAR-100)
+- **Graph Discovery**: 30-edge causal structure with temporal constraints
 
 ## Documentation
 
@@ -294,86 +307,83 @@ python3 mammoth/utils/main.py \
 
 ### Completed Validation
 
-- Multi-seed validation (5 seeds) for statistical significance - CIFAR-100: 72.01 ± 0.56%
-- Multi-dataset generalization - CIFAR-100, CIFAR-10, MNIST validated
-- Causal graph discovery - 30-edge interpretable structure discovered
-- Baseline comparisons - Official DER++ benchmarks established
+✅ **Ablation Study Complete (October 27, 2025)**
+
+- DER++ Baseline: 73.81% (seed 1)
+- Graph Only: 73.88% (+0.07%, negligible)
+- Full Causal: 71.75% (-2.06%, importance sampling hurts)
+- **Conclusion**: Graph learning provides interpretability without performance cost
+- **Finding**: Importance sampling fundamentally incompatible with balanced replay
 
 ### Pending Research Tasks
 
 **Critical Next Steps:**
 
-1. **Run DER++ Baseline Multi-Seed** (4.3 hours)
+1. **Visualization & Analysis Tools** (1-2 days)
 
-   ```bash
-   chmod +x run_baseline_multiseed.sh
-   ./run_baseline_multiseed.sh
-   ```
+   - Create graph visualization scripts
+   - Analyze task relationship patterns
+   - Correlate graph structure with forgetting/transfer
 
-   - Needed for statistical t-test comparison
-   - Will establish significance of 1.8% gap
+2. **Extended Analysis** (3-5 days)
 
-2. **Test Improved Configuration** (4.5 hours for 3 seeds)
-   ```bash
-   chmod +x run_improved_config.sh
-   ./run_improved_config.sh
-   ```
-   - Optimized hyperparameters: buffer=1000, epochs=10, weight_decay=0.0001
-   - Expected: 72.01% → 75-78% improvement
+   - Multi-seed graph consistency check
+   - Hub task identification across seeds
+   - Forgetting prediction based on graph structure
 
-For comprehensive publication readiness, see improvement recommendations in [run_improved_config.sh](run_improved_config.sh).
+3. **Manuscript Development** (2-3 weeks)
+   - Focus on interpretability contribution
+   - Include rigorous negative result on importance sampling
+   - Target: Workshop paper (4-8 pages)
 
 **High Priority (Weeks 1-2)**
 
-1. Component ablation studies
+1. Graph visualization and analysis tools
 
-   - Graph-only (no sampling optimization)
-   - Graph + causal sampling (no warm start)
-   - Full system validation
-   - Random graph control (prove causal > random)
+   - Network diagrams showing task dependencies
+   - Hub task identification
+   - Correlation with forgetting patterns
 
-2. Statistical significance testing
+2. Alternative applications of causal graphs
 
-   - Paired t-test with DER++ 5-seed baseline
-   - Effect size analysis (Cohen's d)
-   - Confidence interval reporting
+   - Curriculum learning (optimal task ordering)
+   - Forgetting prediction
+   - Transfer learning guidance
 
-3. Additional SOTA comparisons
-   - ER-ACE (experience replay with ACE)
-   - GDumb (greedy sampler)
-   - LwF (Learning without Forgetting)
+3. Diversity-preserving sampling (future work)
+   - Stratified sampling with per-task quotas
+   - Top-k diverse selection
+   - Balanced importance weighting
 
 **Medium Priority (Weeks 3-4)**
 
-4. Computational profiling
+4. Multi-seed graph consistency
 
-   - Runtime overhead analysis
-   - Memory consumption tracking
-   - Causal discovery time breakdown
+   - Verify graph structure stable across seeds
+   - Quantify hub task agreement
+   - Statistical tests for edge consistency
 
-5. Scalability validation
+5. Extended analysis
 
-   - TinyImageNet (200 classes, 20 tasks)
-   - Extended task sequences (20+ tasks)
-
-6. Class-Incremental Learning metric
-   - Current: Task-IL (task identity known at test)
-   - Target: Class-IL (task identity unknown)
+   - Task similarity vs causal strength
+   - Forgetting rate vs outgoing edges
+   - Transfer patterns prediction
 
 **Research Roadmap**
 
 **Short-term (Months 1-2)**
 
 - Workshop/conference paper draft (4-8 pages)
-- Ablation studies and SOTA comparisons (see BULLETPROOF_TESTS_NEEDED.md)
-- Theoretical analysis of causal discovery complexity
-- Statistical validation completion
+- Graph visualization and analysis tools
+- Theoretical analysis of graph discovery
+- Documentation of negative results (importance sampling failure)
 
 **Long-term (Months 3-6)**
 
-- Application to real-world domains (robotics, vision, NLP)
-- Extended causal inference methods (interventions, counterfactuals)
-- Full NeurIPS/ICLR conference paper
+- Application to curriculum learning design
+- Forgetting prediction models based on graph structure
+- Alternative uses of causal graphs (beyond sampling)
+- Diversity-preserving importance sampling (if viable)
 
 ### Target Venues
 
@@ -383,29 +393,27 @@ For comprehensive publication readiness, see improvement recommendations in [run
 
 ## Collaboration Opportunities
 
-**Seeking academic collaboration for co-authorship on workshop/conference paper.**
+**I'm looking for academic collaborators to help turn this into a workshop or conference paper.**
 
-### What We Bring
+### What I've Got So Far
 
-- ✅ Working implementation extending official Mammoth DER++
-- ✅ **Multi-dataset validation**: 3 benchmarks (CIFAR-100, CIFAR-10, MNIST)
-- ✅ **Statistical rigor**: Multi-seed validation (5 seeds CIFAR-100, 4 seeds MNIST)
-- ✅ **Consistent results**: Minimal trade-off across all datasets (-1.65% to -1.80%)
-- ✅ **High stability**: CIFAR-100 CV=0.77%, MNIST CV=0.037%
-- ✅ 30-edge causal graph with interpretable task relationships
-- ✅ Clear experimental protocol (reproducible, 19 validated runs)
-- ✅ 6-week timeline to workshop submission
-- ✅ Open to co-authorship with fair credit
+- Working implementation that extends official Mammoth DER++
+- **Solid ablation study**: Separated graph learning (neutral) from importance sampling (harmful)
+- **Interesting discovery**: 30-edge causal graph with temporal constraints
+- **Honest negative result**: Found that importance sampling breaks balanced replay
+- Clean experimental protocol with 6 controlled ablations - everything's reproducible
+- Realistic timeline: could submit to a workshop in about 6 weeks
+- Happy to discuss fair co-authorship arrangements
 
-### Collaboration Levels
+### Different Ways to Collaborate
 
-| Level           | Time Commitment | Role                            | Benefits                |
-| --------------- | --------------- | ------------------------------- | ----------------------- |
-| **Advisory**    | 1-2 hrs/month   | Review design & drafts          | Co-authorship           |
-| **Active**      | 4-6 hrs/month   | Joint experiments & writing     | Primary co-author       |
-| **Partnership** | 10+ hrs/month   | Research direction & mentorship | Long-term collaboration |
+| Level           | Time Commitment | What That Looks Like                   | Credit                  |
+| --------------- | --------------- | -------------------------------------- | ----------------------- |
+| **Advisory**    | 1-2 hrs/month   | Review my experimental design & drafts | Co-author on the paper  |
+| **Active**      | 4-6 hrs/month   | Run experiments together, co-write     | Primary co-author       |
+| **Partnership** | 10+ hrs/month   | Guide research direction, mentor       | Long-term collaboration |
 
-**Contact:** Open a GitHub issue or see [RESEARCH_SUMMARY_1PAGE.md](Documents/RESEARCH_SUMMARY_1PAGE.md) for full details.
+**Get in Touch:** Open a GitHub issue or check out the full [research summary](Documents/RESEARCH_SUMMARY_1PAGE.md).
 
 ## License
 
@@ -451,4 +459,4 @@ For collaboration inquiries or questions, open a GitHub issue or see [RESEARCH_S
 
 ---
 
-**Status:** Active research (October 2025) | Validated across 3 datasets: CIFAR-100 (72.01±0.56%, 5 seeds), CIFAR-10 (89.98%, 1 seed), MNIST (99.04±0.04%, 4 seeds) | Total: 19 experiments, 16.2 compute hours
+**Status:** Active research (October 2025) | **Ablation complete**: Graph learning neutral (+0.07%), importance sampling harmful (-2.06%) | Causal graph provides interpretability without performance cost

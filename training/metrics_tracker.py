@@ -345,7 +345,7 @@ class ContinualLearningMetrics:
         summary = self.get_summary(task_id)
         
         print("\n" + "="*60)
-        print(f"📊 Metrics Summary - After Task {summary['task_id']}")
+        print(f"Metrics Summary - After Task {summary['task_id']}")
         print("="*60)
         print(f"Average Accuracy:    {summary['average_accuracy']:.2f}%")
         print(f"Final Task Accuracy: {summary['final_accuracy']:.2f}%")
@@ -356,7 +356,7 @@ class ContinualLearningMetrics:
         if 'causal_metrics' in summary:
             cm = summary['causal_metrics']
             print("\n" + "-"*60)
-            print("🔬 Causal Metrics")
+            print("Causal Metrics")
             print("-"*60)
             print(f"ATE (mean ± std):    {cm['ate_mean']:.4f} ± {cm['ate_std']:.4f}")
             print(f"ATE (median):        {cm['ate_median']:.4f}")

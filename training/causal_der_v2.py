@@ -59,7 +59,7 @@ class CausalDEREngine:
     """
     DER++ Engine with Phase 2: Causal Importance Scoring
     
-    Phase 1 (VALIDATED ✅): Clean DER++ baseline - 70.19% Task-IL
+    Phase 1 (VALIDATED): Clean DER++ baseline - 70.19% Task-IL
     Phase 2 (CURRENT): Add importance-weighted sampling - Target: +1-2% (71-72%)
     
     Loss = CE(current) + α·MSE(replay_logits) + β·CE(replay_labels)
@@ -156,7 +156,7 @@ class CausalDEREngine:
         if enable_causal_graph_learning and StructuralCausalModel is not None:
             self.scm = StructuralCausalModel(num_tasks=num_tasks, feature_dim=feature_dim)
             self.task_feature_cache = {}  # Cache features per task for graph learning
-            print(f"[CausalDER-v2] ✅ Structural Causal Model initialized for graph learning")
+            print(f"[CausalDER-v2] Structural Causal Model initialized for graph learning")
         else:
             self.scm = None
             self.task_feature_cache = {}
@@ -184,7 +184,7 @@ class CausalDEREngine:
         if enable_causal_graph_learning:
             print(f"[CausalDER-v2] Causal graph learning: ENABLED ({num_tasks} tasks, {feature_dim}D features)")
         if self.metrics_tracker:
-            print(f"[CausalDER-v2] ✅ Comprehensive metrics tracking enabled")
+            print(f"[CausalDER-v2] Comprehensive metrics tracking enabled")
     
     def is_empty(self) -> bool:
         """Check if buffer is empty."""
@@ -675,7 +675,7 @@ class CausalDEREngine:
                     )
                     
                     if self.causal_graph is not None:
-                        print(f"  ✅ Causal graph learned successfully!")
+                        print(f"  Causal graph learned successfully")
                         print(f"  Graph shape: {self.causal_graph.shape}")
                         
                         # Analyze strong causal dependencies (>0.5 strength)
@@ -707,7 +707,7 @@ class CausalDEREngine:
                         print(f"    Max |strength|: {max_strength:.3f}")
                         
                 except Exception as e:
-                    print(f"  ⚠️ Causal graph learning failed: {e}")
+                    print(f"  WARNING: Causal graph learning failed: {e}")
                     import traceback
                     traceback.print_exc()
             else:
@@ -724,9 +724,9 @@ class CausalDEREngine:
                         buffer_size=len(self),
                         num_intervention_samples=50
                     )
-                    print(f"  ✅ Causal Forgetting Detector ready!")
+                    print(f"  Causal Forgetting Detector ready")
                 except Exception as e:
-                    print(f"  ⚠️ Forgetting detector initialization failed: {e}")
+                    print(f"  WARNING: Forgetting detector initialization failed: {e}")
     
     def get_statistics(self) -> Dict:
         """

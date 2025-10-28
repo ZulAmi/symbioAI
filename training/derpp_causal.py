@@ -21,6 +21,10 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 from typing import Optional
+import logging
+
+# Setup logger
+logger = logging.getLogger(__name__)
 
 # Add mammoth to path to import official DER++
 mammoth_path = Path(__file__).parent.parent / 'mammoth'
@@ -84,15 +88,15 @@ class DerppCausal(Derpp):
         parser.add_argument('--use_importance_sampling', type=int, default=0,
                           help='Enable importance sampling (0=off, 1=on)')
         
-        # Causal-specific tuning parameters
-        parser.add_argument('--causal_blend_ratio', type=float, default=0.7,
-                          help='Causal vs recency blend (0.7 = 70%% causal, 30%% recency)')
+        # Causal-specific tuning parameters (FIXED defaults for better performance)
+        parser.add_argument('--causal_blend_ratio', type=float, default=0.3,
+                          help='Weight for causal vs uniform sampling (0.3 = 30%% causal, 70%% uniform - safer default)')
         parser.add_argument('--sparsity_start', type=float, default=0.9,
                           help='Initial sparsification quantile (keep top X%%)')
         parser.add_argument('--sparsity_end', type=float, default=0.7,
                           help='Final sparsification quantile')
-        parser.add_argument('--causal_warmup_tasks', type=int, default=3,
-                          help='Number of tasks to warm up causal sampling (0=immediate)')
+        parser.add_argument('--causal_warmup_tasks', type=int, default=5,
+                          help='Number of tasks to warm up causal sampling (5 = safer, lets graph stabilize)')
         
         return parser
     
@@ -111,11 +115,11 @@ class DerppCausal(Derpp):
         self.causal_cache_size = getattr(args, 'causal_cache_size', 200)
         self.importance_weight = getattr(args, 'importance_weight', 0.5)
         
-        # Causal-specific tuning parameters
-        self.causal_blend_ratio = getattr(args, 'causal_blend_ratio', 0.7)
+        # Causal-specific tuning parameters (FIXED defaults)
+        self.causal_blend_ratio = getattr(args, 'causal_blend_ratio', 0.3)  # Reduced from 0.7
         self.sparsity_start = getattr(args, 'sparsity_start', 0.9)
         self.sparsity_end = getattr(args, 'sparsity_end', 0.7)
-        self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 3)
+        self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 5)  # Increased from 3
         
         # Initialize Structural Causal Model if enabled
         self.scm = None
@@ -128,7 +132,7 @@ class DerppCausal(Derpp):
                 num_tasks=self.num_tasks,
                 feature_dim=self.feature_dim
             )
-            print(f"[DER++ Causal] ✅ Causal graph learning ENABLED")
+            print(f"[DER++ Causal] Causal graph learning ENABLED")
             print(f"[DER++ Causal]    - Tasks: {self.num_tasks}")
             print(f"[DER++ Causal]    - Feature dim: {self.feature_dim}D")
             print(f"[DER++ Causal]    - Cache size: {self.causal_cache_size} samples/task")
@@ -293,23 +297,48 @@ class DerppCausal(Derpp):
             task_id = int(task_label.item()) if torch.is_tensor(task_label) else int(task_label)
             
             if task_id < current_task and task_id < self.causal_graph.size(0):
-                # Causal effect of past task on current task
-                causal_strength = abs(self.causal_graph[task_id, current_task].item())
+                # CRITICAL: Graph indexing and importance calculation
+                # ======================================================
+                # The causal graph is stored as graph[source, target] where:
+                #   graph[i, j] = strength of causal edge from Task i → Task j
+                #   
+                # PROBLEM: graph[old_task, current_task] doesn't exist yet!
+                #   → The current task was just added, so no edges TO it exist in the graph
+                #   → Example: Training Task 3, graph only has relationships between tasks 0,1,2
+                #   → Lookup graph[0, 3] returns 0 because edge doesn't exist yet!
+                #
+                # SOLUTION: Use the SUM of outgoing edges from old_task as importance
+                #   → If Task 0 strongly influenced Tasks 1 and 2, it's likely important for Task 3
+                #   → Sum of graph[task_id, :] (all outgoing edges from this task)
+                #   → This measures "how influential was this task historically?"
+                #
+                # Example: Training Task 3, buffer sample from Task 0
+                #   → Sum: graph[0,1] + graph[0,2] = 0.678 + 0.594 = 1.272
+                #   → High sum = Task 0 was influential = prioritize its samples
+                #
+                # Compute importance as sum of outgoing edges (row sum)
+                causal_strength = abs(self.causal_graph[task_id, :].sum().item())
                 
-                # Blend causal strength with recency (newer tasks get slight boost)
-                # Using tunable blend ratio instead of hardcoded 0.7
-                recency_weight = 1.0 - (current_task - task_id) / max(current_task, 1)
-                blended_importance = self.causal_blend_ratio * causal_strength + (1 - self.causal_blend_ratio) * recency_weight
+                # Normalize by number of ACTUAL edges (not potential targets)
+                # This prevents importance from being diluted when few edges exist
+                num_edges = (self.causal_graph[task_id, :].abs() > 0.01).sum().item()
+                if num_edges > 0:
+                    causal_strength = causal_strength / num_edges
+                else:
+                    causal_strength = 0.0
+                
+                # ASSERTION: Sanity check that we're not reading future→past edges
+                assert task_id < current_task, \
+                    f"Bug: Trying to read causal effect from future task {task_id} to past task {current_task}"
+                
+                # Use normalized causal influence as importance
+                # Higher total influence = more important to replay
+                blended_importance = causal_strength
                 
                 importance_scores[i] = blended_importance
             else:
-                # No causal relationship or future task
-                # Use recency as fallback instead of fixed 0.1
-                if task_id < current_task:
-                    recency_weight = 1.0 - (current_task - task_id) / max(current_task, 1)
-                    importance_scores[i] = 0.3 * recency_weight  # Lower than causal-guided
-                else:
-                    importance_scores[i] = 0.1  # Small baseline importance
+                # No causal relationship or future task - use small baseline
+                importance_scores[i] = 0.1
         
         # QUICK WIN #1 (continued): Blend causal importance with uniform
         uniform_probs = torch.ones_like(importance_scores) / importance_scores.size(0)
@@ -322,6 +351,26 @@ class DerppCausal(Derpp):
         
         # Blend uniform and causal based on warm start factor
         sampling_probs = (1 - causal_blend) * uniform_probs + causal_blend * causal_probs
+        
+        # DEBUG: Log importance statistics once per task (first call after graph learned)
+        if not hasattr(self, '_debug_logged_task') or self._debug_logged_task != current_task:
+            if self.causal_graph is not None and current_task >= 1:
+                self._debug_logged_task = current_task
+                print(f"\n[DEBUG] Task {current_task} - Causal Sampling Diagnostics:")
+                print(f"  Warmup: blend={causal_blend:.2f} (warmup_tasks={self.causal_warmup_tasks})")
+                print(f"  Importance scores: mean={importance_scores.mean():.4f}, std={importance_scores.std():.4f}, min={importance_scores.min():.4f}, max={importance_scores.max():.4f}")
+                print(f"  Samples with causal_strength>0: {(importance_scores > 0.1).sum().item()}/{importance_scores.size(0)}")
+                print(f"  Causal probs: mean={causal_probs.mean():.6f}, std={causal_probs.std():.6f}, max={causal_probs.max():.6f}")
+                print(f"  Final sampling probs: mean={sampling_probs.mean():.6f}, std={sampling_probs.std():.6f}, max={sampling_probs.max():.6f}")
+                
+                # Top-10 samples by sampling probability
+                top_k = 10
+                top_probs, top_indices = torch.topk(sampling_probs, min(top_k, sampling_probs.size(0)))
+                print(f"  Top-{top_k} samples by sampling prob:")
+                for rank, (idx, prob) in enumerate(zip(top_indices, top_probs)):
+                    task_id = int(buf_task_labels[idx].item()) if torch.is_tensor(buf_task_labels[idx]) else int(buf_task_labels[idx])
+                    imp = importance_scores[idx].item()
+                    print(f"    #{rank+1}: idx={idx.item()}, task={task_id}, importance={imp:.4f}, prob={prob.item():.6f}")
         
         # Sample according to blended importance
         try:
@@ -382,7 +431,7 @@ class DerppCausal(Derpp):
         ]
         
         if len(valid_tasks) < 2:
-            print(f"  ⚠️ Not enough data yet (need ≥2 tasks with ≥10 samples)")
+            print(f"  WARNING: Not enough data yet (need at least 2 tasks with at least 10 samples)")
             return
         
         # Convert cached features to format expected by SCM
@@ -416,18 +465,44 @@ class DerppCausal(Derpp):
             )
             
             if self.causal_graph is not None:
+                # VALIDATION: Ensure graph has expected shape and properties
+                assert self.causal_graph.shape == (self.num_tasks, self.num_tasks), \
+                    f"Bug: Causal graph has wrong shape {self.causal_graph.shape}, expected ({self.num_tasks}, {self.num_tasks})"
+                
+                # VALIDATION: Check that graph follows temporal ordering (no future→past edges)
+                # For continual learning, Task i can only influence Task j if i < j (learned first)
+                # Strong backward edges (j→i where j>i) indicate a bug
+                for i in range(self.num_tasks):
+                    for j in range(i):  # j < i means j is earlier than i
+                        if abs(self.causal_graph[i, j]) > 0.3:  # Strong backward edge
+                            logger.warning(
+                                f"WARNING: Strong backward edge detected: "
+                                f"Task {i} -> Task {j} (strength={self.causal_graph[i, j]:.3f}). "
+                                f"This suggests task {i} causally affects earlier task {j}, which violates temporal ordering. "
+                                f"This may indicate a bug in graph learning or feature entanglement."
+                            )
+                
+                # VALIDATION: Diagonal should be zero (tasks don't cause themselves)
+                diag_max = torch.diag(self.causal_graph).abs().max().item()
+                if diag_max > 0.01:
+                    logger.warning(
+                        f"WARNING: Non-zero diagonal in causal graph (max={diag_max:.3f}). "
+                        f"Tasks should not have causal edges to themselves. Setting diagonal to zero."
+                    )
+                    self.causal_graph.fill_diagonal_(0)
+                
                 self._print_causal_graph_summary()
             else:
-                print(f"  ⚠️ Causal graph learning returned None")
+                print(f"  WARNING: Causal graph learning returned None")
                 
         except Exception as e:
-            print(f"  ⚠️ Causal graph learning failed: {e}")
+            print(f"  WARNING: Causal graph learning failed: {e}")
             import traceback
             traceback.print_exc()
     
     def _print_causal_graph_summary(self):
         """Print summary of learned causal graph."""
-        print(f"  ✅ Causal graph learned successfully!")
+        print(f"  Causal graph learned successfully")
         print(f"  Graph shape: {self.causal_graph.shape}")
         
         # Analyze strong causal dependencies (>0.5 strength)
