@@ -487,21 +487,47 @@ class DerppCausal(Derpp):
         # Prepare buffer samples for causal detector
         buffer_samples = [(buf_inputs[i], buf_labels[i]) for i in range(buf_inputs.size(0))]
         
-        # Get old task data for measuring forgetting (use cached features if available)
+        # Get old task data for measuring forgetting across ALL previous tasks
         old_task_data = {}
         current_task = self.current_task
         
-        if current_task >= 1 and hasattr(self, 'task_feature_cache'):
-            # Use cached data from previous tasks
+        if current_task >= 1:
+            # CRITICAL FIX: Extract old task samples from BUFFER, not just cache
+            # The buffer contains samples from ALL previous tasks, so we can measure
+            # forgetting across all of them
+            
+            # Get task labels from buffer (assumes buffer stores task info or we infer from class labels)
+            if hasattr(self.buffer, 'task_labels') and self.buffer.task_labels is not None:
+                buf_task_labels = self.buffer.task_labels[:buf_inputs.size(0)]
+            else:
+                # Infer task from class label (assumes cpt = classes_per_task is set)
+                if hasattr(self, 'cpt'):
+                    buf_task_labels = buf_labels // self.cpt
+                else:
+                    # Fallback: assume 10 classes per task for CIFAR-100
+                    buf_task_labels = buf_labels // 10
+            
+            # Group buffer samples by task
             for task_id in range(current_task):
-                if task_id in self.task_feature_cache:
-                    cache = self.task_feature_cache[task_id]
-                    if len(cache['inputs']) > 0:
-                        # Take up to 50 samples per task for forgetting measurement
-                        n_samples = min(50, len(cache['inputs']))
-                        task_inputs = torch.stack([cache['inputs'][i] for i in range(n_samples)])
-                        task_labels = torch.stack([cache['labels'][i] for i in range(n_samples)])
-                        old_task_data[task_id] = (task_inputs.to(self.device), task_labels.to(self.device))
+                # Find all samples from this task in the buffer
+                task_mask = (buf_task_labels == task_id)
+                if task_mask.sum() > 0:
+                    task_indices = task_mask.nonzero(as_tuple=True)[0]
+                    # Take up to 50 samples per task for measurement
+                    n_samples = min(50, len(task_indices))
+                    sampled_indices = task_indices[torch.randperm(len(task_indices))[:n_samples]]
+                    
+                    task_inputs = buf_inputs[sampled_indices]
+                    task_labels = buf_labels[sampled_indices]
+                    old_task_data[task_id] = (task_inputs.to(self.device), task_labels.to(self.device))
+            
+            # DEBUG: Log what tasks we extracted
+            if len(old_task_data) > 0 and not hasattr(self, '_debug_task_extraction_logged'):
+                self._debug_task_extraction_logged = True
+                print(f"  [DEBUG] Buffer task distribution at Task {current_task}:")
+                print(f"    Unique task labels in buffer: {torch.unique(buf_task_labels).tolist()}")
+                print(f"    Samples per task: {[(tid, (buf_task_labels == tid).sum().item()) for tid in range(current_task)]}")
+                print(f"    Extracted old_task_data keys: {list(old_task_data.keys())}")
         
         if len(old_task_data) == 0:
             # Fallback: Can't measure forgetting without old task data, use uniform sampling
