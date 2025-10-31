@@ -103,11 +103,11 @@ At Task 5: Task 0 sample → measure forgetting across Tasks 0,1,2,3,4
 
 **Experimental Results (CIFAR-100, 3 tasks, 1 epoch)**:
 
-| Method                     | Task-IL | Per-Task Accuracy     | Interpretation              |
-| -------------------------- | ------- | --------------------- | --------------------------- |
-| **Vanilla DER++**          | 33.8%   | [34.8%, 30.8%, 35.8%] | Standard uniform replay     |
-| **TRUE Causal (Cross-Task)** | 24.4%   | [24.9%, 23.0%, 25.3%] | Interventional selection    |
-| **Performance Gap**        | -9.4%   | -9.9%, -7.8%, -10.5%  | 27.8% relative degradation  |
+| Method                       | Task-IL | Per-Task Accuracy     | Interpretation             |
+| ---------------------------- | ------- | --------------------- | -------------------------- |
+| **Vanilla DER++**            | 33.8%   | [34.8%, 30.8%, 35.8%] | Standard uniform replay    |
+| **TRUE Causal (Cross-Task)** | 24.4%   | [24.9%, 23.0%, 25.3%] | Interventional selection   |
+| **Performance Gap**          | -9.4%   | -9.9%, -7.8%, -10.5%  | 27.8% relative degradation |
 
 **Analysis of Negative Result**:
 

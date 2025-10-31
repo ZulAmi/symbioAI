@@ -206,12 +206,14 @@ Demonstrated that causal graph learning can be integrated into continual learnin
 Rigorously evaluated two causal sampling approaches and documented their failure modes:
 
 **Importance-Weighted Sampling** (Graph-based):
+
 - Performance: -2.06% degradation
 - Root cause: Concentrates samples from single tasks, destroying balanced replay diversity
 - Lesson: Continual learning requires diversity preservation; importance weighting incompatible
 
 **Interventional Causality** (Pearl Level 2):
-- Performance: -9.4% degradation  
+
+- Performance: -9.4% degradation
 - Implementation: Gradient-based factual vs. counterfactual comparisons with cross-task measurement
 - Root cause: Weak causal signals (effect magnitudes < 0.2), 90-96% neutral samples, insufficient signal-to-noise
 - Lesson: Gradient-based micro-interventions inadequate for meaningful causal effect estimation
@@ -366,11 +368,13 @@ python3 mammoth/utils/main.py \
 **Immediate Priorities (Weeks 1-2)**
 
 1. **Manuscript Development**
+
    - Draft workshop paper (4-8 pages) emphasizing interpretability contribution
    - Document two negative results with clear failure mode analysis
    - Frame interventional causality as important negative finding for the field
 
 2. **Visualization and Analysis**
+
    - Generate graph visualizations showing task dependencies
    - Correlate graph structure with forgetting patterns
    - Hub task analysis and interpretation
@@ -383,11 +387,13 @@ python3 mammoth/utils/main.py \
 **Medium-Term Extensions (Weeks 3-6)**
 
 4. **Alternative Graph Applications**
+
    - Curriculum learning: Task ordering based on causal structure
    - Forgetting prediction: Correlation between hub tasks and catastrophic forgetting
    - Transfer learning guidance: Edge strength as transfer potential indicator
 
 5. **Theoretical Analysis**
+
    - Sample complexity bounds for causal discovery in continual learning
    - Formal analysis of why importance sampling fails (diversity-performance tradeoff)
    - Conditions under which interventional causality could succeed
