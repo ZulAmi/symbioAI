@@ -114,6 +114,14 @@ class DerppCausal(Derpp):
         parser.add_argument('--true_micro_steps', type=int, default=2,
                           help='Number of micro-steps to apply during TRUE causal interventions')
         
+        # OPTIMIZATION FLAGS
+        parser.add_argument('--debug', type=int, default=0,
+                          help='Enable debug logging (0=off, 1=on)')
+        parser.add_argument('--use_batched_causality', type=int, default=1,
+                          help='Use batched causal effect measurement (faster)')
+        parser.add_argument('--causal_batch_size', type=int, default=16,
+                          help='Batch size for causal measurements')
+        
         return parser
     
     def __init__(self, backbone, loss, args, transform, dataset=None):
@@ -138,7 +146,17 @@ class DerppCausal(Derpp):
         self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 5)  # Increased from 3
         
         # TRUE INTERVENTIONAL CAUSALITY
-        self.use_true_causality = getattr(args, 'use_true_causality', 0)
+        # Map use_causal_sampling to use_true_causality for backward compatibility
+        # use_causal_sampling: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
+        # If use_true_causality is not explicitly set (default=0), use use_causal_sampling value
+        explicit_true_causality = getattr(args, 'use_true_causality', 0)
+        if explicit_true_causality == 0 and self.use_causal_sampling > 0:
+            # User set use_causal_sampling but not use_true_causality - use the former
+            self.use_true_causality = self.use_causal_sampling
+        else:
+            # User explicitly set use_true_causality - respect it
+            self.use_true_causality = explicit_true_causality
+        
         self.causal_num_interventions = getattr(args, 'causal_num_interventions', 50)
         self.causal_effect_threshold = getattr(args, 'causal_effect_threshold', 0.05)
         self.causal_hybrid_candidates = getattr(args, 'causal_hybrid_candidates', 200)
@@ -148,6 +166,11 @@ class DerppCausal(Derpp):
         # Internal cache for TRUE-only/hybrid reuse between intervals
         self._causal_step_counter = 0
         self._true_cached_batch = None  # (inputs, labels, logits)
+        
+        # OPTIMIZATION FLAGS
+        self.debug = getattr(args, 'debug', 0) == 1
+        self.use_batched_causality = getattr(args, 'use_batched_causality', 1) == 1
+        self.causal_batch_size = getattr(args, 'causal_batch_size', 16)
         
         # Initialize Structural Causal Model if enabled
         self.scm = None
@@ -178,11 +201,17 @@ class DerppCausal(Derpp):
                 true_temp_lr=self.true_temp_lr,
                 true_micro_steps=self.true_micro_steps
             )
-            print(f"[DER++ Causal] TRUE INTERVENTIONAL CAUSALITY ENABLED")
-            print(f"[DER++ Causal]    - Using CausalForgettingDetector")
-            print(f"[DER++ Causal]    - Intervention samples: {self.causal_num_interventions}")
-            print(f"[DER++ Causal]    - Effect threshold: {self.causal_effect_threshold}")
-            print(f"[DER++ Causal]    - Method: Factual vs Counterfactual comparison")
+            # Pass debug flag to detector
+            self.causal_forgetting_detector.debug = self.debug
+            
+            if self.debug or True:  # Always print initialization info
+                print(f"[DER++ Causal] TRUE INTERVENTIONAL CAUSALITY ENABLED")
+                print(f"[DER++ Causal]    - Using CausalForgettingDetector")
+                print(f"[DER++ Causal]    - Intervention samples: {self.causal_num_interventions}")
+                print(f"[DER++ Causal]    - Effect threshold: {self.causal_effect_threshold}")
+                print(f"[DER++ Causal]    - Method: Factual vs Counterfactual comparison")
+                print(f"[DER++ Causal]    - Batched processing: {self.use_batched_causality} (batch_size={self.causal_batch_size})")
+                print(f"[DER++ Causal]    - Debug logging: {self.debug}")
         
         # Metrics tracker
         self.metrics_tracker = ContinualLearningMetrics(num_tasks=self.num_tasks) if ContinualLearningMetrics else None
@@ -484,6 +513,10 @@ class DerppCausal(Derpp):
         mode_name = mode_name_map.get(self.use_true_causality, "HEURISTIC")
         print(f"\n[{mode_name} CAUSALITY] Sampling from buffer...")
         
+        # CRITICAL: Ensure buffer data is float32 (not float16 or float64)
+        buf_inputs = buf_inputs.float()
+        buf_labels = buf_labels.long()
+        
         # Prepare buffer samples for causal detector
         buffer_samples = [(buf_inputs[i], buf_labels[i]) for i in range(buf_inputs.size(0))]
         
@@ -546,8 +579,10 @@ class DerppCausal(Derpp):
             # Prepare candidate pool (limit for runtime)
             num_candidates = min(self.causal_hybrid_candidates, buf_inputs.size(0))
             candidate_indices = torch.randperm(buf_inputs.size(0))[:num_candidates]
-            print(f"  [TRUE-ONLY] Computing TRUE causal effects on {num_candidates} candidates...")
-            print(f"  [TRUE-ONLY] Measuring forgetting across {len(old_task_data)} old tasks: {list(old_task_data.keys())}")
+            
+            if self.debug:
+                print(f"  [TRUE-ONLY] Computing TRUE causal effects on {num_candidates} candidates...")
+                print(f"  [TRUE-ONLY] Measuring forgetting across {len(old_task_data)} old tasks: {list(old_task_data.keys())}")
 
             true_causal_effects = []
             for idx in candidate_indices.tolist():
@@ -578,23 +613,32 @@ class DerppCausal(Derpp):
                         'mechanism': 'error'
                     })
 
-            # Log stats
-            print(f"  [TRUE-ONLY] TRUE causal effects computed:")
-            if len(true_causal_effects) > 0:
-                effect_sizes = [e['effect_size'] for e in true_causal_effects]
-                print(f"    Effect size range: [{min(effect_sizes):.4f}, {max(effect_sizes):.4f}], mean={sum(effect_sizes)/len(effect_sizes):.4f}")
-                print(f"    Beneficial samples: {sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold)}")
-                print(f"    Harmful samples: {sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold)}")
-                print(f"    Neutral samples: {sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold)}")
+            # Log stats (only if debug or first few tasks)
+            if self.debug or current_task < 3:
+                print(f"  [TRUE-ONLY] TRUE causal effects computed:")
+                if len(true_causal_effects) > 0:
+                    effect_sizes = [e['effect_size'] for e in true_causal_effects]
+                    print(f"    Effect size range: [{min(effect_sizes):.4f}, {max(effect_sizes):.4f}], mean={sum(effect_sizes)/len(effect_sizes):.4f}")
+                    print(f"    Beneficial samples: {sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold)}")
+                    print(f"    Harmful samples: {sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold)}")
+                    print(f"    Neutral samples: {sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold)}")
 
             sorted_true_effects = sorted(true_causal_effects, key=lambda x: x['effect_size'])
             selected_indices = [e['index'] for e in sorted_true_effects[:size]]
             indices = torch.tensor(selected_indices, dtype=torch.long)
-            print(f"  [TRUE-ONLY] Selected {len(indices)} samples from {num_candidates} candidates")
+            
+            if self.debug:
+                print(f"  [TRUE-ONLY] Selected {len(indices)} samples from {num_candidates} candidates")
+            
             # Cache selection and advance counter
             selected = (buf_inputs[indices], buf_labels[indices], buf_logits[indices])
             self._true_cached_batch = selected
             self._causal_step_counter += 1
+            
+            # Print optimization stats every few tasks
+            if current_task % 3 == 0 and hasattr(self.causal_forgetting_detector, 'print_optimization_stats'):
+                self.causal_forgetting_detector.print_optimization_stats()
+            
             return selected
 
         # ============================================================

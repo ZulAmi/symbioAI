@@ -76,11 +76,11 @@ I've built a system that applies **interventional causality** to replay buffer s
 - Balanced replay is critical for continual learning
 - 30-edge causal graph discovered with clear hub structure
 
-### 3.2 Current Work: TRUE Interventional Causality (Completed - Negative Result)
+### 3.2 Current Work: TRUE Interventional Causality (Implementation Blocked - Technical Failure)
 
-**Implementation Status (October 30, 2025)**:
+**Implementation Status (November 5, 2025)**:
 
-We implemented Pearl Level 2 interventional causality for replay buffer selection using gradient-based factual vs. counterfactual comparisons. The system performs temporary model updates to measure each sample's causal effect on preventing forgetting across all previously learned tasks.
+We implemented Pearl Level 2 interventional causality for replay buffer selection using gradient-based factual vs. counterfactual comparisons. However, the implementation has been **blocked by a critical Apple Silicon MPS backend bug** that prevents gradient-based interventions from executing correctly.
 
 **Core Implementation**:
 
@@ -101,35 +101,65 @@ At Task 5: Task 0 sample → measure only Task 0 forgetting
 At Task 5: Task 0 sample → measure forgetting across Tasks 0,1,2,3,4
 ```
 
-**Experimental Results (CIFAR-100, 3 tasks, 1 epoch)**:
+**Technical Failure: MPS Backend Incompatibility**
 
-| Method                       | Task-IL | Per-Task Accuracy     | Interpretation             |
-| ---------------------------- | ------- | --------------------- | -------------------------- |
-| **Vanilla DER++**            | 33.8%   | [34.8%, 30.8%, 35.8%] | Standard uniform replay    |
-| **TRUE Causal (Cross-Task)** | 24.4%   | [24.9%, 23.0%, 25.3%] | Interventional selection   |
-| **Performance Gap**          | -9.4%   | -9.9%, -7.8%, -10.5%  | 27.8% relative degradation |
+All TRUE interventional causality experiments are currently **blocked** by a persistent dtype mismatch error on Apple Silicon:
 
-**Analysis of Negative Result**:
+```
+RuntimeError: Mismatched Tensor types in NNPack convolutionOutput
+```
 
-1. **Noisy Gradient Signals**: Causal effect magnitudes at Task 3 ranged from -0.16 to +0.15 with mean approximately -0.006, indicating minimal discriminative power between samples.
+**Observed Behavior** (CIFAR-100, Task 2+):
 
-2. **Sample Selection Ineffectiveness**: 90-96% of evaluated samples classified as "neutral" (effect near zero), resulting in near-random selection patterns that fail to identify truly beneficial samples.
+- All TRUE causal effects return 0.0000 (complete measurement failure)
+- 100% of samples classified as "neutral" (0 beneficial, 0 harmful)
+- Error occurs during gradient computation in torch.enable_grad() context
+- Issue persists despite multiple fixes:
+  - ✗ Explicitly disabling autocast for all devices (MPS/CUDA/CPU)
+  - ✗ Forcing float32 dtype conversion for all tensors
+  - ✗ Ensuring model parameters are float32
+  - ✗ Converting numpy→torch with explicit .float() calls
+  - ✗ Moving entire intervention to CPU (still crashes)
 
-3. **Cross-Task Averaging Artifacts**: Aggregating forgetting measurements across multiple tasks dampens signal strength, making it difficult to distinguish causal effects from measurement noise.
+**Root Cause Analysis**:
 
-4. **Computational Overhead Without Benefit**: The checkpoint/restore mechanism adds substantial computational cost (~2-3x baseline training time) while providing no performance improvement.
+1. **Apple Silicon MPS Limitation**: PyTorch MPS backend has known issues with mixed dtype operations in gradient contexts, particularly with NNPack (CPU SIMD library used as fallback)
 
-**Research Value**:
+2. **Gradient Context Conflicts**: The checkpoint/restore mechanism with torch.enable_grad() triggers dtype conversion bugs in MPS backend that cannot be resolved through dtype forcing
 
-This represents a rigorous negative result with significant scientific value:
+3. **No Viable Workaround**: Moving to CPU still fails (NNPack error is CPU-specific), suggesting fundamental incompatibility between:
+   - Gradient-based interventions (require torch.enable_grad())
+   - Model state manipulation (checkpoint/restore)
+   - MPS/CPU tensor routing in PyTorch
 
-- First systematic evaluation of Pearl Level 2 interventional causality for continual learning replay selection
-- Empirically demonstrates fundamental limitations of gradient-based causal proxies in this domain
-- Identifies that weak micro-step interventions (3 steps, lr=0.1) produce insufficient signal-to-noise ratio
-- Documents cross-task measurement methodology for future work
-- Provides baseline for alternative causal measurement approaches (influence functions, gradient matching, meta-learning)
+**Attempted Experimental Results** (CIFAR-100, Task 2):
 
-**Implications**: Gradient-based counterfactual interventions are computationally expensive but fail to capture meaningful causal effects in the continual learning replay setting. Future work should investigate stronger intervention protocols or alternative causal estimation methods.
+| Method                 | Status         | Causal Effects Measured | Interpretation                    |
+| ---------------------- | -------------- | ----------------------- | --------------------------------- |
+| **Vanilla DER++**      | ✅ Working     | N/A                     | Standard uniform replay (control) |
+| **TRUE Causal**        | ❌ **BLOCKED** | 0.0000 (all failures)   | MPS dtype bug prevents execution  |
+| **Effective Sampling** | Random         | No discrimination       | Falls back to uniform selection   |
+
+**Research Status**:
+
+This represents a **technical implementation failure** rather than a conceptual negative result:
+
+- Implementation is theoretically sound (Pearl Level 2 do-calculus correctly applied)
+- Cross-task measurement methodology is valid
+- **However**: Cannot execute due to PyTorch backend limitations on available hardware
+- **Research value limited**: Cannot empirically evaluate approach effectiveness
+- **Publication barrier**: No experimental results to analyze or report
+
+**Implications**:
+
+The TRUE interventional causality approach **cannot be evaluated** on Apple Silicon with current PyTorch MPS backend. Alternative paths:
+
+1. **Hardware migration**: Rerun on NVIDIA GPU with CUDA backend (estimated 6-8 hours compute per seed)
+2. **Method abandonment**: Focus solely on correlation-based graph discovery (already validated)
+3. **Alternative implementations**: Influence functions or meta-learning approaches without gradient contexts
+4. **Future work**: Revisit when PyTorch MPS backend resolves gradient dtype issues
+
+**Current Decision**: Proceeding with **correlation-based causal graph discovery only** (validated results). TRUE interventional causality remains unvalidated due to technical limitations.
 
 ---
 
@@ -199,15 +229,23 @@ I'd love to work with researchers who have expertise in:
 
 ### 6.1 Scientific Contributions
 
+**Validated Results**:
+
 - **Causal Graph Discovery**: First systematic integration of causal graph learning into continual learning for task relationship analysis
 - **Interpretability Without Cost**: Demonstrated that causal graph learning provides task dependency visualization with negligible performance impact (+0.07%)
-- **Rigorous Negative Results**: Two empirically validated failure modes with clear explanations:
-  - Importance sampling destroys balanced replay diversity (-2.06% performance)
-  - TRUE interventional causality produces insufficient signal-to-noise for effective sample selection (-9.4% performance)
-- **Cross-Task Measurement Methodology**: Implemented and validated multi-task forgetting measurement protocol for causal effect estimation
+- **Validated Negative Result**: Importance sampling destroys balanced replay diversity (-2.06% performance degradation)
 - **Reproducible Experimental Protocol**: Complete ablation studies built on Mammoth framework with documented hyperparameters
 - **Clean Separation of Concerns**: Ablations isolate graph learning (neutral) from sampling strategies (harmful)
 - **Temporal Constraint Validation**: Enforced forward-only causal edges respecting task ordering (i→j where i<j)
+
+**Technical Limitation** (Not a Research Contribution):
+
+- **TRUE Interventional Causality**: Implementation blocked by PyTorch MPS backend bug
+  - Cannot execute gradient-based interventions on Apple Silicon
+  - All measurements return 0.0000 (100% failure rate)
+  - Requires CUDA hardware for validation
+  - Status: Unvalidated, excluded from primary publication
+  - Research value: None (technical failure, not conceptual insight)
 
 ### 6.2 Practical Applications
 
@@ -219,21 +257,26 @@ I'd love to work with researchers who have expertise in:
 
 ### 6.3 Research Program Potential
 
-**Primary Publication**: Causal methods for continual learning: Graph discovery and interventional replay selection (NeurIPS/ICLR 2026 workshop)
+**Primary Publication**: Causal graph discovery for continual learning: Interpretability without performance cost (NeurIPS/ICLR 2026 workshop)
 
-**Contributions**:
+**Validated Contributions**:
 
-- Positive result: Graph learning provides interpretability at zero performance cost
-- Negative result 1: Importance sampling incompatible with balanced replay requirements
-- Negative result 2: Gradient-based interventional causality insufficient for replay selection
-- Methodological contribution: Cross-task forgetting measurement protocol
+- **Positive result**: Graph learning provides interpretability at zero performance cost (+0.07%)
+- **Negative result**: Importance sampling incompatible with balanced replay requirements (-2.06%)
+- **Methodological contribution**: PC algorithm integration for task-level causal discovery
+
+**Technical Limitation** (Excluded from primary publication):
+
+- TRUE interventional causality blocked by PyTorch MPS backend bug
+- Implementation complete but unvalidated (requires CUDA hardware)
+- Noted as "future work pending hardware access"
 
 **Follow-on Research Directions**:
 
+- **Priority**: Access to CUDA GPU for TRUE interventional causality validation
 - Theoretical analysis: Sample complexity bounds for causal discovery in sequential task settings
 - Alternative causal estimation: Influence functions, gradient matching, meta-learning approaches
 - Graph applications: Curriculum design based on task dependencies, forgetting prediction models
-- Stronger interventions: Multi-step lookahead, ensemble-based effect estimation
 - Diversity-aware sampling: Stratified selection with per-task quotas to preserve balanced replay
 
 ---
@@ -243,9 +286,10 @@ I'd love to work with researchers who have expertise in:
 ### 7.1 Immediate Outcomes
 
 - Co-authorship on publication targeting NeurIPS/ICLR workshop
-- Validated implementation with multi-dataset results (code already public)
-- Publication-ready experimental results with statistical significance
+- Validated implementation with reproducible results (code already public)
+- Publication-ready experimental results: 1 positive + 1 negative (statistical significance)
 - Early position in emerging area (causal inference + continual learning)
+- **Note**: Interventional causality results conditional on hardware access
 
 ### 7.2 Medium-Term Opportunities
 

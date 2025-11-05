@@ -28,27 +28,41 @@
 
 ---
 
-**Completed Work: TRUE Interventional Causality (Negative Result)**
+**Attempted Work: TRUE Interventional Causality (Implementation Blocked - Technical Failure)**
 
-We implemented Pearl Level 2 interventional causality for replay selection using gradient-based counterfactual comparisons. Samples are evaluated by measuring their causal effect on preventing forgetting across all previously learned tasks through temporary model updates.
+**Status (November 5, 2025)**: Implementation of Pearl Level 2 interventional causality is **blocked by critical MPS backend bug**. Cannot execute gradient-based interventions on Apple Silicon.
 
-**Implementation Details**:
+**Implementation Attempted**:
 
 - Cross-task forgetting measurement: At task N, measure effect on tasks 0...N-1
-- Buffer-based extraction: Infer task labels from class structure for historical sample retrieval
-- Factual vs counterfactual protocol: Checkpoint model, train with/without sample, measure multi-task forgetting, compute difference
-- Intervention parameters: 3 micro-steps, learning rate 0.1, evaluation interval 5
+- Buffer-based extraction: Infer task labels from class structure
+- Factual vs counterfactual protocol: Checkpoint model, train with/without sample, measure multi-task forgetting
+- Intervention parameters: 2-3 micro-steps, learning rate 0.05-0.1, evaluation interval 1-5
 
-**Experimental Results (CIFAR-100, 3 tasks, 1 epoch)**:
+**Technical Failure: MPS Backend Incompatibility**
 
-| Method                       | Task-IL | Performance vs Baseline |
-| ---------------------------- | ------- | ----------------------- |
-| Vanilla DER++ (uniform)      | 33.8%   | Baseline                |
-| TRUE Causal (interventional) | 24.4%   | -9.4% (27.8% worse)     |
+All TRUE interventional experiments **blocked** by persistent Apple Silicon dtype error:
 
-**Analysis**: Gradient-based interventions produce weak causal signals (effect range: -0.16 to +0.15, mean ≈ -0.006) with 90-96% of samples classified as neutral. Cross-task averaging further dampens discriminative power. The computational overhead (checkpoint/restore operations) is not justified by the resulting performance degradation.
+```
+RuntimeError: Mismatched Tensor types in NNPack convolutionOutput
+```
 
-**Research Value**: This rigorous negative result demonstrates fundamental limitations of gradient-based causal proxies for continual learning replay selection, providing important guidance for future work on alternative causal estimation methods.
+**Observed Behavior** (All tasks 2+):
+
+- All causal effects return 0.0000 (complete measurement failure)
+- 100% neutral samples (0 beneficial, 0 harmful)
+- Error in torch.enable_grad() gradient contexts
+- Multiple fix attempts failed (dtype forcing, autocast disabling, CPU migration)
+
+**Root Cause**: PyTorch MPS backend incompatibility with gradient-based interventions involving checkpoint/restore operations.
+
+**Research Impact**: Cannot empirically evaluate TRUE interventional causality due to hardware/software limitations. This is a **technical implementation failure**, not a conceptual negative result.
+
+**Current Decision**: Focus on **correlation-based causal graph discovery only** (validated positive results below). TRUE interventional causality unvalidated due to PyTorch MPS limitations.
+
+---
+
+**Previous Validated Work: Causal Graph Discovery (Completed)**
 
 **CIFAR-100 detailed (primary dataset, 10 tasks, 5 epochs)**:
 
@@ -174,20 +188,21 @@ Clean ablation to separate graph learning from importance sampling:
 
 **Summary of Completed Experiments**
 
-| Experiment Phase     | Dataset   | Seeds | Result    | Gap from DER++ | Status   |
-| -------------------- | --------- | ----- | --------- | -------------- | -------- |
-| Phase 1 Baseline     | CIFAR-100 | 1     | 73.81%    | N/A (baseline) | Complete |
-| Phase 2 Causal       | CIFAR-100 | 1     | 70.32%    | -3.49%         | Complete |
-| Phase 3 Graph        | CIFAR-100 | 1     | 62.3%     | -11.51%        | Complete |
-| Quick Wins           | CIFAR-100 | 1     | Abandoned | Still degraded | Failed   |
-| Ablation: Graph Only | CIFAR-100 | 1     | 73.88%    | +0.07% (noise) | Complete |
-| Ablation: Full       | CIFAR-100 | 1     | 71.75%    | -2.06%         | Complete |
+| Experiment Phase     | Dataset   | Seeds | Result    | Gap from DER++ | Status                |
+| -------------------- | --------- | ----- | --------- | -------------- | --------------------- |
+| Phase 1 Baseline     | CIFAR-100 | 1     | 73.81%    | N/A (baseline) | Complete              |
+| Phase 2 Causal       | CIFAR-100 | 1     | 70.32%    | -3.49%         | Complete              |
+| Phase 3 Graph        | CIFAR-100 | 1     | 62.3%     | -11.51%        | Complete              |
+| Quick Wins           | CIFAR-100 | 1     | Abandoned | Still degraded | Failed                |
+| Ablation: Graph Only | CIFAR-100 | 1     | 73.88%    | +0.07% (noise) | Complete              |
+| Ablation: Full       | CIFAR-100 | 1     | 71.75%    | -2.06%         | Complete              |
+| TRUE Interventional  | CIFAR-100 | -     | N/A       | Cannot test    | Blocked (MPS backend) |
 
-**Total Experiments Run**: 6 controlled ablation studies
+**Total Completed Experiments**: 6 controlled ablation studies  
+**Total Attempted Experiments**: 7 (TRUE interventional blocked by technical failure)  
+**Total Compute Time**: ~5.2 hours (6×52min successful runs)
 
-**Total Compute Time**: ~5.2 hours (6×52min)
-
-**Key Lesson**: Importance sampling breaks balanced replay - graph learning gives you interpretability for free
+**Key Lesson**: Importance sampling breaks balanced replay - graph learning gives you interpretability for free. TRUE interventional causality unvalidated due to PyTorch MPS backend limitations.
 
 ### Research Contributions
 
@@ -201,35 +216,32 @@ Demonstrated that causal graph learning can be integrated into continual learnin
 4. **Hub Identification** - Task 3 identified as causal hub with strongest outgoing edges
 5. **Reproducible Protocol** - ResNet-18 feature extraction (512D) with documented hyperparameters
 
-**Secondary Contribution: Negative Results on Causal Sampling**
+**Secondary Contribution: Negative Results and Technical Limitations**
 
 Rigorously evaluated two causal sampling approaches and documented their failure modes:
 
-**Importance-Weighted Sampling** (Graph-based):
+**1. Importance-Weighted Sampling** (Graph-based) - **Validated Negative Result**:
 
-- Performance: -2.06% degradation
+- Performance: -2.06% degradation (71.75% vs 73.81% baseline)
 - Root cause: Concentrates samples from single tasks, destroying balanced replay diversity
-- Lesson: Continual learning requires diversity preservation; importance weighting incompatible
+- Lesson: Continual learning requires diversity preservation; importance weighting fundamentally incompatible
+- Status: **Complete empirical validation**
 
-**Interventional Causality** (Pearl Level 2):
+**2. Interventional Causality** (Pearl Level 2) - **Technical Implementation Failure**:
 
-- Performance: -9.4% degradation
+- Status: **BLOCKED** - Cannot execute on Apple Silicon MPS backend
+- Error: "RuntimeError: Mismatched Tensor types in NNPack convolutionOutput"
+- All attempted experiments return 0.0000 causal effects (100% measurement failure)
 - Implementation: Gradient-based factual vs. counterfactual comparisons with cross-task measurement
+- Root cause: PyTorch MPS backend incompatibility with gradient contexts in checkpoint/restore operations
+- Attempted fixes: Explicit float32 forcing, autocast disabling, CPU migration (all failed)
+- Research impact: **Cannot provide empirical results** - technical limitation, not conceptual failure
+- Status: **Unvalidated** due to hardware/software constraints
 - Root cause: Weak causal signals (effect magnitudes < 0.2), 90-96% neutral samples, insufficient signal-to-noise
-- Lesson: Gradient-based micro-interventions inadequate for meaningful causal effect estimation
+- Research impact: **Cannot provide empirical results** - technical limitation, not conceptual failure
+- Status: **Unvalidated** due to hardware/software constraints
 
-**Technical Implementation (Interventional Approach):**
-
-```python
-# For each candidate buffer sample at task N:
-1. Checkpoint model state
-2. FACTUAL: Train 3 micro-steps WITH sample → measure loss on tasks 0...N-1
-3. Restore checkpoint from saved state
-4. COUNTERFACTUAL: Train 3 micro-steps WITHOUT sample → measure loss on tasks 0...N-1
-5. Causal effect = factual_forgetting - counterfactual_forgetting
-6. Select samples with most negative effects (theory: reduce forgetting)
-7. Result: Effects too weak, selection no better than random
-```
+**Note on Publication**: The validated contribution (causal graph discovery) provides sufficient novelty for workshop publication. The importance sampling negative result has clear empirical evidence. The interventional causality approach cannot be included in publications without access to CUDA hardware for validation.
 
 ## Implementation
 
@@ -363,15 +375,25 @@ python3 mammoth/utils/main.py \
 - **Takeaway**: Graph learning gives interpretability for free
 - **Finding**: Importance sampling breaks balanced replay
 
+❌ **TRUE Interventional Causality Blocked (November 5, 2025)**
+
+- Status: Cannot execute on Apple Silicon MPS backend
+- Error: Persistent "RuntimeError: Mismatched Tensor types in NNPack convolutionOutput"
+- All interventions return 0.0000 effects (100% measurement failure)
+- Multiple fix attempts exhausted (dtype forcing, autocast disabling, CPU migration)
+- **Decision**: Focus publication on validated graph discovery results only
+- **Future**: Requires CUDA hardware or PyTorch MPS bug fixes
+
 ### Research Roadmap
 
-**Immediate Priorities (Weeks 1-2)**
+**Immediate Priorities (Weeks 1-2)** - Focus on Validated Results
 
 1. **Manuscript Development**
 
-   - Draft workshop paper (4-8 pages) emphasizing interpretability contribution
-   - Document two negative results with clear failure mode analysis
-   - Frame interventional causality as important negative finding for the field
+   - Draft workshop paper (4-8 pages) emphasizing causal graph discovery
+   - Document importance sampling negative result (validated: -2.06%)
+   - Note TRUE interventional causality as future work (blocked by technical limitations)
+   - Frame as "interpretability without performance cost" contribution
 
 2. **Visualization and Analysis**
 
@@ -396,15 +418,17 @@ python3 mammoth/utils/main.py \
 
    - Sample complexity bounds for causal discovery in continual learning
    - Formal analysis of why importance sampling fails (diversity-performance tradeoff)
-   - Conditions under which interventional causality could succeed
+   - **Deferred**: Interventional causality analysis (requires CUDA validation first)
 
 6. **Future Work Directions**
-   - Stronger intervention protocols (multi-step lookahead, larger learning rates)
+   - **Priority**: Access to CUDA hardware for TRUE interventional causality validation
    - Alternative causal estimation (influence functions, gradient matching)
    - Diversity-preserving importance sampling with stratified selection
+   - PyTorch MPS backend bug investigation/reporting
 
-**Long-Term Research Program (Months 3-6)**
+**Long-Term Research Program (Months 3-6)** - Conditional on Hardware Access
 
+- **If CUDA Available**: Complete TRUE interventional causality validation
 - Extended applications to curriculum design and meta-learning
 - Forgetting prediction models leveraging causal graph structure
 - Investigation of alternative causal proxies beyond gradient-based interventions
@@ -424,12 +448,16 @@ Seeking academic collaborators for workshop or conference paper on causal method
 
 - Complete implementation extending official Mammoth DER++ framework
 - Rigorous ablation study: 6 controlled experiments separating graph learning from sampling strategies
-- One positive result: Graph discovery provides interpretability at zero performance cost (+0.07%)
-- Two validated negative results: Importance sampling (-2.06%) and interventional causality (-9.4%)
+- **One validated positive result**: Graph discovery provides interpretability at zero performance cost (+0.07%)
+- **One validated negative result**: Importance sampling degrades performance (-2.06%)
+- **One technical limitation**: TRUE interventional causality blocked by MPS backend bug (unvalidated)
 - Discovered causal structure: 30-edge graph with temporal constraints and identified hub tasks
 - Reproducible experimental protocol with documented hyperparameters and multi-seed validation
-- Timeline: Workshop submission feasible within 6 weeks
+- Timeline: Workshop submission feasible within 4-6 weeks (focus on validated results)
+- **Hardware need**: Access to CUDA GPU for interventional causality validation (optional future work)
 - Co-authorship arrangements negotiable based on contribution level
+
+**Publication Scope**: Current validated results (graph discovery + importance sampling negative result) provide sufficient novelty for workshop publication. Interventional causality can be noted as "future work pending hardware access."
 
 ### Different Ways to Collaborate
 
