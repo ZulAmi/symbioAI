@@ -139,6 +139,9 @@ class DerppCausal(Derpp):
         self.enable_causal_graph = getattr(args, 'enable_causal_graph_learning', 0)
         self.use_causal_sampling = getattr(args, 'use_causal_sampling', 0)
         self.use_importance_sampling = getattr(args, 'use_importance_sampling', 0)
+        
+        # DEBUG: Print what we're reading
+        print(f"[DEBUG] use_causal_sampling from args: {self.use_causal_sampling}")
         self.temperature = getattr(args, 'temperature', 2.0)
         self.num_tasks = getattr(args, 'num_tasks', 10)
         self.feature_dim = getattr(args, 'feature_dim', 512)
@@ -154,6 +157,10 @@ class DerppCausal(Derpp):
         # TRUE INTERVENTIONAL CAUSALITY
         # use_causal_sampling is the primary flag: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
         self.use_true_causality = self.use_causal_sampling
+        
+        # DEBUG: Verify it's set correctly
+        print(f"[DEBUG] use_true_causality set to: {self.use_true_causality}")
+        print(f"[DEBUG] CausalForgettingDetector available: {CausalForgettingDetector is not None}")
         
         self.causal_num_interventions = getattr(args, 'causal_num_interventions', 50)
         self.causal_effect_threshold = getattr(args, 'causal_effect_threshold', 0.05)
