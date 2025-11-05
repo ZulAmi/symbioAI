@@ -39,16 +39,20 @@ from mammoth.models.derpp import Derpp
 try:
     from training.causal_inference import StructuralCausalModel, CausalForgettingDetector
     from training.metrics_tracker import ContinualLearningMetrics
-except ImportError:
+    print("[DEBUG] Successfully imported from training.* path")
+except ImportError as e1:
     try:
         # When files are in /mammoth/models/
         from causal_inference import StructuralCausalModel, CausalForgettingDetector
         from metrics_tracker import ContinualLearningMetrics
-    except ImportError:
+        print("[DEBUG] Successfully imported from direct path (mammoth/models/)")
+    except ImportError as e2:
         StructuralCausalModel = None
         CausalForgettingDetector = None
         ContinualLearningMetrics = None
-        print("[WARNING] Causal inference modules not found. Running in base DER++ mode.")
+        print(f"[WARNING] Causal inference modules not found. Running in base DER++ mode.")
+        print(f"[DEBUG] First import error: {e1}")
+        print(f"[DEBUG] Second import error: {e2}")
 
 
 class DerppCausal(Derpp):
