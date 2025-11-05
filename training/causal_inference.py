@@ -1093,6 +1093,9 @@ class CausalForgettingDetector:
         if not old_task_data:
             return 0.0
         
+        # CRITICAL: Use model's current device, not self.device (model may have been moved)
+        model_device = next(self.model.parameters()).device
+        
         # OPTIMIZATION: Stack all task samples into one batch for single forward pass
         all_x, all_y = [], []
         for task_id, (task_x, task_y) in old_task_data.items():
@@ -1101,8 +1104,8 @@ class CausalForgettingDetector:
             all_y.append(task_y[:n_samples])
         
         # Single batched forward pass
-        batch_x = torch.cat(all_x, dim=0).to(self.device)
-        batch_y = torch.cat(all_y, dim=0).to(self.device)
+        batch_x = torch.cat(all_x, dim=0).to(model_device)
+        batch_y = torch.cat(all_y, dim=0).to(model_device)
         
         # NOTE: MPS autocast completely disabled for TRUE causality (gradient compatibility)
         with torch.no_grad():
