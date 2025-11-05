@@ -105,8 +105,8 @@ class DerppCausal(Derpp):
                           help='Number of tasks to warm up causal sampling (5 = safer, lets graph stabilize)')
         
         # TRUE INTERVENTIONAL CAUSALITY OPTIONS
-        parser.add_argument('--use_true_causality', type=int, default=0,
-                          help='Use TRUE interventional causality (0=off, 1=heuristic_only, 2=hybrid, 3=true_only)')
+        # Note: use_causal_sampling is the primary flag (0=off, 1=heuristic, 2=hybrid, 3=TRUE-only)
+        # use_true_causality is kept for backward compatibility but defaults to use_causal_sampling
         parser.add_argument('--causal_num_interventions', type=int, default=50,
                           help='Number of intervention samples for TRUE causal measurement')
         parser.add_argument('--causal_effect_threshold', type=float, default=0.05,
@@ -152,10 +152,8 @@ class DerppCausal(Derpp):
         self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 5)  # Increased from 3
         
         # TRUE INTERVENTIONAL CAUSALITY
-        # Map use_causal_sampling to use_true_causality for backward compatibility
-        # use_causal_sampling: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
-        # use_true_causality is just an alias - use_causal_sampling is the primary flag
-        self.use_true_causality = self.use_causal_sampling if self.use_causal_sampling > 0 else getattr(args, 'use_true_causality', 0)
+        # use_causal_sampling is the primary flag: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
+        self.use_true_causality = self.use_causal_sampling
         
         self.causal_num_interventions = getattr(args, 'causal_num_interventions', 50)
         self.causal_effect_threshold = getattr(args, 'causal_effect_threshold', 0.05)
