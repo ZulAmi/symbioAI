@@ -42,7 +42,12 @@ try:
     print("[DEBUG] Successfully imported from training.* path")
 except ImportError as e1:
     try:
-        # When files are in /mammoth/models/
+        # Add mammoth/models to path for direct import
+        import os
+        models_dir = os.path.join(os.path.dirname(__file__), '.')
+        if models_dir not in sys.path:
+            sys.path.insert(0, models_dir)
+        
         from causal_inference import StructuralCausalModel, CausalForgettingDetector
         from metrics_tracker import ContinualLearningMetrics
         print("[DEBUG] Successfully imported from direct path (mammoth/models/)")
