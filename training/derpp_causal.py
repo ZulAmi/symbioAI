@@ -35,14 +35,20 @@ if str(repo_root) not in sys.path:
 from mammoth.models.derpp import Derpp
 
 # Import our causal inference modules
+# Try both local path (when in training/) and mammoth models path (when installed)
 try:
     from training.causal_inference import StructuralCausalModel, CausalForgettingDetector
     from training.metrics_tracker import ContinualLearningMetrics
 except ImportError:
-    StructuralCausalModel = None
-    CausalForgettingDetector = None
-    ContinualLearningMetrics = None
-    print("[WARNING] Causal inference modules not found. Running in base DER++ mode.")
+    try:
+        # When files are in /mammoth/models/
+        from causal_inference import StructuralCausalModel, CausalForgettingDetector
+        from metrics_tracker import ContinualLearningMetrics
+    except ImportError:
+        StructuralCausalModel = None
+        CausalForgettingDetector = None
+        ContinualLearningMetrics = None
+        print("[WARNING] Causal inference modules not found. Running in base DER++ mode.")
 
 
 class DerppCausal(Derpp):
