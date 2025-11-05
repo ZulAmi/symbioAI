@@ -154,14 +154,8 @@ class DerppCausal(Derpp):
         # TRUE INTERVENTIONAL CAUSALITY
         # Map use_causal_sampling to use_true_causality for backward compatibility
         # use_causal_sampling: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
-        # If use_true_causality is not explicitly set (default=0), use use_causal_sampling value
-        explicit_true_causality = getattr(args, 'use_true_causality', 0)
-        if explicit_true_causality == 0 and self.use_causal_sampling > 0:
-            # User set use_causal_sampling but not use_true_causality - use the former
-            self.use_true_causality = self.use_causal_sampling
-        else:
-            # User explicitly set use_true_causality - respect it
-            self.use_true_causality = explicit_true_causality
+        # use_true_causality is just an alias - use_causal_sampling is the primary flag
+        self.use_true_causality = self.use_causal_sampling if self.use_causal_sampling > 0 else getattr(args, 'use_true_causality', 0)
         
         self.causal_num_interventions = getattr(args, 'causal_num_interventions', 50)
         self.causal_effect_threshold = getattr(args, 'causal_effect_threshold', 0.05)
