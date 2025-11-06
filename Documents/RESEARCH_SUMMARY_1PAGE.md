@@ -76,11 +76,11 @@ I've built a system that applies **interventional causality** to replay buffer s
 - Balanced replay is critical for continual learning
 - 30-edge causal graph discovered with clear hub structure
 
-### 3.2 Current Work: TRUE Interventional Causality (Implementation Blocked - Technical Failure)
+### 3.2 Current Work: TRUE Interventional Causality (Preliminary Results - Single Seed)
 
-**Implementation Status (November 5, 2025)**:
+**Implementation Status (November 5-6, 2025)**:
 
-We implemented Pearl Level 2 interventional causality for replay buffer selection using gradient-based factual vs. counterfactual comparisons. However, the implementation has been **blocked by a critical Apple Silicon MPS backend bug** that prevents gradient-based interventions from executing correctly.
+Successfully migrated from Apple Silicon (MPS backend bug) to RunPod cloud GPU (RTX 5090, CUDA). Completed **first empirical evaluation** of Pearl Level 2 interventional causality for replay buffer selection.
 
 **Core Implementation**:
 
@@ -101,65 +101,62 @@ At Task 5: Task 0 sample → measure only Task 0 forgetting
 At Task 5: Task 0 sample → measure forgetting across Tasks 0,1,2,3,4
 ```
 
-**Technical Failure: MPS Backend Incompatibility**
+**Preliminary Experimental Results** (CIFAR-100, 10 tasks, 5 epochs, seed 1):
 
-All TRUE interventional causality experiments are currently **blocked** by a persistent dtype mismatch error on Apple Silicon:
+| Method              | Task-IL    | Gap from Vanilla | Interpretation                   |
+| ------------------- | ---------- | ---------------- | -------------------------------- |
+| **Vanilla DER++**   | **64.30%** | N/A (baseline)   | Standard uniform replay          |
+| **TRUE Causality**  | **62.81%** | **-1.49%**       | Competitive but slightly worse   |
+| **Graph Heuristic** | **57.64%** | **-6.66%**       | Correlation-based approach fails |
 
-```
-RuntimeError: Mismatched Tensor types in NNPack convolutionOutput
-```
+**Key Findings**:
 
-**Observed Behavior** (CIFAR-100, Task 2+):
+1. **TRUE Causality Works on CUDA**: Successfully executed on RTX 5090, producing non-zero causal effects (-0.39 to +0.28 range)
+2. **Competitive Performance**: Only 1.49% gap from vanilla baseline (within noise for single seed)
+3. **Better than Graph Heuristic**: TRUE interventional approach outperforms correlation-based causal graph (+5.17%)
+4. **Critical Low Baseline Issue**: Vanilla achieved 64.30% vs. expected 73.81% from October baseline (-9.51% gap)
 
-- All TRUE causal effects return 0.0000 (complete measurement failure)
-- 100% of samples classified as "neutral" (0 beneficial, 0 harmful)
-- Error occurs during gradient computation in torch.enable_grad() context
-- Issue persists despite multiple fixes:
-  - ✗ Explicitly disabling autocast for all devices (MPS/CUDA/CPU)
-  - ✗ Forcing float32 dtype conversion for all tensors
-  - ✗ Ensuring model parameters are float32
-  - ✗ Converting numpy→torch with explicit .float() calls
-  - ✗ Moving entire intervention to CPU (still crashes)
+**Low Baseline Analysis**:
 
-**Root Cause Analysis**:
+All three methods underperformed historical expectations by ~9-10%:
 
-1. **Apple Silicon MPS Limitation**: PyTorch MPS backend has known issues with mixed dtype operations in gradient contexts, particularly with NNPack (CPU SIMD library used as fallback)
+- **Expected vanilla**: 73.81% (October Mac baseline)
+- **Actual vanilla**: 64.30% (November RunPod)
+- **Possible causes**: Different Mammoth version, CIFAR-100 preprocessing differences, environment variations, hyperparameter mismatch
 
-2. **Gradient Context Conflicts**: The checkpoint/restore mechanism with torch.enable_grad() triggers dtype conversion bugs in MPS backend that cannot be resolved through dtype forcing
+**Statistical Validity Limitations**:
 
-3. **No Viable Workaround**: Moving to CPU still fails (NNPack error is CPU-specific), suggesting fundamental incompatibility between:
-   - Gradient-based interventions (require torch.enable_grad())
-   - Model state manipulation (checkpoint/restore)
-   - MPS/CPU tensor routing in PyTorch
+⚠️ **Single seed = NO statistical significance**
 
-**Attempted Experimental Results** (CIFAR-100, Task 2):
-
-| Method                 | Status         | Causal Effects Measured | Interpretation                    |
-| ---------------------- | -------------- | ----------------------- | --------------------------------- |
-| **Vanilla DER++**      | ✅ Working     | N/A                     | Standard uniform replay (control) |
-| **TRUE Causal**        | ❌ **BLOCKED** | 0.0000 (all failures)   | MPS dtype bug prevents execution  |
-| **Effective Sampling** | Random         | No discrimination       | Falls back to uniform selection   |
+- 1.49% gap could be random noise
+- Need 3-5 seeds minimum for confidence intervals
+- Current result: **Inconclusive** (neither clear success nor failure)
 
 **Research Status**:
 
-This represents a **technical implementation failure** rather than a conceptual negative result:
+**Proof-of-Concept Success with Caveats**:
 
-- Implementation is theoretically sound (Pearl Level 2 do-calculus correctly applied)
-- Cross-task measurement methodology is valid
-- **However**: Cannot execute due to PyTorch backend limitations on available hardware
-- **Research value limited**: Cannot empirically evaluate approach effectiveness
-- **Publication barrier**: No experimental results to analyze or report
+- ✅ TRUE interventional causality **executes correctly** on CUDA (MPS bug bypassed)
+- ✅ Produces **meaningful causal effects** (non-zero, reasonable magnitude)
+- ✅ **Competitive with vanilla** (-1.49% within single-seed noise)
+- ✅ **Superior to correlation-based graph** (+5.17% improvement)
+- ⚠️ **Cannot claim statistical significance** without multi-seed validation
+- ⚠️ **Low baseline mystery** requires investigation before conclusions
+- ⚠️ **Publication-ready status**: Requires 3-5 seed replication + baseline debugging
 
 **Implications**:
 
-The TRUE interventional causality approach **cannot be evaluated** on Apple Silicon with current PyTorch MPS backend. Alternative paths:
+TRUE interventional causality shows **promising preliminary results** but requires validation:
 
-1. **Hardware migration**: Rerun on NVIDIA GPU with CUDA backend (estimated 6-8 hours compute per seed)
-2. **Method abandonment**: Focus solely on correlation-based graph discovery (already validated)
-3. **Alternative implementations**: Influence functions or meta-learning approaches without gradient contexts
-4. **Future work**: Revisit when PyTorch MPS backend resolves gradient dtype issues
+1. **Optimistic Interpretation**: Competitive performance despite computational overhead, significantly better than graph heuristic, potentially beneficial with proper tuning
+2. **Realistic Interpretation**: Inconclusive due to single seed, low baseline suggests configuration issues, need multi-seed validation
+3. **Next Steps**: Debug low baseline, run 3-5 seeds for statistical power, compare against corrected vanilla baseline
 
-**Current Decision**: Proceeding with **correlation-based causal graph discovery only** (validated results). TRUE interventional causality remains unvalidated due to technical limitations.
+**Publication Readiness**:
+
+- **Current status**: Proof-of-concept with mixed preliminary results
+- **Required for publication**: Multi-seed validation (3-5 seeds), baseline debugging, confidence intervals
+- **Collaboration value**: Working implementation + preliminary data = strong foundation for partnership
 
 ---
 
@@ -229,7 +226,7 @@ I'd love to work with researchers who have expertise in:
 
 ### 6.1 Scientific Contributions
 
-**Validated Results**:
+**Validated Results** (Completed Work):
 
 - **Causal Graph Discovery**: First systematic integration of causal graph learning into continual learning for task relationship analysis
 - **Interpretability Without Cost**: Demonstrated that causal graph learning provides task dependency visualization with negligible performance impact (+0.07%)
@@ -237,6 +234,15 @@ I'd love to work with researchers who have expertise in:
 - **Reproducible Experimental Protocol**: Complete ablation studies built on Mammoth framework with documented hyperparameters
 - **Clean Separation of Concerns**: Ablations isolate graph learning (neutral) from sampling strategies (harmful)
 - **Temporal Constraint Validation**: Enforced forward-only causal edges respecting task ordering (i→j where i<j)
+
+**Preliminary Results** (Proof-of-Concept, Requires Validation):
+
+- **TRUE Interventional Causality Implementation**: First working implementation of Pearl Level 2 do-calculus for continual learning replay selection on CUDA
+- **Competitive Performance**: TRUE causality achieves 62.81% vs. 64.30% vanilla baseline (-1.49%, within single-seed noise)
+- **Superior to Graph Heuristic**: TRUE interventional approach outperforms correlation-based causal graph by +5.17% (62.81% vs. 57.64%)
+- **Cross-Task Measurement**: Validated methodology for measuring sample impact across all previously learned tasks
+- **MPS Backend Resolution**: Successfully bypassed Apple Silicon limitations via cloud GPU migration
+- **Caution**: Single seed only, low baseline issue unresolved, statistical significance unknown
 
 **Technical Limitation** (Not a Research Contribution):
 

@@ -8,15 +8,15 @@
 
 **CausalDER** investigates causal methods for continual learning, including causal graph discovery for task relationships and interventional causality for replay buffer selection. This research systematically evaluates Pearl's causal hierarchy (Levels 1-2) applied to continual learning via the DER++ replay mechanism.
 
-**Primary Finding:** Causal graph discovery provides interpretable task relationships with negligible performance impact (+0.07%), while both importance-weighted sampling (-2.06%) and gradient-based interventional selection (-9.4%) degrade performance relative to uniform replay baselines.
+**Primary Finding:** Causal graph discovery provides interpretable task relationships with negligible performance impact (+0.07%). Importance-weighted sampling degrades performance (-2.06%) by destroying replay diversity. **NEW (Nov 2025)**: TRUE interventional causality shows competitive preliminary results (62.81% vs 64.30% vanilla, -1.49% gap) but requires multi-seed validation.
 
-**Research Status:** Experimental validation complete (October 2025). Results include one positive finding (graph learning) and two rigorous negative results (importance sampling and interventional causality), all with clear empirical evidence and theoretical explanations.
+**Research Status:** Graph discovery validated (October 2025). TRUE interventional causality proof-of-concept complete (November 2025), pending multi-seed validation and baseline debugging.
 
 **Code:** Public on GitHub at [github.com/ZulAmi/symbioAI](https://github.com/ZulAmi/symbioAI)
 
 ### Validated Results (October 2025)
 
-**Previous Work: Causal Graph Discovery**
+**Causal Graph Discovery (Completed)**
 
 | Experiment         | Graph Learning | Importance Sampling | Task-IL    | Interpretation          |
 | ------------------ | -------------- | ------------------- | ---------- | ----------------------- |
@@ -24,7 +24,41 @@
 | **Graph Only**     | ✅             | ❌                  | **73.88%** | +0.07% (negligible)     |
 | **Full Causal**    | ✅             | ✅                  | **71.75%** | -2.06% (sampling hurts) |
 
-**Key Finding**: Graph learning provides interpretability without performance cost, but both importance-weighted and interventional causal sampling degrade accuracy.
+**Key Finding**: Graph learning provides interpretability without performance cost. Importance-weighted sampling degrades accuracy by destroying balanced replay diversity.
+
+---
+
+### Preliminary Results (November 2025 - Requires Validation)
+
+**TRUE Interventional Causality (RunPod RTX 5090, CUDA)**
+
+**Status**: Proof-of-concept complete, **single seed only**, requires multi-seed validation.
+
+| Method              | Task-IL    | Gap from Vanilla | Status                          |
+| ------------------- | ---------- | ---------------- | ------------------------------- |
+| **Vanilla DER++**   | **64.30%** | N/A (baseline)   | ⚠️ Low baseline (-9.51% vs Oct) |
+| **TRUE Causality**  | **62.81%** | **-1.49%**       | ✅ Competitive (within noise)   |
+| **Graph Heuristic** | **57.64%** | **-6.66%**       | ❌ Clear failure                |
+
+**Configuration**: CIFAR-100, 10 tasks, 5 epochs, seed 1, buffer 500, alpha=0.1, beta=0.5
+
+**Key Findings**:
+
+- ✅ **TRUE causality works on CUDA** (bypassed MPS backend bug)
+- ✅ **Competitive with vanilla** (-1.49% within single-seed noise)
+- ✅ **Better than graph heuristic** (+5.17% improvement)
+- ⚠️ **Low baseline issue**: Vanilla 64.30% vs expected 73.81% (-9.51% gap)
+- ⚠️ **Single seed**: NO statistical significance - need 3-5 seeds minimum
+- ⚠️ **Inconclusive**: Cannot claim TRUE > vanilla without multi-seed validation
+
+**Research Impact**:
+
+- **Proof-of-concept success**: TRUE interventional causality executes correctly with meaningful causal effects
+- **Preliminary competitive performance**: Small gap suggests potential viability
+- **Baseline mystery**: All methods underperformed by ~9-10%, requires investigation
+- **Next steps**: Multi-seed validation + baseline debugging before publication
+
+---
 
 ---
 
@@ -188,21 +222,27 @@ Clean ablation to separate graph learning from importance sampling:
 
 **Summary of Completed Experiments**
 
-| Experiment Phase     | Dataset   | Seeds | Result    | Gap from DER++ | Status                |
-| -------------------- | --------- | ----- | --------- | -------------- | --------------------- |
-| Phase 1 Baseline     | CIFAR-100 | 1     | 73.81%    | N/A (baseline) | Complete              |
-| Phase 2 Causal       | CIFAR-100 | 1     | 70.32%    | -3.49%         | Complete              |
-| Phase 3 Graph        | CIFAR-100 | 1     | 62.3%     | -11.51%        | Complete              |
-| Quick Wins           | CIFAR-100 | 1     | Abandoned | Still degraded | Failed                |
-| Ablation: Graph Only | CIFAR-100 | 1     | 73.88%    | +0.07% (noise) | Complete              |
-| Ablation: Full       | CIFAR-100 | 1     | 71.75%    | -2.06%         | Complete              |
-| TRUE Interventional  | CIFAR-100 | -     | N/A       | Cannot test    | Blocked (MPS backend) |
+| Experiment Phase          | Dataset   | Seeds | Result     | Gap from DER++        | Status                  |
+| ------------------------- | --------- | ----- | ---------- | --------------------- | ----------------------- |
+| Phase 1 Baseline          | CIFAR-100 | 1     | 73.81%     | N/A (baseline)        | Complete                |
+| Phase 2 Causal            | CIFAR-100 | 1     | 70.32%     | -3.49%                | Complete                |
+| Phase 3 Graph             | CIFAR-100 | 1     | 62.3%      | -11.51%               | Complete                |
+| Quick Wins                | CIFAR-100 | 1     | Abandoned  | Still degraded        | Failed                  |
+| Ablation: Graph Only      | CIFAR-100 | 1     | 73.88%     | +0.07% (noise)        | Complete                |
+| Ablation: Full            | CIFAR-100 | 1     | 71.75%     | -2.06%                | Complete                |
+| **TRUE: Vanilla**         | CIFAR-100 | 1     | **64.30%** | N/A (RunPod baseline) | Complete (Nov 2025)     |
+| **TRUE: Interventional**  | CIFAR-100 | 1     | **62.81%** | **-1.49%**            | **Proof-of-concept**    |
+| **TRUE: Graph Heuristic** | CIFAR-100 | 1     | **57.64%** | **-6.66%**            | **Complete (Nov 2025)** |
 
-**Total Completed Experiments**: 6 controlled ablation studies  
-**Total Attempted Experiments**: 7 (TRUE interventional blocked by technical failure)  
-**Total Compute Time**: ~5.2 hours (6×52min successful runs)
+**Total Completed Experiments**: 9 controlled studies (6 October + 3 November)  
+**Total Compute Time**: ~11 hours (6×52min Mac runs + 3×~6hr RunPod runs)
 
-**Key Lesson**: Importance sampling breaks balanced replay - graph learning gives you interpretability for free. TRUE interventional causality unvalidated due to PyTorch MPS backend limitations.
+**Key Lessons**:
+
+- Graph learning: Free interpretability (+0.07%)
+- Importance sampling: Destroys diversity (-2.06%)
+- **TRUE interventional causality**: Competitive (-1.49%) but requires multi-seed validation
+- **Low baseline mystery**: Nov RunPod vanilla (64.30%) vs Oct Mac vanilla (73.81%) = -9.51% gap
 
 ### Research Contributions
 
@@ -216,30 +256,30 @@ Demonstrated that causal graph learning can be integrated into continual learnin
 4. **Hub Identification** - Task 3 identified as causal hub with strongest outgoing edges
 5. **Reproducible Protocol** - ResNet-18 feature extraction (512D) with documented hyperparameters
 
-**Secondary Contribution: Negative Results and Technical Limitations**
+**Secondary Contribution: Mixed Results from Causal Sampling Approaches**
 
-Rigorously evaluated two causal sampling approaches and documented their failure modes:
+Rigorously evaluated two causal sampling approaches with different outcomes:
 
 **1. Importance-Weighted Sampling** (Graph-based) - **Validated Negative Result**:
 
 - Performance: -2.06% degradation (71.75% vs 73.81% baseline)
 - Root cause: Concentrates samples from single tasks, destroying balanced replay diversity
 - Lesson: Continual learning requires diversity preservation; importance weighting fundamentally incompatible
-- Status: **Complete empirical validation**
+- Status: **Complete empirical validation** (October 2025)
 
-**2. Interventional Causality** (Pearl Level 2) - **Technical Implementation Failure**:
+**2. Interventional Causality** (Pearl Level 2) - **Promising Preliminary Results**:
 
-- Status: **BLOCKED** - Cannot execute on Apple Silicon MPS backend
-- Error: "RuntimeError: Mismatched Tensor types in NNPack convolutionOutput"
-- All attempted experiments return 0.0000 causal effects (100% measurement failure)
+- Performance: -1.49% degradation (62.81% vs 64.30% RunPod baseline)
+- **However**: All methods underperformed expectations by ~9-10% (64.30% vs 73.81% historical)
+- Relative comparison: TRUE outperforms graph heuristic by +5.17% (62.81% vs 57.64%)
 - Implementation: Gradient-based factual vs. counterfactual comparisons with cross-task measurement
-- Root cause: PyTorch MPS backend incompatibility with gradient contexts in checkpoint/restore operations
-- Attempted fixes: Explicit float32 forcing, autocast disabling, CPU migration (all failed)
-- Research impact: **Cannot provide empirical results** - technical limitation, not conceptual failure
-- Status: **Unvalidated** due to hardware/software constraints
-- Root cause: Weak causal signals (effect magnitudes < 0.2), 90-96% neutral samples, insufficient signal-to-noise
-- Research impact: **Cannot provide empirical results** - technical limitation, not conceptual failure
-- Status: **Unvalidated** due to hardware/software constraints
+- Status: **Proof-of-concept complete** (November 2025), requires multi-seed validation
+- Limitations:
+  - Single seed only (no statistical significance)
+  - Low baseline issue unresolved (configuration or environment differences)
+  - Cannot claim TRUE > vanilla without 3-5 seed replication
+- Research value: **Working implementation with competitive preliminary results**, strong foundation for collaboration
+- Next steps: Multi-seed validation + baseline debugging
 
 **Note on Publication**: The validated contribution (causal graph discovery) provides sufficient novelty for workshop publication. The importance sampling negative result has clear empirical evidence. The interventional causality approach cannot be included in publications without access to CUDA hardware for validation.
 
