@@ -507,3 +507,4 @@ validation/scripts/completed_experiments/
 # Experiment results (keep structure only)
 validation/results/*/
 !validation/results/.gitkeep
+useless/
