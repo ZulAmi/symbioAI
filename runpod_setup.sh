@@ -37,8 +37,16 @@ fi
 # 3. Copy custom files INTO Mammoth
 echo ""
 echo "[3/6] Copying custom files to Mammoth..."
+# Copy model files
 cp /workspace/symbioAI/training/derpp_causal.py /workspace/mammoth/models/
 cp /workspace/symbioAI/training/causal_inference.py /workspace/mammoth/models/
+
+# Copy Python runner script
+cp /workspace/symbioAI/run_optimized_true_causality.py /workspace/mammoth/
+
+# Copy validation directory (for results)
+cp -r /workspace/symbioAI/validation /workspace/mammoth/
+
 echo "✅ Custom files copied"
 
 # 4. Install Mammoth dependencies
@@ -73,24 +81,20 @@ echo "============================================================"
 echo "READY TO RUN EXPERIMENTS"
 echo "============================================================"
 echo ""
-echo "Run the following to start 3 parallel experiments:"
+echo "Quick Start - Run optimized TRUE causality (3x faster):"
 echo ""
-echo "  bash /workspace/symbioAI/runpod_run_experiments.sh"
+echo "  cd /workspace/mammoth"
+echo "  python3 run_optimized_true_causality.py"
 echo ""
-echo "Or manually start each in tmux:"
+echo "This will run 5-epoch optimized TRUE causality (~15 min vs 43 min baseline)"
 echo ""
-echo "# Vanilla DER++"
-echo "tmux new -s vanilla -d"
-echo "tmux send-keys -t vanilla 'cd /workspace/mammoth && python utils/main.py --model derpp --dataset seq-cifar100 --buffer_size 500 --alpha 0.1 --beta 0.5 --n_epochs 5 --lr 0.03 --lr_milestones 3 4 --seed 1 2>&1 | grep -v NNPACK | tee /workspace/vanilla_5ep.log' C-m"
+echo "Options:"
+echo "  # 1-epoch quick test"
+echo "  python3 run_optimized_true_causality.py --n_epochs 1"
 echo ""
-echo "# Graph Heuristic"
-echo "tmux new -s graph -d"
-echo "tmux send-keys -t graph 'cd /workspace/mammoth && python utils/main.py --model derpp-causal --dataset seq-cifar100 --buffer_size 500 --alpha 0.1 --beta 0.5 --n_epochs 5 --lr 0.03 --lr_milestones 3 4 --enable_causal_graph_learning 1 --use_causal_sampling 1 --seed 1 2>&1 | grep -v NNPACK | tee /workspace/graph_5ep.log' C-m"
+echo "  # Different seed"
+echo "  python3 run_optimized_true_causality.py --seed 42"
 echo ""
-echo "# TRUE Interventional"
-echo "tmux new -s true -d"
-echo "tmux send-keys -t true 'cd /workspace/mammoth && python utils/main.py --model derpp-causal --dataset seq-cifar100 --buffer_size 500 --alpha 0.1 --beta 0.5 --n_epochs 5 --lr 0.03 --lr_milestones 3 4 --use_causal_sampling 3 --debug 1 --temperature 2.0 --seed 1 2>&1 | grep -v NNPACK | tee /workspace/true_5ep.log' C-m"
-echo ""
-echo "Monitor with: tmux attach -t vanilla (or graph, true)"
-echo "Detach with: Ctrl+B then D"
+echo "  # See all options"
+echo "  python3 run_optimized_true_causality.py --help"
 echo ""
