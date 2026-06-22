@@ -1,0 +1,7 @@
+# Vanilla DER++ baseline — no causality
+defaults:
+  - base
+
+model: derpp
+use_causal_sampling: 0
+enable_causal_graph_learning: 0

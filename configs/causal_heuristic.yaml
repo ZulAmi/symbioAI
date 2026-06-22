@@ -1,0 +1,9 @@
+# Mode 1: PC-graph heuristic sampling (fast, correlational)
+defaults:
+  - base
+
+model: derpp-causal
+use_causal_sampling: 1
+enable_causal_graph_learning: 1
+causal_blend_ratio: 0.3
+causal_warmup_tasks: 5

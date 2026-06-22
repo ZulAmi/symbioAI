@@ -9,11 +9,13 @@ Author: Symbio AI
 Date: October 22, 2025
 """
 
+from __future__ import annotations
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 from collections import defaultdict
 import logging
 
@@ -51,21 +53,21 @@ class ContinualLearningMetrics:
         self.acc_matrix[:] = np.nan  # Initialize with NaN to track what's been computed
         
         # Task-specific metrics
-        self.task_accuracies: List[float] = []  # Final accuracy per task
-        self.initial_accuracies: List[float] = []  # Accuracy before training each task
-        
+        self.task_accuracies: list[float] = []
+        self.initial_accuracies: list[float] = []
+
         # Causal metrics
-        self.ate_scores: Dict[int, List[float]] = defaultdict(list)  # ATE per task
-        self.harmful_samples: Dict[int, int] = {}  # Count of harmful samples per task
-        self.beneficial_samples: Dict[int, int] = {}  # Count of beneficial samples per task
-        self.replay_gains: Dict[int, float] = {}  # Replay gain per task
+        self.ate_scores: dict[int, list[float]] = defaultdict(list)
+        self.harmful_samples: dict[int, int] = {}
+        self.beneficial_samples: dict[int, int] = {}
+        self.replay_gains: dict[int, float] = {}
         
         # Current task
         self.current_task = 0
         
         logger.info(f"Initialized metrics tracker for {num_tasks} tasks")
     
-    def record_accuracy(self, task_id: int, trained_up_to: int, accuracy: float):
+    def record_accuracy(self, task_id: int, trained_up_to: int, accuracy: float) -> None:
         """
         Record accuracy on task_id after training up to trained_up_to.
         
@@ -76,7 +78,7 @@ class ContinualLearningMetrics:
         """
         self.acc_matrix[trained_up_to, task_id] = accuracy
     
-    def record_initial_accuracy(self, task_id: int, accuracy: float):
+    def record_initial_accuracy(self, task_id: int, accuracy: float) -> None:
         """
         Record initial accuracy on task_id before training.
         
@@ -89,7 +91,7 @@ class ContinualLearningMetrics:
         else:
             logger.warning(f"Initial accuracy for task {task_id} already recorded")
     
-    def record_final_accuracy(self, task_id: int, accuracy: float):
+    def record_final_accuracy(self, task_id: int, accuracy: float) -> None:
         """
         Record final accuracy on task_id after training it.
         
@@ -241,7 +243,7 @@ class ContinualLearningMetrics:
         
         return float(np.mean(fwt_values))
     
-    def record_ate_score(self, task_id: int, ate: float):
+    def record_ate_score(self, task_id: int, ate: float) -> None:
         """
         Record ATE score for a sample from task_id.
         
@@ -251,7 +253,7 @@ class ContinualLearningMetrics:
         """
         self.ate_scores[task_id].append(ate)
     
-    def record_sample_attribution(self, task_id: int, ate: float, threshold: float = 0.05):
+    def record_sample_attribution(self, task_id: int, ate: float, threshold: float = 0.05) -> None:
         """
         Categorize sample as harmful/beneficial based on ATE.
         
@@ -267,7 +269,7 @@ class ContinualLearningMetrics:
         elif ate > threshold:
             self.beneficial_samples[task_id] = self.beneficial_samples.get(task_id, 0) + 1
     
-    def record_replay_gain(self, task_id: int, gain: float):
+    def record_replay_gain(self, task_id: int, gain: float) -> None:
         """
         Record replay gain (causal vs random sampling benefit).
         
@@ -277,7 +279,7 @@ class ContinualLearningMetrics:
         """
         self.replay_gains[task_id] = gain
     
-    def get_causal_metrics_summary(self) -> Dict:
+    def get_causal_metrics_summary(self) -> dict:
         """
         Get summary of causal metrics.
         
@@ -302,7 +304,7 @@ class ContinualLearningMetrics:
             'avg_replay_gain': avg_replay_gain,
         }
     
-    def get_summary(self, task_id: Optional[int] = None) -> Dict:
+    def get_summary(self, task_id: Optional[int] = None) -> dict:
         """
         Get comprehensive metrics summary.
         
@@ -335,7 +337,7 @@ class ContinualLearningMetrics:
         
         return summary
     
-    def print_summary(self, task_id: Optional[int] = None):
+    def print_summary(self, task_id: Optional[int] = None) -> None:
         """
         Print formatted metrics summary.
         
@@ -368,11 +370,11 @@ class ContinualLearningMetrics:
         
         print("="*60 + "\n")
     
-    def update_current_task(self, task_id: int):
+    def update_current_task(self, task_id: int) -> None:
         """Update the current task being trained."""
         self.current_task = task_id
     
-    def save_to_file(self, filepath: str):
+    def save_to_file(self, filepath: str) -> None:
         """
         Save metrics to JSON file.
         
@@ -402,9 +404,9 @@ def estimate_ate_for_sample(
     model: nn.Module,
     sample_data: torch.Tensor,
     sample_target: torch.Tensor,
-    buffer_samples: List[Tuple[torch.Tensor, torch.Tensor]],
+    buffer_samples: list[tuple[torch.Tensor, torch.Tensor]],
     device: torch.device,
-    num_reference: int = 20
+    num_reference: int = 20,
 ) -> float:
     """
     Estimate ATE for a single sample via counterfactual removal.

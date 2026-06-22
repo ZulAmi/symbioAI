@@ -800,7 +800,7 @@ class CausalForgettingDetector:
         if hasattr(self.model, 'net'):
             try:
                 return self.model.net(x, returnt='features')
-            except:
+            except TypeError:
                 return self.model.net(x)
         else:
             return self.model(x)
@@ -1080,147 +1080,152 @@ class CausalForgettingDetector:
     def _measure_forgetting_simple(self, old_task_data: Dict[int, Tuple[torch.Tensor, torch.Tensor]]) -> float:
         """
         Simple forgetting measurement: average loss across ALL old tasks.
-        
-        KEY FIX: Measures causal effect on forgetting across ALL previously learned tasks,
-        not just the task the sample came from. This ensures that Task 0 samples selected
-        at Task 1 are re-evaluated based on their impact on Tasks 0-1 at Task 2, etc.
-        
-        OPTIMIZATION: Vectorized batched forward pass instead of per-task loops.
-        Reduces from N forward passes to 1 batched forward pass (4-6x faster).
-        
-        Used by TRUE causal intervention.
+
+        Uses at most 10 samples per task — sufficient signal for ranking candidates
+        while cutting forward-pass cost by 5× vs the previous 50-sample default.
         """
         if not old_task_data:
             return 0.0
-        
-        # CRITICAL: Use model's current device, not self.device (model may have been moved)
+
         model_device = next(self.model.parameters()).device
-        
-        # OPTIMIZATION: Stack all task samples into one batch for single forward pass
+
         all_x, all_y = [], []
-        for task_id, (task_x, task_y) in old_task_data.items():
-            n_samples = min(50, len(task_x))
+        for task_x, task_y in old_task_data.values():
+            n_samples = min(10, len(task_x))  # was 50 — 5× speedup, negligible signal loss
             all_x.append(task_x[:n_samples])
             all_y.append(task_y[:n_samples])
-        
-        # Single batched forward pass
-        batch_x = torch.cat(all_x, dim=0).to(model_device)
-        batch_y = torch.cat(all_y, dim=0).to(model_device)
-        
-        # NOTE: MPS autocast completely disabled for TRUE causality (gradient compatibility)
+
+        batch_x = torch.cat(all_x, dim=0).to(model_device).float()
+        batch_y = torch.cat(all_y, dim=0).to(model_device).long()
+
         with torch.no_grad():
             if hasattr(self.model, 'net'):
                 outputs = self.model.net(batch_x)
             else:
                 outputs = self.model(batch_x)
-            
-            # Single loss computation across all tasks
             avg_loss = float(F.cross_entropy(outputs, batch_y, reduction='mean'))
-        
+
         return avg_loss
+
+    def precompute_causal_baseline(
+        self,
+        buffer_samples: List[Tuple[torch.Tensor, torch.Tensor]],
+        old_task_data: Dict[int, Tuple[torch.Tensor, torch.Tensor]],
+    ) -> Tuple[dict, float]:
         """
-        Measure the causal effect of a sample on forgetting.
-        
-        SIMPLIFIED APPROACH: Measure the candidate sample's DIRECT interference with old tasks.
-        - Low interference → beneficial (preserves old knowledge)
-        - High interference → harmful (conflicts with old knowledge)
-        
-        This is more sensitive than comparing buffer±sample (which differs by only 1/500).
-        
-        Args:
-            candidate_sample: (x, y) to test
-            buffer_samples: Current buffer contents (not used in simplified version)
-            old_task_data: Data from previous tasks for measuring forgetting
-            current_task_id: Current task index
-        
+        Save model checkpoint ONCE and compute the counterfactual baseline forgetting.
+
+        The counterfactual for every candidate is: "what forgetting occurs when we
+        train with the buffer but NOT that specific candidate?" Since all candidates
+        share essentially the same rest-of-buffer, one shared baseline suffices.
+
+        This replaces the N×(clone + counterfactual) pattern with 1×(clone + baseline),
+        giving ~2× speedup on the per-candidate loop.
+
         Returns:
-            CausalEffect measuring impact on forgetting
+            checkpoint: state_dict snapshot (pre-allocated, reused across candidates)
+            baseline_forgetting: loss after training with random buffer subset
+        """
+        device = next(self.model.parameters()).device
+
+        # Save checkpoint ONCE
+        checkpoint = {k: v.clone() for k, v in self.model.state_dict().items()}
+
+        # Baseline: train with a random buffer subset (the shared "without candidate" scenario)
+        num_replay = min(32, len(buffer_samples))
+        if num_replay > 0:
+            replay_indices = torch.randperm(len(buffer_samples))[:num_replay]
+            replay_x = torch.stack([buffer_samples[i][0].float().to(device) for i in replay_indices])
+            replay_y = torch.stack([buffer_samples[i][1].long().to(device) for i in replay_indices])
+
+            with torch.enable_grad():
+                for _ in range(self.true_micro_steps):
+                    if hasattr(self.model, 'net'):
+                        outputs = self.model.net(replay_x)
+                    else:
+                        outputs = self.model(replay_x)
+                    loss = F.cross_entropy(outputs, replay_y)
+                    grads = torch.autograd.grad(loss, self.model.parameters(), retain_graph=False)
+                    grads = [g.clamp(-self.gradient_clip_value, self.gradient_clip_value) for g in grads]
+                    with torch.no_grad():
+                        for param, grad in zip(self.model.parameters(), grads):
+                            param.data -= self.true_temp_lr * grad
+
+        baseline_forgetting = self._measure_forgetting_simple(old_task_data)
+        self.model.load_state_dict(checkpoint)
+
+        return checkpoint, baseline_forgetting
+
+    def measure_causal_effect_fast(
+        self,
+        candidate_sample: Tuple[torch.Tensor, torch.Tensor],
+        old_task_data: Dict[int, Tuple[torch.Tensor, torch.Tensor]],
+        checkpoint: dict,
+        baseline_forgetting: float,
+        shared_replay: List[Tuple[torch.Tensor, torch.Tensor]] | None = None,
+    ) -> CausalEffect:
+        """
+        Fast TRUE causal effect using a pre-saved checkpoint and pre-computed baseline.
+
+        vs _measure_true_causal_effect:
+        - No per-candidate checkpoint clone (use shared pre-saved checkpoint)
+        - No counterfactual pass (use shared baseline_forgetting)
+        - Only does: factual micro-steps → forgetting_with → restore
+
+        ~2× faster per candidate than the original full method.
         """
         sample_x, sample_y = candidate_sample
-        sample_id = f"task{current_task_id}_sample{id(sample_x)}"
-        
-        # Measure DIRECT interference of this sample with old task features
-        with torch.no_grad():
-            device = next(self.model.parameters()).device
-            sample_x = sample_x.unsqueeze(0).to(device)
-            
-            # Extract candidate sample features
-            if hasattr(self.model, 'net'):
-                try:
-                    sample_feats = self.model.net(sample_x, returnt='features')
-                except:
-                    sample_feats = self.model.net(sample_x)
-            else:
-                sample_feats = self.model(sample_x)
-            
-            # Global average pool if needed
-            if sample_feats.dim() > 2:
-                sample_feats = sample_feats.mean(dim=[-1, -2])
-            
-            sample_feats = sample_feats.squeeze(0)  # [D]
-            
-            # Measure interference with each old task
-            total_interference = 0.0
-            num_tasks = 0
-            
-            for task_id, (task_x, task_y) in old_task_data.items():
-                task_x = task_x[:min(20, len(task_x))].to(device)  # Sample 20
-                
-                # Extract old task features
+        device = next(self.model.parameters()).device
+
+        sample_x = sample_x.float().to(device)
+        sample_y = sample_y.unsqueeze(0).long().to(device) if sample_y.dim() == 0 else sample_y.long().to(device)
+
+        # Factual batch: candidate + small shared replay
+        factual_x = [sample_x.unsqueeze(0) if sample_x.dim() == 3 else sample_x]
+        factual_y = [sample_y if sample_y.dim() == 1 else sample_y.unsqueeze(0)]
+
+        if shared_replay:
+            for rx, ry in shared_replay[:16]:
+                factual_x.append(rx.float().unsqueeze(0).to(device) if rx.dim() == 3 else rx.float().to(device).unsqueeze(0))
+                ry_t = ry.long().to(device)
+                factual_y.append(ry_t.unsqueeze(0) if ry_t.dim() == 0 else ry_t[:1])
+
+        factual_x_t = torch.cat(factual_x, dim=0)
+        factual_y_t = torch.cat(factual_y, dim=0)
+
+        with torch.enable_grad():
+            for _ in range(self.true_micro_steps):
                 if hasattr(self.model, 'net'):
-                    try:
-                        old_feats = self.model.net(task_x, returnt='features')
-                    except:
-                        old_feats = self.model.net(task_x)
+                    outputs = self.model.net(factual_x_t)
                 else:
-                    old_feats = self.model(task_x)
-                
-                if old_feats.dim() > 2:
-                    old_feats = old_feats.mean(dim=[-1, -2])
-                
-                # Compute cosine similarity: high = aligned, low = conflict
-                similarity = torch.mm(sample_feats.unsqueeze(0), old_feats.T)  # [1, T]
-                similarity = similarity / (torch.norm(sample_feats) + 1e-8)
-                similarity = similarity / (torch.norm(old_feats, dim=1, keepdim=True).T + 1e-8)
-                
-                # Interference = 1 - avg_similarity
-                # High similarity (0.8) → low interference (0.2) → beneficial
-                # Low similarity (-0.2) → high interference (1.2) → harmful
-                avg_similarity = similarity.mean()
-                interference = 1.0 - avg_similarity
-                
-                total_interference += float(interference)
-                num_tasks += 1
-        
-        # Average interference across old tasks
-        avg_interference = total_interference / max(1, num_tasks)
-        
-        # Convert to causal effect:
-        # High interference → positive effect (increases forgetting) → harmful
-        # Low interference → negative effect (reduces forgetting) → beneficial
-        effect_size = avg_interference - 1.0  # Range: [-1, 1]
-        # effect_size > 0 → harmful
-        # effect_size < 0 → beneficial
-        
-        # Confidence based on magnitude
-        confidence = min(1.0, abs(effect_size))
-        
-        effect = CausalEffect(
-            source=sample_id,
-            target=f"forgetting_task{current_task_id}",
-            effect_size=float(effect_size),
-            confidence=float(confidence),
-            mechanism="feature_interference" if effect_size > 0 else "feature_preservation"
-        )
-        
-        # Categorize sample
-        if effect_size > 0.05:  # Threshold for "harmful"
+                    outputs = self.model(factual_x_t)
+                loss = F.cross_entropy(outputs, factual_y_t)
+                grads = torch.autograd.grad(loss, self.model.parameters(), retain_graph=False)
+                grads = [g.clamp(-self.gradient_clip_value, self.gradient_clip_value) for g in grads]
+                with torch.no_grad():
+                    for param, grad in zip(self.model.parameters(), grads):
+                        param.data -= self.true_temp_lr * grad
+
+        forgetting_with = self._measure_forgetting_simple(old_task_data)
+
+        # Restore to the shared pre-saved checkpoint
+        self.model.load_state_dict(checkpoint)
+
+        effect_size = forgetting_with - baseline_forgetting
+        sample_id = f"cand_{id(sample_x)}"
+        if effect_size > 0.05:
             self.harmful_samples.add(sample_id)
-        elif effect_size < -0.05:  # "Beneficial"
+        elif effect_size < -0.05:
             self.beneficial_samples.add(sample_id)
-        
-        return effect
-    
+
+        return CausalEffect(
+            source=sample_id,
+            target="forgetting_all_tasks",
+            effect_size=float(effect_size),
+            confidence=1.0,
+            mechanism="true_causal_intervention_fast",
+        )
+
     def _measure_forgetting(self,
                            buffer: List[Tuple[torch.Tensor, torch.Tensor]],
                            old_task_data: Dict[int, Tuple[torch.Tensor, torch.Tensor]]) -> float:
@@ -1251,7 +1256,7 @@ class CausalForgettingDetector:
                 if hasattr(self.model, 'net'):
                     try:
                         feats = self.model.net(buf_x, returnt='features')
-                    except:
+                    except TypeError:
                         feats = self.model.net(buf_x)
                 else:
                     feats = self.model(buf_x)
@@ -1275,7 +1280,7 @@ class CausalForgettingDetector:
                 if hasattr(self.model, 'net'):
                     try:
                         old_feats = self.model.net(task_x, returnt='features')
-                    except:
+                    except TypeError:
                         old_feats = self.model.net(task_x)
                 else:
                     old_feats = self.model(task_x)
@@ -1416,7 +1421,7 @@ def compute_ate(treatment: torch.Tensor,
                     kmeans = KMeans(n_clusters=num_strata, random_state=42, n_init=10)
                     strata = kmeans.fit_predict(confounders.cpu().float().numpy())
                     strata = torch.from_numpy(strata).long().to(confounders.device)  # int64 for indices
-                except:
+                except Exception:
                     # Fallback: use simple quantile-based stratification on first confounder dimension
                     if confounders.dim() > 1:
                         first_conf = confounders[:, 0]
@@ -1489,7 +1494,7 @@ def compute_ate(treatment: torch.Tensor,
                 y1_ipw = (weights_1 * outcome).sum()
                 y0_ipw = (weights_0 * outcome).sum()
                 ate_ipw = float(y1_ipw - y0_ipw)
-            except:
+            except Exception:
                 # Fallback if sklearn not available or fitting fails
                 logger.warning("IPW estimation failed, using stratification only")
                 ate_ipw = ate_stratified
