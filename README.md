@@ -151,20 +151,6 @@ Results are saved to `runs/ablation/<param>/results.csv` with a summary plot.
 
 ---
 
-## Docker (RunPod / Cloud GPU)
-
-```bash
-# Build and run a single experiment
-docker-compose up
-
-# Override: run influence function mode (faster, ~2h)
-docker-compose run experiment python run_optimized_true_causality.py \
-  --use_causal_sampling 4 --seed 1 --wandb
-```
-
-Set `WANDB_API_KEY` in your environment to enable metric logging.
-
----
 
 ## Repository Structure
 
