@@ -1,0 +1,11 @@
+# Ablation: true_micro_steps — gradient steps per intervention
+# Sweeps: compute vs accuracy tradeoff
+defaults:
+  - ../causal_true
+
+ablate:
+  param: true_micro_steps
+  values: [1, 2, 3]
+
+n_epochs: 5            # Use short runs for ablations
+seeds: [1, 2, 3]

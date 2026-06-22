@@ -61,6 +61,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+!validation/results/**/*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -504,7 +505,9 @@ mammoth/
 # ============================================================================
 validation/scripts/completed_experiments/
 
-# Experiment results (keep structure only)
+# Experiment results — commit validated seed logs so results are reproducible/verifiable
 validation/results/*/
 !validation/results/.gitkeep
+!validation/results/5Seed/*.log
+!validation/results/new5ep/*.log
 useless/

@@ -1,0 +1,34 @@
+# Base configuration — shared across all experiments
+# Override any field in a child config with `defaults: [base]`
+
+dataset: seq-cifar100
+n_tasks: 10
+n_epochs: 50          # Literature standard; our validated results used 5 (low-epoch regime)
+batch_size: 128
+minibatch_size: 128
+buffer_size: 500
+
+# Optimiser
+lr: 0.03
+lr_milestones: [35, 45]   # Scaled to 50 epochs; use [3, 4] for 5-epoch runs
+lr_gamma: 0.2
+
+# DER++ loss weights
+alpha: 0.1   # MSE distillation weight
+beta: 0.5    # CE replay weight
+
+# Reproducibility
+seeds: [1, 2, 3, 4, 5]
+
+# Causality (disabled by default — override in method configs)
+use_causal_sampling: 0
+enable_causal_graph_learning: 0
+
+# Logging & tracking
+wandb_project: causal-continual-learning
+wandb_entity: null        # Set via env var WANDB_ENTITY
+log_interval: 100
+
+# RunPod / infrastructure
+num_workers: 4
+pin_memory: true

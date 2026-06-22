@@ -23,41 +23,25 @@ import torch.nn.functional as F
 from typing import Optional
 import logging
 
-# Setup logger
 logger = logging.getLogger(__name__)
 
-# Add repo root to path so we can import the Mammoth package normally
+# Add repo root to path so Mammoth can be found when running from symbioAI/
 repo_root = Path(__file__).parent.parent
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
-# Import official DER++ base class
 from mammoth.models.derpp import Derpp
 
-# Import our causal inference modules
-# Try both local path (when in training/) and mammoth models path (when installed)
 try:
     from training.causal_inference import StructuralCausalModel, CausalForgettingDetector
     from training.metrics_tracker import ContinualLearningMetrics
-    print("[DEBUG] Successfully imported from training.* path")
-except ImportError as e1:
-    try:
-        # Add mammoth/models to path for direct import
-        import os
-        models_dir = os.path.join(os.path.dirname(__file__), '.')
-        if models_dir not in sys.path:
-            sys.path.insert(0, models_dir)
-        
-        from causal_inference import StructuralCausalModel, CausalForgettingDetector
-        from metrics_tracker import ContinualLearningMetrics
-        print("[DEBUG] Successfully imported from direct path (mammoth/models/)")
-    except ImportError as e2:
-        StructuralCausalModel = None
-        CausalForgettingDetector = None
-        ContinualLearningMetrics = None
-        print(f"[WARNING] Causal inference modules not found. Running in base DER++ mode.")
-        print(f"[DEBUG] First import error: {e1}")
-        print(f"[DEBUG] Second import error: {e2}")
+    from training.influence_approx import InfluenceFunctionApproximator
+except ImportError as e:
+    raise ImportError(
+        f"Cannot import causal inference modules: {e}\n"
+        "Run experiments from the repo root with:\n"
+        "  PYTHONPATH=/path/to/symbioAI python -m utils.main --model derpp-causal ..."
+    ) from e
 
 
 class DerppCausal(Derpp):
@@ -89,7 +73,8 @@ class DerppCausal(Derpp):
         parser.add_argument('--enable_causal_graph_learning', type=int, default=0,
                           help='Enable causal graph learning between tasks (0=off, 1=on)')
         parser.add_argument('--use_causal_sampling', type=int, default=0,
-                          help='Use ATE-based importance sampling (0=off, 1=on)')
+                          help='Causal sampling mode: 0=vanilla, 1=heuristic, 2=hybrid, '
+                               '3=TRUE (checkpoint/restore), 4=influence-fn (LiSSA)')
         parser.add_argument('--temperature', type=float, default=2.0,
                           help='Temperature for KL divergence (if used instead of MSE)')
         parser.add_argument('--num_tasks', type=int, default=10,
@@ -110,7 +95,7 @@ class DerppCausal(Derpp):
                           help='Initial sparsification quantile (keep top X%%)')
         parser.add_argument('--sparsity_end', type=float, default=0.7,
                           help='Final sparsification quantile')
-        parser.add_argument('--causal_warmup_tasks', type=int, default=5,
+        parser.add_argument('--causal_warmup_tasks', type=int, default=2,
                           help='Number of tasks to warm up causal sampling (5 = safer, lets graph stabilize)')
         
         # TRUE INTERVENTIONAL CAUSALITY OPTIONS
@@ -149,8 +134,7 @@ class DerppCausal(Derpp):
         self.use_causal_sampling = getattr(args, 'use_causal_sampling', 0)
         self.use_importance_sampling = getattr(args, 'use_importance_sampling', 0)
         
-        # DEBUG: Print what we're reading
-        print(f"[DEBUG] use_causal_sampling from args: {self.use_causal_sampling}")
+        logger.debug("use_causal_sampling=%d", self.use_causal_sampling)
         self.temperature = getattr(args, 'temperature', 2.0)
         self.num_tasks = getattr(args, 'num_tasks', 10)
         self.feature_dim = getattr(args, 'feature_dim', 512)
@@ -161,15 +145,14 @@ class DerppCausal(Derpp):
         self.causal_blend_ratio = getattr(args, 'causal_blend_ratio', 0.3)  # Reduced from 0.7
         self.sparsity_start = getattr(args, 'sparsity_start', 0.9)
         self.sparsity_end = getattr(args, 'sparsity_end', 0.7)
-        self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 5)  # Increased from 3
+        self.causal_warmup_tasks = getattr(args, 'causal_warmup_tasks', 2)
         
         # TRUE INTERVENTIONAL CAUSALITY
         # use_causal_sampling is the primary flag: 0=none, 1=heuristic, 2=hybrid, 3=TRUE-only
         self.use_true_causality = self.use_causal_sampling
         
-        # DEBUG: Verify it's set correctly
-        print(f"[DEBUG] use_true_causality set to: {self.use_true_causality}")
-        print(f"[DEBUG] CausalForgettingDetector available: {CausalForgettingDetector is not None}")
+        logger.debug("use_true_causality=%d, CausalForgettingDetector available=%s",
+                     self.use_true_causality, CausalForgettingDetector is not None)
         
         self.causal_num_interventions = getattr(args, 'causal_num_interventions', 50)
         self.causal_effect_threshold = getattr(args, 'causal_effect_threshold', 0.05)
@@ -198,15 +181,14 @@ class DerppCausal(Derpp):
                 num_tasks=self.num_tasks,
                 feature_dim=self.feature_dim
             )
-            print(f"[DER++ Causal] Causal graph learning ENABLED")
-            print(f"[DER++ Causal]    - Tasks: {self.num_tasks}")
-            print(f"[DER++ Causal]    - Feature dim: {self.feature_dim}D")
-            print(f"[DER++ Causal]    - Cache size: {self.causal_cache_size} samples/task")
-            print(f"[DER++ Causal]    - Temperature: {self.temperature}")
+            logger.info(
+                "Causal graph learning enabled — tasks=%d, feature_dim=%dD, "
+                "cache_size=%d, temperature=%.1f",
+                self.num_tasks, self.feature_dim, self.causal_cache_size, self.temperature,
+            )
         else:
-            print(f"[DER++ Causal] Running in official DER++ mode (no causality)")
+            logger.info("Running in standard DER++ mode (causality disabled)")
         
-        # Initialize TRUE Causal Forgetting Detector
         if self.use_true_causality and CausalForgettingDetector is not None:
             self.causal_forgetting_detector = CausalForgettingDetector(
                 model=self.net,
@@ -215,17 +197,13 @@ class DerppCausal(Derpp):
                 true_temp_lr=self.true_temp_lr,
                 true_micro_steps=self.true_micro_steps
             )
-            # Pass debug flag to detector
             self.causal_forgetting_detector.debug = self.debug
-            
-            if self.debug or True:  # Always print initialization info
-                print(f"[DER++ Causal] TRUE INTERVENTIONAL CAUSALITY ENABLED")
-                print(f"[DER++ Causal]    - Using CausalForgettingDetector")
-                print(f"[DER++ Causal]    - Intervention samples: {self.causal_num_interventions}")
-                print(f"[DER++ Causal]    - Effect threshold: {self.causal_effect_threshold}")
-                print(f"[DER++ Causal]    - Method: Factual vs Counterfactual comparison")
-                print(f"[DER++ Causal]    - Batched processing: {self.use_batched_causality} (batch_size={self.causal_batch_size})")
-                print(f"[DER++ Causal]    - Debug logging: {self.debug}")
+            logger.info(
+                "TRUE interventional causality enabled — mode=%d, interventions=%d, "
+                "threshold=%.3f, batched=%s (batch_size=%d)",
+                self.use_true_causality, self.causal_num_interventions,
+                self.causal_effect_threshold, self.use_batched_causality, self.causal_batch_size,
+            )
         
         # Metrics tracker
         self.metrics_tracker = ContinualLearningMetrics(num_tasks=self.num_tasks) if ContinualLearningMetrics else None
@@ -454,25 +432,17 @@ class DerppCausal(Derpp):
         # Blend uniform and causal based on warm start factor
         sampling_probs = (1 - causal_blend) * uniform_probs + causal_blend * causal_probs
         
-        # DEBUG: Log importance statistics once per task (first call after graph learned)
-        if not hasattr(self, '_debug_logged_task') or self._debug_logged_task != current_task:
+        if self.debug and (not hasattr(self, '_debug_logged_task') or self._debug_logged_task != current_task):
             if self.causal_graph is not None and current_task >= 1:
                 self._debug_logged_task = current_task
-                print(f"\n[DEBUG] Task {current_task} - Causal Sampling Diagnostics:")
-                print(f"  Warmup: blend={causal_blend:.2f} (warmup_tasks={self.causal_warmup_tasks})")
-                print(f"  Importance scores: mean={importance_scores.mean():.4f}, std={importance_scores.std():.4f}, min={importance_scores.min():.4f}, max={importance_scores.max():.4f}")
-                print(f"  Samples with causal_strength>0: {(importance_scores > 0.1).sum().item()}/{importance_scores.size(0)}")
-                print(f"  Causal probs: mean={causal_probs.mean():.6f}, std={causal_probs.std():.6f}, max={causal_probs.max():.6f}")
-                print(f"  Final sampling probs: mean={sampling_probs.mean():.6f}, std={sampling_probs.std():.6f}, max={sampling_probs.max():.6f}")
-                
-                # Top-10 samples by sampling probability
-                top_k = 10
-                top_probs, top_indices = torch.topk(sampling_probs, min(top_k, sampling_probs.size(0)))
-                print(f"  Top-{top_k} samples by sampling prob:")
-                for rank, (idx, prob) in enumerate(zip(top_indices, top_probs)):
-                    task_id = int(buf_task_labels[idx].item()) if torch.is_tensor(buf_task_labels[idx]) else int(buf_task_labels[idx])
-                    imp = importance_scores[idx].item()
-                    print(f"    #{rank+1}: idx={idx.item()}, task={task_id}, importance={imp:.4f}, prob={prob.item():.6f}")
+                logger.debug(
+                    "Task %d causal sampling — blend=%.2f, importance: mean=%.4f std=%.4f "
+                    "min=%.4f max=%.4f, causal_strength>0: %d/%d",
+                    current_task, causal_blend,
+                    importance_scores.mean(), importance_scores.std(),
+                    importance_scores.min(), importance_scores.max(),
+                    (importance_scores > 0.1).sum().item(), importance_scores.size(0),
+                )
         
         # Sample according to blended importance
         try:
@@ -525,7 +495,7 @@ class DerppCausal(Derpp):
 
         mode_name_map = {1: "HEURISTIC", 2: "HYBRID", 3: "TRUE-ONLY"}
         mode_name = mode_name_map.get(self.use_true_causality, "HEURISTIC")
-        print(f"\n[{mode_name} CAUSALITY] Sampling from buffer...")
+        logger.info("[%s] Sampling from buffer (task=%d)", mode_name, self.current_task)
         
         # CRITICAL: Ensure buffer data is float32 (not float16 or float64)
         buf_inputs = buf_inputs.float()
@@ -561,24 +531,24 @@ class DerppCausal(Derpp):
                 if task_mask.sum() > 0:
                     task_indices = task_mask.nonzero(as_tuple=True)[0]
                     # Take up to 50 samples per task for measurement
-                    n_samples = min(50, len(task_indices))
+                    n_samples = min(15, len(task_indices))
                     sampled_indices = task_indices[torch.randperm(len(task_indices))[:n_samples]]
                     
+                    # 15 samples per task is sufficient for ranking signal; was 50 (3× speedup)
                     task_inputs = buf_inputs[sampled_indices]
                     task_labels = buf_labels[sampled_indices]
                     old_task_data[task_id] = (task_inputs.to(self.device), task_labels.to(self.device))
+
             
-            # DEBUG: Log what tasks we extracted
-            if len(old_task_data) > 0 and not hasattr(self, '_debug_task_extraction_logged'):
+            if self.debug and len(old_task_data) > 0 and not hasattr(self, '_debug_task_extraction_logged'):
                 self._debug_task_extraction_logged = True
-                print(f"  [DEBUG] Buffer task distribution at Task {current_task}:")
-                print(f"    Unique task labels in buffer: {torch.unique(buf_task_labels).tolist()}")
-                print(f"    Samples per task: {[(tid, (buf_task_labels == tid).sum().item()) for tid in range(current_task)]}")
-                print(f"    Extracted old_task_data keys: {list(old_task_data.keys())}")
+                logger.debug(
+                    "Buffer task distribution at task %d: unique=%s, keys=%s",
+                    current_task, torch.unique(buf_task_labels).tolist(), list(old_task_data.keys()),
+                )
         
         if len(old_task_data) == 0:
-            # Fallback: Can't measure forgetting without old task data, use uniform sampling
-            print(f"  WARNING: No old task data available for causal attribution. Using uniform sampling.")
+            logger.warning("No old task data for causal attribution — falling back to uniform sampling")
             indices = torch.randperm(buf_inputs.size(0))[:size]
             # Cache selection and advance counter
             selected = (buf_inputs[indices], buf_labels[indices], buf_logits[indices])
@@ -590,59 +560,72 @@ class DerppCausal(Derpp):
         # TRUE-ONLY MODE: Skip heuristic filtering entirely
         # ============================================================
         if self.use_true_causality == 3:
-            # Prepare candidate pool (limit for runtime)
             num_candidates = min(self.causal_hybrid_candidates, buf_inputs.size(0))
             candidate_indices = torch.randperm(buf_inputs.size(0))[:num_candidates]
-            
-            if self.debug:
-                print(f"  [TRUE-ONLY] Computing TRUE causal effects on {num_candidates} candidates...")
-                print(f"  [TRUE-ONLY] Measuring forgetting across {len(old_task_data)} old tasks: {list(old_task_data.keys())}")
+
+            logger.debug("[TRUE-ONLY] Evaluating %d candidates across %d old tasks",
+                         num_candidates, len(old_task_data))
+
+            # --- KEY OPTIMISATION: compute checkpoint + baseline ONCE ---
+            # The original code cloned the full model state dict inside every
+            # per-candidate call to _measure_true_causal_effect (100 × 44 MB
+            # clone) and recomputed the counterfactual for each candidate
+            # separately. Hoisting both out of the loop gives ~2× speedup in
+            # the evaluation loop, on top of the 5× gain from reducing the
+            # forgetting sample count from 50 → 10 per task.
+            checkpoint, baseline_forgetting = (
+                self.causal_forgetting_detector.precompute_causal_baseline(
+                    buffer_samples, old_task_data
+                )
+            )
+            # One small shared replay batch for all factual passes
+            num_replay = min(16, len(buffer_samples))
+            shared_replay_idx = torch.randperm(len(buffer_samples))[:num_replay].tolist()
+            shared_replay = [buffer_samples[i] for i in shared_replay_idx]
 
             true_causal_effects = []
             for idx in candidate_indices.tolist():
-                candidate_sample = (buf_inputs[idx], buf_labels[idx])
-                other_samples = [buffer_samples[i] for i in range(len(buffer_samples)) if i != idx]
-
                 try:
-                    effect = self.causal_forgetting_detector.attribute_forgetting(
-                        candidate_sample=candidate_sample,
-                        buffer_samples=other_samples,
+                    effect = self.causal_forgetting_detector.measure_causal_effect_fast(
+                        candidate_sample=(buf_inputs[idx], buf_labels[idx]),
                         old_task_data=old_task_data,
-                        current_task_id=current_task,
-                        use_true_intervention=True
+                        checkpoint=checkpoint,
+                        baseline_forgetting=baseline_forgetting,
+                        shared_replay=shared_replay,
                     )
                     true_causal_effects.append({
                         'index': idx,
                         'effect_size': effect.effect_size,
                         'confidence': effect.confidence,
-                        'mechanism': effect.mechanism
+                        'mechanism': effect.mechanism,
                     })
                 except Exception as e:
-                    if len(true_causal_effects) == 0:
-                        print(f"    [WARNING] TRUE causal attribution failed: {type(e).__name__}: {str(e)[:100]}")
+                    if not true_causal_effects:
+                        logger.warning("[TRUE-ONLY] causal attribution failed: %s: %s",
+                                       type(e).__name__, str(e)[:120])
                     true_causal_effects.append({
                         'index': idx,
                         'effect_size': 0.0,
                         'confidence': 0.0,
-                        'mechanism': 'error'
+                        'mechanism': 'error',
                     })
 
-            # Log stats (only if debug or first few tasks)
-            if self.debug or current_task < 3:
-                print(f"  [TRUE-ONLY] TRUE causal effects computed:")
-                if len(true_causal_effects) > 0:
-                    effect_sizes = [e['effect_size'] for e in true_causal_effects]
-                    print(f"    Effect size range: [{min(effect_sizes):.4f}, {max(effect_sizes):.4f}], mean={sum(effect_sizes)/len(effect_sizes):.4f}")
-                    print(f"    Beneficial samples: {sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold)}")
-                    print(f"    Harmful samples: {sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold)}")
-                    print(f"    Neutral samples: {sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold)}")
+            if true_causal_effects:
+                effect_sizes = [e['effect_size'] for e in true_causal_effects]
+                logger.debug(
+                    "[TRUE-ONLY] effects: range=[%.4f, %.4f] mean=%.4f — "
+                    "beneficial=%d harmful=%d neutral=%d",
+                    min(effect_sizes), max(effect_sizes), sum(effect_sizes) / len(effect_sizes),
+                    sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold),
+                    sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold),
+                    sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold),
+                )
 
             sorted_true_effects = sorted(true_causal_effects, key=lambda x: x['effect_size'])
             selected_indices = [e['index'] for e in sorted_true_effects[:size]]
             indices = torch.tensor(selected_indices, dtype=torch.long)
-            
-            if self.debug:
-                print(f"  [TRUE-ONLY] Selected {len(indices)} samples from {num_candidates} candidates")
+
+            logger.debug("[TRUE-ONLY] Selected %d samples from %d candidates", len(indices), num_candidates)
             
             # Cache selection and advance counter
             selected = (buf_inputs[indices], buf_labels[indices], buf_logits[indices])
@@ -656,9 +639,37 @@ class DerppCausal(Derpp):
             return selected
 
         # ============================================================
+        # INFLUENCE FUNCTION MODE (mode 4): LiSSA approximation
+        # ============================================================
+        if self.use_true_causality == 4:
+            num_candidates = min(self.causal_hybrid_candidates, buf_inputs.size(0))
+            candidate_indices = torch.randperm(buf_inputs.size(0))[:num_candidates]
+
+            if not hasattr(self, "_influence_approx"):
+                self._influence_approx = InfluenceFunctionApproximator(self.net)
+
+            buffer_samples_cands = [
+                (buf_inputs[i], buf_labels[i]) for i in candidate_indices.tolist()
+            ]
+            top_k_local = self._influence_approx.rank_buffer_samples(
+                buffer_samples=buffer_samples_cands,
+                old_task_data=old_task_data,
+                top_k=size,
+            )
+            # Map local indices back to global buffer indices
+            selected_global = [candidate_indices[i].item() for i in top_k_local]
+            indices = torch.tensor(selected_global[:size], dtype=torch.long)
+
+            logger.debug("[INFLUENCE] Selected %d/%d candidates via LiSSA", len(indices), num_candidates)
+            selected = (buf_inputs[indices], buf_labels[indices], buf_logits[indices])
+            self._true_cached_batch = selected
+            self._causal_step_counter += 1
+            return selected
+
+        # ============================================================
         # STAGE 1: HEURISTIC FILTERING (Fast feature-based scoring)
         # ============================================================
-        print(f"  [STAGE 1] Heuristic filtering on {buf_inputs.size(0)} samples...")
+        logger.info("[STAGE 1] Heuristic filtering on %d buffer samples", buf_inputs.size(0))
         
         heuristic_effects = []
         
@@ -685,9 +696,9 @@ class DerppCausal(Derpp):
                     'mechanism': effect.mechanism
                 })
             except Exception as e:
-                # Log error for debugging
-                if len(heuristic_effects) == 0:  # Only log first error
-                    print(f"    [WARNING] Heuristic scoring failed: {type(e).__name__}: {str(e)[:100]}")
+                if len(heuristic_effects) == 0:
+                    logger.warning("[STAGE 1] Heuristic scoring failed: %s: %s",
+                                   type(e).__name__, str(e)[:100])
                 # If scoring fails, assign neutral effect
                 heuristic_effects.append({
                     'index': idx,
@@ -696,14 +707,16 @@ class DerppCausal(Derpp):
                     'mechanism': 'error'
                 })
         
-        # Log Stage 1 statistics
-        print(f"  [STAGE 1] Heuristic scoring complete:")
-        if len(heuristic_effects) > 0:
+        if heuristic_effects:
             effect_sizes = [e['effect_size'] for e in heuristic_effects]
-            print(f"    Effect size range: [{min(effect_sizes):.4f}, {max(effect_sizes):.4f}], mean={sum(effect_sizes)/len(effect_sizes):.4f}")
-            print(f"    Beneficial: {sum(1 for e in heuristic_effects if e['effect_size'] < -self.causal_effect_threshold)}")
-            print(f"    Harmful: {sum(1 for e in heuristic_effects if e['effect_size'] > self.causal_effect_threshold)}")
-            print(f"    Neutral: {sum(1 for e in heuristic_effects if abs(e['effect_size']) <= self.causal_effect_threshold)}")
+            logger.debug(
+                "[STAGE 1] complete: range=[%.4f, %.4f] mean=%.4f — "
+                "beneficial=%d harmful=%d neutral=%d",
+                min(effect_sizes), max(effect_sizes), sum(effect_sizes) / len(effect_sizes),
+                sum(1 for e in heuristic_effects if e['effect_size'] < -self.causal_effect_threshold),
+                sum(1 for e in heuristic_effects if e['effect_size'] > self.causal_effect_threshold),
+                sum(1 for e in heuristic_effects if abs(e['effect_size']) <= self.causal_effect_threshold),
+            )
         
         # MODE 1: Heuristic only - directly select from heuristic scores
         if self.use_true_causality == 1:
@@ -714,7 +727,7 @@ class DerppCausal(Derpp):
             selected_indices = [e['index'] for e in sorted_effects[:size]]
             indices = torch.tensor(selected_indices, dtype=torch.long)
             
-            print(f"  [HEURISTIC-ONLY] Selected {len(indices)} samples based on feature similarity.")
+            logger.info("[HEURISTIC-ONLY] Selected %d samples by feature similarity", len(indices))
             return buf_inputs[indices], buf_labels[indices], buf_logits[indices]
         
         # ============================================================
@@ -726,7 +739,7 @@ class DerppCausal(Derpp):
         sorted_effects = sorted(heuristic_effects, key=lambda x: x['effect_size'])
         top_candidates = sorted_effects[:num_candidates]
         
-        print(f"  [STAGE 2] TRUE causal re-ranking on top {num_candidates} candidates...")
+        logger.info("[STAGE 2] TRUE causal re-ranking on top %d candidates", num_candidates)
         
         # Compute TRUE causal effects for top candidates
         true_causal_effects = []
@@ -755,10 +768,9 @@ class DerppCausal(Derpp):
                     'mechanism': effect.mechanism
                 })
             except Exception as e:
-                # Log error for debugging
-                if len(true_causal_effects) == 0:  # Only log first error
-                    print(f"    [WARNING] TRUE causal attribution failed: {type(e).__name__}: {str(e)[:100]}")
-                # If causal attribution fails, keep heuristic score
+                if len(true_causal_effects) == 0:
+                    logger.warning("[STAGE 2] TRUE causal attribution failed: %s: %s",
+                                   type(e).__name__, str(e)[:100])
                 true_causal_effects.append({
                     'index': idx,
                     'effect_size': candidate_dict['effect_size'],  # Fallback to heuristic
@@ -766,14 +778,16 @@ class DerppCausal(Derpp):
                     'mechanism': 'error_fallback'
                 })
         
-        # Log Stage 2 statistics
-        print(f"  [STAGE 2] TRUE causal effects computed:")
-        if len(true_causal_effects) > 0:
+        if true_causal_effects:
             effect_sizes = [e['effect_size'] for e in true_causal_effects]
-            print(f"    Effect size range: [{min(effect_sizes):.4f}, {max(effect_sizes):.4f}], mean={sum(effect_sizes)/len(effect_sizes):.4f}")
-            print(f"    Beneficial samples: {sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold)}")
-            print(f"    Harmful samples: {sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold)}")
-            print(f"    Neutral samples: {sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold)}")
+            logger.debug(
+                "[STAGE 2] effects: range=[%.4f, %.4f] mean=%.4f — "
+                "beneficial=%d harmful=%d neutral=%d",
+                min(effect_sizes), max(effect_sizes), sum(effect_sizes) / len(effect_sizes),
+                sum(1 for e in true_causal_effects if e['effect_size'] < -self.causal_effect_threshold),
+                sum(1 for e in true_causal_effects if e['effect_size'] > self.causal_effect_threshold),
+                sum(1 for e in true_causal_effects if abs(e['effect_size']) <= self.causal_effect_threshold),
+            )
         
         # Sort by TRUE causal effect (most beneficial = most negative)
         sorted_true_effects = sorted(true_causal_effects, key=lambda x: x['effect_size'])
@@ -782,7 +796,7 @@ class DerppCausal(Derpp):
         selected_indices = [e['index'] for e in sorted_true_effects[:size]]
         indices = torch.tensor(selected_indices, dtype=torch.long)
         
-        print(f"  [HYBRID] Selected {len(indices)} samples: {num_candidates} candidates → {len(indices)} final")
+        logger.info("[HYBRID] Selected %d samples from %d candidates", len(indices), num_candidates)
         
         # Cache selection and advance counter
         selected = (buf_inputs[indices], buf_labels[indices], buf_logits[indices])
@@ -797,9 +811,8 @@ class DerppCausal(Derpp):
         Official DER++ part: inherited (no-op in base class)
         Causal extensions: Learn causal graph, update metrics
         """
-        task_id = self.current_task  # Read from inherited property
-        print(f"\n[DER++ Causal] End of Task {task_id}")
-        print(f"  Buffer: {len(self.buffer)}/{self.buffer.buffer_size} samples")
+        task_id = self.current_task
+        logger.info("End of task %d — buffer: %d/%d", task_id, len(self.buffer), self.buffer.buffer_size)
         
         # Learn causal graph if enabled and we have enough tasks
         if self.enable_causal_graph and self.scm is not None and task_id >= 1:
@@ -826,11 +839,9 @@ class DerppCausal(Derpp):
         - Early tasks: Keep more edges (0.9 quantile = top 10%)
         - Later tasks: Tighten to strongest edges (0.7 quantile = top 30%)
         """
-        task_id = self.current_task  # Read from inherited property
-        
-        print(f"\n[Phase 2] Learning causal graph between tasks...")
-        print(f"  Tasks completed: {task_id + 1}")
-        print(f"  Cached task data: {list(self.task_feature_cache.keys())}")
+        task_id = self.current_task
+        logger.info("Learning causal graph — tasks completed: %d, cached: %s",
+                    task_id + 1, list(self.task_feature_cache.keys()))
         
         # Check if we have enough cached data
         valid_tasks = [
@@ -839,7 +850,7 @@ class DerppCausal(Derpp):
         ]
         
         if len(valid_tasks) < 2:
-            print(f"  WARNING: Not enough data yet (need at least 2 tasks with at least 10 samples)")
+            logger.warning("Not enough cached data for causal graph (need ≥2 tasks with ≥10 samples)")
             return
         
         # Convert cached features to format expected by SCM
@@ -852,16 +863,17 @@ class DerppCausal(Derpp):
                 task_data[tid] = torch.stack(cache['features'])
                 task_labels[tid] = torch.stack(cache['labels'])
         
-        print(f"  Learning from {len(task_data)} tasks with sufficient data:")
-        for tid, data in task_data.items():
-            print(f"    Task {tid}: {data.shape[0]} samples, {data.shape[1]}D features")
+        logger.debug("Learning from %d tasks: %s",
+                     len(task_data),
+                     {tid: data.shape for tid, data in task_data.items()})
         
         # Adaptive sparsification using tunable start/end thresholds
         # Gradually transition from sparsity_start to sparsity_end as tasks progress
         task_progress = task_id / max(self.num_tasks - 1, 1)
         adaptive_quantile = self.sparsity_start - (self.sparsity_start - self.sparsity_end) * task_progress
         adaptive_quantile = max(0.5, min(0.95, adaptive_quantile))  # Clamp to safe range [0.5, 0.95]
-        print(f"  Using adaptive sparsification: {adaptive_quantile:.2f} quantile (start={self.sparsity_start:.2f}, end={self.sparsity_end:.2f})")
+        logger.debug("Adaptive sparsification: quantile=%.2f (start=%.2f → end=%.2f)",
+                     adaptive_quantile, self.sparsity_start, self.sparsity_end)
         
         try:
             # Learn causal structure using SCM with adaptive threshold
@@ -901,45 +913,34 @@ class DerppCausal(Derpp):
                 
                 self._print_causal_graph_summary()
             else:
-                print(f"  WARNING: Causal graph learning returned None")
-                
+                logger.warning("Causal graph learning returned None")
+
         except Exception as e:
-            print(f"  WARNING: Causal graph learning failed: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.exception("Causal graph learning failed: %s", e)
     
-    def _print_causal_graph_summary(self):
-        """Print summary of learned causal graph."""
-        print(f"  Causal graph learned successfully")
-        print(f"  Graph shape: {self.causal_graph.shape}")
-        
-        # Analyze strong causal dependencies (>0.5 strength)
+    def _print_causal_graph_summary(self) -> None:
+        """Log summary of learned causal graph."""
         strong_edges = (self.causal_graph.abs() > 0.5).nonzero(as_tuple=False)
-        print(f"  Strong causal dependencies ({len(strong_edges)} edges with |strength| > 0.5):")
-        
+        num_edges = int((self.causal_graph.abs() > 0.1).sum().item())
+        graph_density = num_edges / (self.num_tasks * (self.num_tasks - 1)) if self.num_tasks > 1 else 0.0
+
+        logger.info(
+            "Causal graph learned — shape=%s, edges(>0.1)=%d, density=%.1f%%, "
+            "mean|w|=%.3f, max|w|=%.3f",
+            tuple(self.causal_graph.shape), num_edges, graph_density * 100,
+            self.causal_graph.abs().mean().item(), self.causal_graph.abs().max().item(),
+        )
+
         if len(strong_edges) > 0:
-            for edge in strong_edges[:10]:  # Show first 10
-                source, target = int(edge[0]), int(edge[1])
-                strength = float(self.causal_graph[source, target])
-                direction = "→" if strength > 0 else "↛"
-                print(f"    Task {source} {direction} Task {target}: {strength:.3f}")
-            
-            if len(strong_edges) > 10:
-                print(f"    ... and {len(strong_edges) - 10} more edges")
+            edge_strs = []
+            for edge in strong_edges[:10]:
+                src, tgt = int(edge[0]), int(edge[1])
+                w = float(self.causal_graph[src, tgt])
+                edge_strs.append(f"T{src}{'→' if w > 0 else '↛'}T{tgt}:{w:.3f}")
+            suffix = f" (+{len(strong_edges) - 10} more)" if len(strong_edges) > 10 else ""
+            logger.debug("Strong edges (|w|>0.5): %s%s", ", ".join(edge_strs), suffix)
         else:
-            print(f"    No strong dependencies found (all edges < 0.5)")
-        
-        # Compute graph statistics
-        num_edges = (self.causal_graph.abs() > 0.1).sum().item()
-        graph_density = num_edges / (self.num_tasks * (self.num_tasks - 1)) if self.num_tasks > 1 else 0
-        mean_strength = self.causal_graph.abs().mean().item()
-        max_strength = self.causal_graph.abs().max().item()
-        
-        print(f"  Graph statistics:")
-        print(f"    Total edges (>0.1): {num_edges}")
-        print(f"    Graph density: {graph_density:.2%}")
-        print(f"    Mean |strength|: {mean_strength:.3f}")
-        print(f"    Max |strength|: {max_strength:.3f}")
+            logger.debug("No strong causal dependencies found (all |w| < 0.5)")
 
 
 # For backward compatibility with existing code

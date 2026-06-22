@@ -1,0 +1,10 @@
+# Ablation: causal_eval_interval — amortisation granularity
+defaults:
+  - ../causal_true
+
+ablate:
+  param: causal_eval_interval
+  values: [1, 5, 10, 50]
+
+n_epochs: 5
+seeds: [1, 2, 3]
