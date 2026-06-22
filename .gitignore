@@ -497,8 +497,6 @@ __pycache__/
 *_generated.py
 *_temp.py
 
-# Exclude mammoth framework (official code, not ours)
-mammoth/
 
 # ============================================================================
 # Completed Experiment Scripts (archived)

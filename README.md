@@ -83,17 +83,15 @@ it targets 3× overhead vs vanilla instead of 10×, while preserving the causal 
 
 ## Installation
 
+Mammoth is included as a git submodule — one clone gets everything:
+
 ```bash
-git clone https://github.com/ZulAmi/symbioAI.git
+git clone --recurse-submodules https://github.com/ZulAmi/symbioAI.git
 cd symbioAI
-
-# Install Mammoth (the CL framework this project extends)
-git clone https://github.com/aimagelab/mammoth.git
-export PYTHONPATH=$(pwd):$(pwd)/mammoth
-
-# Install this package
 pip install -e ".[tracking,viz]"
 ```
+
+That's it. `derpp-causal` is registered with Mammoth automatically on first run.
 
 **Extras**:
 - `pip install -e .` — core only (torch, numpy, scikit-learn, scipy, omegaconf)
@@ -101,23 +99,28 @@ pip install -e ".[tracking,viz]"
 - `pip install -e ".[viz]"` — adds matplotlib, seaborn
 - `pip install -e ".[dev]"` — adds pytest, mypy, ruff
 
+**If you already cloned without `--recurse-submodules`:**
+```bash
+git submodule update --init --recursive
+```
+
 ---
 
 ## Reproducing the Results
 
 ```bash
-# TRUE Causality — seed 1 (takes ~13 h on RTX 5090)
-python run_optimized_true_causality.py \
-  --use_causal_sampling 3 \
-  --seed 1
+# Smoke test first — vanilla, 1 epoch (~5 min)
+python run_optimized_true_causality.py --use_causal_sampling 0 --n_epochs 1 --seed 1
+
+# TRUE Causality — seed 1 (~3-5 h on RTX 5090, optimised from ~13 h)
+python run_optimized_true_causality.py --use_causal_sampling 3 --seed 1
 
 # Vanilla DER++ baseline — seed 1 (~43 min)
-python run_optimized_true_causality.py \
-  --use_causal_sampling 0 \
-  --seed 1
+python run_optimized_true_causality.py --use_causal_sampling 0 --seed 1
 
-# Run all 5 seeds with W&B logging
+# All 5 seeds with W&B logging
 for seed in 1 2 3 4 5; do
+  python run_optimized_true_causality.py --use_causal_sampling 0 --seed $seed --wandb
   python run_optimized_true_causality.py --use_causal_sampling 3 --seed $seed --wandb
 done
 ```
