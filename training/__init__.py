@@ -2,7 +2,7 @@
 Training package for advanced continual learning methods.
 
 Contains:
-- causal_der.py: TRUE Causal Dark Experience Replay with SCM
+- derpp_causal.py: TRUE Causal Dark Experience Replay with SCM
 - causal_inference.py: Pearl's causal inference framework
 - Other advanced CL methods
 """

@@ -290,6 +290,9 @@ symbioai_test_suite/data/ # Part of 188M test suite data
 # Training code is PUBLIC (demonstrates skills and reproducibility)
 # Only protect: optimized variants, tuned hyperparameters, and WIP experiments
 
+# Auto-generated shim (written by run_optimized_true_causality.py on each run)
+mammoth/models/derpp_causal.py
+
 # Optimized/tuned variants of algorithms (competitive advantage)
 training/*_optimized.py
 training/*_tuned.py

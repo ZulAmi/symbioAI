@@ -9,7 +9,7 @@ import torch.nn as nn
 class TinyMLP(nn.Module):
     """Minimal CPU backbone — stands in for ResNet-18 during testing."""
 
-    def __init__(self, in_dim: int = 32, out_dim: int = 10, feat_dim: int = 16) -> None:
+    def __init__(self, in_dim: int = 16, out_dim: int = 10, feat_dim: int = 16) -> None:
         super().__init__()
         self.feat_dim = feat_dim
         self.net = self  # some callers use model.net(x)

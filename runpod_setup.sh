@@ -1,100 +1,85 @@
 #!/bin/bash
 # ============================================================
-# RUNPOD COMPLETE SETUP SCRIPT
-# Run this on a fresh RunPod instance to set up everything
+# RUNPOD SETUP SCRIPT — SymbioAI Causal Continual Learning
+# Run once on a fresh RunPod instance to set up everything.
 # ============================================================
 
 set -e  # Exit on error
 
 echo "============================================================"
-echo "SYMBIO AI - RUNPOD SETUP"
+echo "SYMBIO AI — RUNPOD SETUP"
 echo "============================================================"
 echo ""
 
-# 1. Clone the official Mammoth framework
-echo "[1/6] Cloning Mammoth framework..."
+# 1. Clone SymbioAI (with Mammoth as submodule)
+echo "[1/4] Cloning SymbioAI with Mammoth submodule..."
 cd /workspace
-if [ ! -d "mammoth" ]; then
-    git clone https://github.com/aimagelab/mammoth.git
-    echo "✅ Mammoth cloned"
-else
-    echo "⚠️  Mammoth already exists, skipping"
-fi
-
-# 2. Clone YOUR repository
-echo ""
-echo "[2/6] Cloning SymbioAI repository..."
 if [ ! -d "symbioAI" ]; then
-    git clone https://github.com/ZulAmi/symbioAI.git
-    echo "✅ SymbioAI cloned"
+    git clone --recurse-submodules https://github.com/ZulAmi/symbioAI.git
+    echo "✅ SymbioAI cloned (includes mammoth/ submodule)"
 else
     cd symbioAI
     git pull origin main
+    git submodule update --init --recursive
     echo "✅ SymbioAI updated"
     cd ..
 fi
 
-# 3. Copy custom files INTO Mammoth
+# 2. Enter the package root
+cd /workspace/symbioAI/symbioAI
+
+# 3. Install dependencies
 echo ""
-echo "[3/6] Copying custom files to Mammoth..."
-# Copy model files
-cp /workspace/symbioAI/training/derpp_causal.py /workspace/mammoth/models/
-cp /workspace/symbioAI/training/causal_inference.py /workspace/mammoth/models/
-
-# Copy Python runner script
-cp /workspace/symbioAI/run_optimized_true_causality.py /workspace/mammoth/
-
-# Copy validation directory (for results)
-cp -r /workspace/symbioAI/validation /workspace/mammoth/
-
-echo "✅ Custom files copied"
-
-# 4. Install Mammoth dependencies
-echo ""
-echo "[4/6] Installing Mammoth dependencies..."
-cd /workspace/mammoth
-pip install -q -r requirements.txt
+echo "[2/4] Installing dependencies..."
+pip install -q -e ".[tracking,viz]"
 echo "✅ Dependencies installed"
 
-# 5. Verify setup
+# 4. Verify setup
 echo ""
-echo "[5/6] Verifying installation..."
-if [ -f "/workspace/mammoth/models/derpp_causal.py" ]; then
-    echo "✅ derpp_causal.py found"
-else
-    echo "❌ ERROR: derpp_causal.py not found!"
-    exit 1
-fi
+echo "[3/4] Verifying installation..."
+python - <<'EOF'
+import torch
+cuda = torch.cuda.is_available()
+device = torch.cuda.get_device_name(0) if cuda else "CPU"
+print(f"✅ PyTorch {torch.__version__} | CUDA: {cuda} | Device: {device}")
+from pathlib import Path
+mammoth_main = Path("mammoth/utils/main.py")
+if mammoth_main.exists():
+    print(f"✅ Mammoth submodule found at {mammoth_main}")
+else:
+    print("❌ ERROR: mammoth submodule not found — run: git submodule update --init --recursive")
+    exit(1)
+EOF
 
-if [ -f "/workspace/mammoth/models/causal_inference.py" ]; then
-    echo "✅ causal_inference.py found"
-else
-    echo "❌ ERROR: causal_inference.py not found!"
-    exit 1
-fi
-
-# 6. Ready to run
+# 5. Smoke test (1 epoch, vanilla mode — fast, no GPU needed to verify wiring)
 echo ""
-echo "[6/6] Setup complete!"
+echo "[4/4] Running 1-epoch smoke test (vanilla DER++)..."
+python run_optimized_true_causality.py --use_causal_sampling 0 --n_epochs 1 --seed 1
+echo "✅ Smoke test passed"
+
 echo ""
 echo "============================================================"
 echo "READY TO RUN EXPERIMENTS"
 echo "============================================================"
 echo ""
-echo "Quick Start - Run optimized TRUE causality (3x faster):"
+echo "All commands should be run from:  /workspace/symbioAI/symbioAI/"
 echo ""
-echo "  cd /workspace/mammoth"
-echo "  python3 run_optimized_true_causality.py"
+echo "Quick reference:"
 echo ""
-echo "This will run 5-epoch optimized TRUE causality (~15 min vs 43 min baseline)"
+echo "  # Vanilla DER++ baseline (~43 min / seed)"
+echo "  python run_optimized_true_causality.py --use_causal_sampling 0 --seed 1"
 echo ""
-echo "Options:"
-echo "  # 1-epoch quick test"
-echo "  python3 run_optimized_true_causality.py --n_epochs 1"
+echo "  # TRUE interventional causality (~3-5 h / seed)"
+echo "  python run_optimized_true_causality.py --use_causal_sampling 3 --seed 1"
 echo ""
-echo "  # Different seed"
-echo "  python3 run_optimized_true_causality.py --seed 42"
+echo "  # All 5 seeds (vanilla + TRUE) — for paper results"
+echo "  for seed in 1 2 3 4 5; do"
+echo "    python run_optimized_true_causality.py --use_causal_sampling 0 --seed \$seed"
+echo "    python run_optimized_true_causality.py --use_causal_sampling 3 --seed \$seed"
+echo "  done"
 echo ""
-echo "  # See all options"
-echo "  python3 run_optimized_true_causality.py --help"
+echo "  # W&B logging"
+echo "  WANDB_API_KEY=<your_key> python run_optimized_true_causality.py --use_causal_sampling 3 --seed 1 --wandb"
+echo ""
+echo "Modes: 0=vanilla  1=heuristic  2=hybrid  3=TRUE-causality  4=influence-fn"
 echo ""
