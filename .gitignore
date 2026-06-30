@@ -1,0 +1,511 @@
+# Symbio AI - Git Ignore Configuration
+# Comprehensive ignore patterns for Python AI/ML projects
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+!validation/results/**/*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv-3.11/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ============================================================================
+# AI/ML Specific
+# ============================================================================
+# Model files
+*.pth
+*.pt
+*.h5
+*.pkl
+*.pickle
+*.joblib
+*.onnx
+*.pb
+*.ckpt
+*.safetensors
+*.bin
+*.model
+*.weights
+
+# Model checkpoints
+checkpoints/
+models/checkpoints/
+saved_models/
+model_cache/
+weights/
+pretrained_models/
+
+# Training artifacts - EXCLUDE ALL LOGS AND RUNS
+runs/
+logs/
+tensorboard/
+wandb/
+mlruns/
+.mlflow/
+
+# Data files - EXCLUDE ENTIRE DATA FOLDER
+data/
+symbioai_test_suite/data/
+*.csv
+*.tsv
+*.json
+*.jsonl
+*.parquet
+*.feather
+*.hdf5
+*.h5
+*.npy
+*.npz
+*.mat
+*.tar.gz
+*.tar
+*.zip
+*.7z
+*.rar
+
+# Dataset caches
+.cache/
+*.cache
+cache/
+__pycache__/
+data/cache/
+
+# Hugging Face cache
+.huggingface/
+transformers_cache/
+hub/
+
+# PyTorch cache
+.torch/
+torch_cache/
+
+# NVIDIA cache
+.nv/
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# Operating System
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ============================================================================
+# Project Specific - LARGE FOLDERS TO EXCLUDE
+# ============================================================================
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.temporary/
+
+# Large project folders that should not be in git
+data/                     # 486M - Dataset files
+experiments/              # 3.3M - Experiment outputs  
+logs/                     # 648K - Log files
+symbioai_test_suite/data/ # Part of 188M test suite data
+
+# ============================================================================
+# STRATEGIC IP PROTECTION - Balance transparency with competitive advantage
+# ============================================================================
+# Training code is PUBLIC (demonstrates skills and reproducibility)
+# Only protect: optimized variants, tuned hyperparameters, and WIP experiments
+
+# Optimized/tuned variants of algorithms (competitive advantage)
+training/*_optimized.py
+training/*_tuned.py
+training/*_secret.py
+training/*_private.py
+
+# Specific hyperparameter configurations that work exceptionally well
+config/*_optimized.yaml
+config/*_tuned.yaml
+config/production.yaml
+config/best_*.yaml
+
+# Advanced validation with proprietary datasets or methods
+validation/tier1_continual_learning/*_optimized.py
+validation/proprietary_datasets/
+
+# Experimental model architectures still under development
+mammoth/models/*_experimental.py
+mammoth/models/*_wip.py
+
+# Internal documentation and work-in-progress notes (private)
+PersonalDocuments/
+notes/
+experiments_log/
+*.md
+!README.md
+!LICENSE.md
+!CONTRIBUTING.md
+
+# Training scripts with best-performing hyperparameters
+run_*_optimized.sh
+run_*_tuned.sh
+run_*_best.sh
+test_*_optimized.sh
+test_*_final.sh
+*_secret.sh
+
+# Training logs and experiment outputs
+*.log
+logs/
+runs/
+wandb/
+
+# Checkpoints and trained models (too large, share separately if needed)
+checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.bin
+*.weights
+
+# Generated files
+requirements-mac.txt
+requirements-filtered.txt
+
+# Test artifacts and reports - EXCLUDE ALL TEST DATA
+symbioai_test_suite/reports/
+symbioai_test_suite/data/
+test_results/
+*.test.log
+coverage_reports/
+
+# Secrets and credentials
+.secrets/
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+.env.local
+.env.production
+.env.*.local
+credentials.json
+service-account.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# Redis
+redis_data/
+dump.rdb
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Kubernetes
+*.secret.yaml
+*-secret.yaml
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+test-results/
+
+# Build artifacts
+build/
+dist/
+*.whl
+
+# Experiments - EXCLUDE ALL EXPERIMENT DATA
+experiments/
+benchmark_results/
+*.benchmark
+*.bench
+results/
+outputs/
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.mp3
+*.wav
+*.flac
+*.ogg
+
+# Large images (keep smaller examples)
+*.tiff
+*.tif
+*_large.png
+*_large.jpg
+*_large.jpeg
+*_huge.*
+
+# Monitoring dashboards
+monitoring/dashboards/*.generated.json
+
+# API keys and tokens
+.api_keys
+*.token
+
+# Local configuration overrides
+config/local.yaml
+config/*.local.yaml
+config/production.yaml
+config/staging.yaml
+
+# SSH keys and certificates
+*.pub
+privatekey.pub
+id_rsa*
+id_ed25519*
+*.ssh
+
+# GPU/CUDA specific
+*.ptx
+*.cubin
+
+# ============================================================================
+# Keep Important Files
+# ============================================================================
+# Documentation and configs you want to keep
+!README.md
+!QUICKSTART.md
+!READY.md
+!requirements.txt
+!config/default.yaml
+!.gitignore
+!pytest.ini
+
+# Keep example notebooks for demos (but not output)
+!examples/*.ipynb
+examples/*_output.*
+examples/*_results.*
+
+# Keep important documentation
+!docs/**/*.md
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.svg
+
+# Keep ONLY small sample files if needed (but exclude large data by default)
+# !data/samples/small_*.txt
+# !data/test/tiny_*.json
+# Uncomment above lines if you need to keep tiny sample files
+
+# Keep configuration templates
+!config/*.template.yaml
+!config/*.example.yaml
+
+# Keep important project files
+!*.py
+!*.md
+!*.yml
+!*.yaml
+!*.toml
+!*.cfg
+!*.ini
+!*.txt
+!*.sh
+!*.json
+
+# But exclude generated/temporary Python files
+__pycache__/
+*.pyc
+*_generated.py
+*_temp.py
+
+
+# ============================================================================
+# Completed Experiment Scripts (archived)
+# ============================================================================
+validation/scripts/completed_experiments/
+
+# Experiment results — commit validated seed logs so results are reproducible/verifiable
+validation/results/*/
+!validation/results/.gitkeep
+!validation/results/5Seed/*.log
+!validation/results/new5ep/*.log
+useless/

@@ -1,0 +1,59 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it using these metadata."
+title: "TRUE Interventional Causality for Continual Learning"
+version: "0.1.0"
+date-released: "2025-11-01"
+abstract: >
+  First application of Pearl's Level 2 do-calculus to replay buffer selection
+  in continual learning. Implements checkpoint/restore counterfactual
+  interventions to measure the TRUE causal effect of each buffer sample on
+  cross-task forgetting, achieving +1.19% absolute Class-IL improvement over
+  vanilla DER++ on CIFAR-100 (5-seed validation).
+authors:
+  - family-names: "Rahmat"
+    given-names: "Muhammad Zulhilmi"
+    email: "zulhilmirahmat@gmail.com"
+    orcid: ""
+license: MIT
+repository-code: "https://github.com/ZulAmi/symbioAI"
+keywords:
+  - continual learning
+  - catastrophic forgetting
+  - causal inference
+  - replay buffer
+  - do-calculus
+  - Pearl causality
+  - class-incremental learning
+references:
+  - type: article
+    authors:
+      - family-names: "Buzzega"
+        given-names: "Pietro"
+      - family-names: "Boschini"
+        given-names: "Matteo"
+      - family-names: "Porrello"
+        given-names: "Angelo"
+      - family-names: "Calderara"
+        given-names: "Simone"
+    title: "Dark Experience for General Continual Learning: a Strong, Simple Baseline"
+    year: 2020
+    conference:
+      name: "NeurIPS"
+  - type: book
+    authors:
+      - family-names: "Pearl"
+        given-names: "Judea"
+    title: "Causality: Models, Reasoning, and Inference"
+    year: 2009
+    publisher:
+      name: "Cambridge University Press"
+  - type: article
+    authors:
+      - family-names: "Koh"
+        given-names: "Pang Wei"
+      - family-names: "Liang"
+        given-names: "Percy"
+    title: "Understanding Black-box Predictions via Influence Functions"
+    year: 2017
+    conference:
+      name: "ICML"

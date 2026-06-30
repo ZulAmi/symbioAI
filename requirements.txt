@@ -1,0 +1,26 @@
+# Causal Continual Learning — Research Dependencies
+# Install: pip install -e ".[dev]"  (see pyproject.toml for extras)
+
+# Core deep learning
+torch>=2.1.0
+torchvision>=0.16.0
+numpy>=1.26.0
+
+# Causal inference utilities
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# Experiment configuration
+PyYAML>=6.0
+omegaconf>=2.3.0
+
+# Experiment tracking
+wandb>=0.16.0
+
+# Visualization
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Training utilities
+tqdm>=4.66.0
+rich>=13.7.0

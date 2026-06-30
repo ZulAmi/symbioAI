@@ -1,0 +1,16 @@
+# Mode 3: TRUE interventional causality (primary validated method)
+# Validated result: +1.19% Class-IL over vanilla DER++ (5 seeds, CIFAR-100, 5 epochs)
+defaults:
+  - base
+
+model: derpp-causal
+use_causal_sampling: 3        # TRUE-only mode (no heuristic pre-filter)
+causal_hybrid_candidates: 100 # Candidate pool size per step
+true_micro_steps: 1           # Gradient steps per intervention (optimised: 1 vs 2)
+causal_eval_interval: 50      # Reuse selection every N steps (amortisation)
+true_temp_lr: 0.05
+causal_effect_threshold: 0.05
+
+# Note: 5-epoch validated results used:
+#   n_epochs: 5, lr_milestones: [3, 4]
+# Switch to standard 50-epoch regime for literature comparison.

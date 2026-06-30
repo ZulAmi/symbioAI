@@ -1,0 +1,10 @@
+# Mode 2: Hybrid — heuristic pre-filter + TRUE re-ranking
+defaults:
+  - base
+
+model: derpp-causal
+use_causal_sampling: 2
+causal_hybrid_candidates: 100
+true_micro_steps: 1
+causal_eval_interval: 50
+true_temp_lr: 0.05
